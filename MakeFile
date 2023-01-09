@@ -1,0 +1,10 @@
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir := $(dir $(mkfile_path))
+
+all:
+
+frontend-dev:
+	cd $(mkfile_dir)/frontend; npm run dev;
+
+backend-dev:
+	cd $(mkfile_dir)/backend; uvicorn main:app --reload;
