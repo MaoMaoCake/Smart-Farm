@@ -19,7 +19,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def verify_password(plain_password, hashed_password) -> str:
+def verify_password(plain_password: str, hashed_password: str) -> str:
     """
     Takes in the plain password and verifies that its is the same as the password stored in the system
     :param plain_password:
@@ -29,7 +29,7 @@ def verify_password(plain_password, hashed_password) -> str:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password) -> str:
+def get_password_hash(password: str) -> str:
     """
     Get the hash of the password
     :param password:
@@ -68,7 +68,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 
-def get_user(username) -> User | None:
+def get_user(username: str) -> User | None:
     """
     Gets username and returns the User Class
     :param username:
