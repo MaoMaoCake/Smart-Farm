@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-load_dotenv('backend/backend.env')
+load_dotenv('backend.env')
 
 from fastapi import FastAPI
 from auth.route import authRouter
