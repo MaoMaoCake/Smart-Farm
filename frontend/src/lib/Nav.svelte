@@ -10,7 +10,7 @@
     })
 </script>
 <div class="bg-primary w-screen h-18 grid grid-cols-5 lg:grid-cols-12">
-    <div class="col-start-1 col-span-2 flex items-center justify-center">
+    <div class="col-start-1 col-span-2 flex">
         <a class="m-5 font-bold white" href="/">AUTO FARM</a>
     </div>
     <div class="col-start-4 flex items-center justify-center lg:col-start-11" >
