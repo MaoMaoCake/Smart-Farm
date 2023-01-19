@@ -2,6 +2,13 @@
   let username = "";
   let password = "";
 
+  function login() {
+    if (username == "" || password == ""){
+      alert("Username or password cannot be empty");
+    } else {
+      alert(`username: ${username} password: ${password}`);
+    }
+  }
 </script>
 <div class="flex align-center justify-center">
   <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
@@ -22,7 +29,7 @@
           </label>
         </div>
         <div class="form-control mt-6">
-          <button class="btn btn-primary">Login</button>
+          <button class="btn btn-primary" on:click={login}>Login</button>
         </div>
       </div>
 </div>
