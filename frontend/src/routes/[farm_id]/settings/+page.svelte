@@ -4,6 +4,7 @@
   import Icon from "@iconify/svelte";
   import {beforeUpdate} from "svelte";
   import { invalidate, invalidateAll } from "$app/navigation"
+  import TimeSetting from "$lib/TimeSetting.svelte";
 
   export let data: PageData;
   let light_switch, ac_switch, humidifier_switch;
@@ -12,7 +13,7 @@
   $: humidifier_switch = data.farm_data.humidifier
   beforeUpdate(() => {
     // This makes the load function run again, this will update the state on our page
-    invalidateAll()
+    // invalidateAll()
   })
   function toggle_switch(type: string, farm_id: string, state: boolean){
       // integration to the api to turn on and off the lights goes here
@@ -28,14 +29,14 @@
   }
 </script>
 
-<div class="flex w-screen justify-center items-center flex-col md:flex-row">
+<div class="flex w-full justify-center items-center flex-col md:flex-row">
     <div>
         <StatPreview farm_name="{data.farm_data.name}" temp="{data.farm_data.temp}" humidity={data.farm_data.humidity}
                      light={data.farm_data.light} ac="{data.farm_data.ac}" humidifier={data.farm_data.humidifier}
                      co2={data.farm_data.co2} co2_val={data.farm_data.co2_val}>
         </StatPreview>
     </div>
-    <div class="flex justify-evenly w-screen">
+    <div class="flex justify-evenly w-full">
         <div class="flex justify-center grow items-center">
             {#if light_switch}
                 <Icon icon="iconoir:light-bulb-on" class="h-9 w-9 bg-amber-500 p-2 mr-1 rounded-lg"/>
@@ -60,5 +61,8 @@
             {/if}
             <input type="checkbox" class="toggle toggle-success" bind:checked={humidifier_switch} on:click={() => {toggle_switch("humidifier", data.farm_id, humidifier_switch)}}/>
         </div>
+    </div>
+    <div class="flex">
+        <TimeSetting farm_id={data.farm_id}/>
     </div>
 </div>
