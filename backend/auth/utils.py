@@ -15,11 +15,13 @@ from fastapi import Depends, HTTPException, status
 # import env variable tools
 import os
 
+from ..database.connector import get_user_from_db
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def verify_password(plain_password: str, hashed_password: str) -> str:
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Takes in the plain password and verifies that its is the same as the password stored in the system
     :param plain_password:
@@ -45,8 +47,10 @@ def authenticate_user(username: str, password: str) -> User | None:
     :param password:
     :return:
     """
-    if password == 'password' and username == 'admin':
-        return User(user_id=1, username='admin', role='Admin')
+    db_username, db_password, db_role = get_user_from_db(username)
+
+    if verify_password(password, db_password):
+        return User(username=db_username, role=db_role)
     else:
         return None
 
@@ -74,8 +78,9 @@ def get_user(username: str) -> User | None:
     :param username:
     :return: User class
     """
-    if username == 'admin':
-        return User(user_id=1, username='admin', role="Admin")
+    db_username, _db_password, db_role = get_user_from_db(username)
+
+    return User(username=db_username, role=db_role)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
