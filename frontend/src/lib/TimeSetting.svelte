@@ -9,12 +9,10 @@
         alert(type)
     }
     function addTime(){
-        timeset = [...timeset, {time_start: "00:00", time_end: "00:00", preset: null}]
+        timeset = [...timeset, {time_start: "00:00", time_end: "00:00", preset: "null"}]
     }
     function rmTime(index: number){
-        // timeset timeset.findIndex(i => i.time_id === id)
         timeset.splice(index, 1)
-        // console.log(timeset.findIndex(i => i.time_id === time_id))
         timeset = timeset
     }
 </script>
