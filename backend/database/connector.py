@@ -2,7 +2,6 @@ import os
 
 import mysql.connector
 from mysql.connector import Error, MySQLConnection
-from mysql.connector.pooling import PooledMySQLConnection
 
 
 def connect_to_database():

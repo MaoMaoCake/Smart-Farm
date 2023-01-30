@@ -15,7 +15,7 @@ from fastapi import Depends, HTTPException, status
 # import env variable tools
 import os
 
-from ..database.connector import get_user_from_db
+from database.connector import get_user_from_db
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
