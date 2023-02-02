@@ -1,7 +1,6 @@
 <script lang="ts">
     import StatPreview from "$lib/StatPreview.svelte";
     import AddFarm from "$lib/AddFarm.svelte";
-    //import { FarmData } from "$lib/SF_types.d.ts"
 
     interface FarmData {
         name: string,
