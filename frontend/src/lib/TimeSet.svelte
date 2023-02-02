@@ -13,6 +13,11 @@
     let s_open = false;
     let e_open = false;
 
+    let options = {
+        /* Minutes increment */
+        minutesIncrement: 5,
+    }
+
     function formatTime(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
@@ -48,7 +53,7 @@
                 {#if s_open}
                     <div class="flex justify-center items-center absolute top-1/2 bottom-1/2 left-1/2 right-1/2">
                         <div class="flex flex-col justify-center">
-                            <TimePicker on:change={startCallback} />
+                            <TimePicker {options} on:change={startCallback} />
                             <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
                         </div>
                     </div>
@@ -60,7 +65,7 @@
                 {#if e_open}
                     <div class="flex justify-center items-center absolute top-1/2 bottom-1/2 left-1/2 right-1/2">
                         <div class="flex flex-col justify-center">
-                            <TimePicker on:change={endCallback} />
+                            <TimePicker {options} on:change={endCallback} />
                             <button class="btn btn-primary" on:click={() => {save("off")}}>Save</button>
                         </div>
                     </div>
