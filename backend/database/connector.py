@@ -1,40 +1,30 @@
 import os
 
-import mysql.connector
-from mysql.connector import Error, MySQLConnection
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from auth.models import User
+from .schemas import UserDb
+
+engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+                       f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+def create_user(username: str, password_hashed: str, email: str, role: str) -> None:
+    new_user = UserDb(username=username,
+                    password=password_hashed,
+                    email=email,
+                    role=role,
+                    createBy=username,
+                    updateBy=username
+                    )
+    session.add(new_user)
+    session.commit()
 
 
-def connect_to_database():
-    try:
-        return mysql.connector.connect(host=os.getenv('DB_HOST'),
-                                       database=os.getenv('DB_DATABASE'),
-                                       user=os.getenv('DB_USER'),
-                                       password=os.getenv('DB_PASSWORD'),
-                                       port=os.getenv('DB_PORT'))
+def get_user_from_db(username: str) -> User | None:
+    user = session.query(UserDb.username, UserDb.role, UserDb.password).filter(UserDb.username==username).first()
 
-    except Error as e:
-        print("Error while connecting to MySQL:", e)
-
-
-def create_user(username, password_hashed, email) -> None:
-    conn = connect_to_database()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO user (username, password, email, createBy, updateBy)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (username, password_hashed, email, username, username))
-    conn.commit()
-    conn.close()
-
-
-def get_user_from_db(username: str) -> tuple:
-    conn = connect_to_database()
-    cursor = conn.cursor()
-    cursor.execute("""
-       SELECT username, password, role FROM user
-       WHERE username = %s
-   """, (username,))
-
-    row = cursor.fetchone()
-    conn.close()
-    return row if row else None
+    return User(username=user.username, password=user.password, role=str(user.role.value)) if user else None
