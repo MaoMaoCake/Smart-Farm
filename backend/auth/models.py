@@ -11,6 +11,7 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
+    id: Optional[int]
     username: str
     password: Optional[str]
     role: str  # Admin User Guest
