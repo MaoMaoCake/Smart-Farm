@@ -1,7 +1,7 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
     import LightSet from "$lib/LightSet.svelte";
-    import {FarmSettings} from "$lib/SettingStores";
+    import {FarmSettings} from "$lib/SettingStores.js";
     export let farm_id;
 
     $FarmSettings.light_schedule = [{time_start: "08:50", time_end: "12:00", preset: "preset1"},
