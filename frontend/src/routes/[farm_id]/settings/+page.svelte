@@ -6,8 +6,9 @@
   import { invalidate, invalidateAll } from "$app/navigation"
   import LightSetting from "$lib/LightSetting.svelte";
   import ACSetting from "$lib/ACSetting.svelte";
-  import CO2 from "$lib/CO2.svelte";
+  import CO2Setting from "$lib/CO2Setting.svelte";
   import {onMount} from "svelte";
+  import HumiditySetting from "$lib/HumiditySetting.svelte";
 
   // The following fetches the data for the farm denoted by the farm id in the path
   // parameter.
@@ -88,7 +89,10 @@
         <ACSetting farm_id=A{data.farm_id}/>
     </div>
     <div class="flex">
-        <CO2/>
+        <CO2Setting farm_id=A{data.farm_id}/>
+    </div>
+    <div class="flex">
+        <HumiditySetting farm_id=A{data.farm_id}/>
     </div>
     <div class="flex">
         <button class="btn btn-primary" on:click={save_settings}>Save</button>
