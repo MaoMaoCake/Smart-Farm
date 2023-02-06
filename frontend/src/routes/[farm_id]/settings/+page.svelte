@@ -9,6 +9,7 @@
   import CO2Setting from "$lib/CO2Setting.svelte";
   import {onMount} from "svelte";
   import HumiditySetting from "$lib/HumiditySetting.svelte";
+  import WateringSetting from "$lib/WateringSetting.svelte";
 
   // The following fetches the data for the farm denoted by the farm id in the path
   // parameter.
@@ -86,13 +87,16 @@
         <LightSetting farm_id={data.farm_id}/>
     </div>
     <div class="flex">
-        <ACSetting farm_id=A{data.farm_id}/>
+        <ACSetting farm_id={data.farm_id}/>
     </div>
     <div class="flex">
-        <CO2Setting farm_id=A{data.farm_id}/>
+        <CO2Setting farm_id={data.farm_id}/>
     </div>
     <div class="flex">
-        <HumiditySetting farm_id=A{data.farm_id}/>
+        <HumiditySetting farm_id={data.farm_id}/>
+    </div>
+    <div class="flex">
+        <WateringSetting farm_id={data.farm_id}/>
     </div>
     <div class="flex">
         <button class="btn btn-primary" on:click={save_settings}>Save</button>
