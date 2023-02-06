@@ -31,6 +31,7 @@ class FarmDb(BaseModel):
     maxHumidity = Column(Integer, nullable=False)
     minCO2 = Column(String, nullable=False)
     lightStatus = Column(Boolean, nullable=False)
+    farmKey = Column(String, nullable=False, unique=True)
 
     temperatureSensors = relationship("TemperatureSensorDB")
     ACs = relationship("ACDB")
