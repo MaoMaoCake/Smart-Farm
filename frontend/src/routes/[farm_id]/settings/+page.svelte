@@ -5,6 +5,7 @@
   import {beforeUpdate} from "svelte";
   import { invalidate, invalidateAll } from "$app/navigation"
   import TimeSetting from "$lib/TimeSetting.svelte";
+  import ACSetting from "$lib/ACSetting.svelte";
 
   export let data: PageData;
   let light_switch, ac_switch, humidifier_switch;
@@ -64,5 +65,8 @@
     </div>
     <div class="flex">
         <TimeSetting farm_id={data.farm_id}/>
+    </div>
+    <div class="flex">
+        <ACSetting></ACSetting>
     </div>
 </div>

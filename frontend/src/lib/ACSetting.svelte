@@ -21,7 +21,7 @@
         <div on:click={() => {info("light")}}>
             <Icon icon="mdi:information" class="h-5 w-5 ml-5" />
         </div>
-        <p class="bg-amber-500 rounded min-w-fit ml-5 pl-5 pr-5 white">Light Setting</p>
+        <p class="bg-blue-900 rounded min-w-fit ml-5 pl-5 pr-5 white">AC Setting</p>
         <div>
             <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
         </div>
@@ -30,10 +30,10 @@
     <div class="flex flex-col pl-5">
         {#each timeset as time, i}
             <TimeSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i + 1}/>
-            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}> remove</button>
+            <button class="btn btn-danger" on:click={() => {rmTime(i)}}> remove</button>
         {/each}
     </div>
-    <button class="btn btn-secondary ml-10 mr-10" on:click={addTime}>Add Time</button>
+    <button class="btn btn-secondary ml-10 mr-10 white" on:click={addTime}>Add Time</button>
 </div>
 
 <style>
