@@ -6,10 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 # OAuth Libraries
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
-from .utils import create_access_token, get_current_active_user
+from .utils import create_access_token, get_current_active_user, create_new_user
 
 from .models import Token, User
-from .utils import authenticate_user
+from .utils import authenticate_user, create_new_user
+
+from database.enum_list import Role
 
 authRouter = APIRouter()
 
@@ -43,3 +45,13 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
     :return:
     """
     return current_user
+
+@authRouter.post("/users/create", response_model=User)
+async def create_user(
+        username: str,
+        password: str,
+        email: str,
+        role: Role,
+        current_user: User = Depends(get_current_active_user)):
+
+    return create_new_user(username, password, email, role, current_user.username)
