@@ -4,13 +4,13 @@
     import {FarmSettings} from "$lib/SettingStores.js";
     export let farm_id;
 
-    $FarmSettings.watering_schedule = [{time_start: "09:50", time_end: "12:00", temp: 25},
-        {time_start: "12:00", time_end: "14:00", temp: 26}]
+    $FarmSettings.watering_schedule = [{time_start: "09:50"},
+        {time_start: "12:00"}]
     function info(type: string){
         alert(type)
     }
     function addTime(){
-        $FarmSettings.watering_schedule = [...$FarmSettings.watering_schedule, {time_start: "00:00", time_end: "00:00", temp: 0}]
+        $FarmSettings.watering_schedule = [...$FarmSettings.watering_schedule, {time_start: "00:00"}]
     }
     function rmTime(index: number){
         $FarmSettings.watering_schedule.splice(index, 1)
