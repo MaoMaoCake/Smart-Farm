@@ -1,6 +1,6 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
-    import ACSet from "$lib/ACSet.svelte";
+    import ACSet from "./ACSet.svelte";
     import {FarmSettings} from "$lib/SettingStores.js";
     export let farm_id;
 

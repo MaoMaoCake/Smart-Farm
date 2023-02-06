@@ -2,14 +2,13 @@
   import type { PageData } from './$types';
   import StatPreview from "$lib/StatPreview.svelte";
   import Icon from "@iconify/svelte";
-  import {beforeUpdate} from "svelte";
-  import { invalidate, invalidateAll } from "$app/navigation"
-  import LightSetting from "$lib/LightSetting.svelte";
-  import ACSetting from "$lib/ACSetting.svelte";
-  import CO2Setting from "$lib/CO2Setting.svelte";
-  import {onMount} from "svelte";
-  import HumiditySetting from "$lib/HumiditySetting.svelte";
-  import WateringSetting from "$lib/WateringSetting.svelte";
+  import {beforeUpdate, onMount} from "svelte";
+  import { invalidateAll } from "$app/navigation"
+  import LightSetting from "./LightSetting.svelte";
+  import ACSetting from "./ACSetting.svelte";
+  import CO2Setting from "./CO2Setting.svelte";
+  import HumiditySetting from "./HumiditySetting.svelte";
+  import WateringSetting from "./WateringSetting.svelte";
 
   // The following fetches the data for the farm denoted by the farm id in the path
   // parameter.
