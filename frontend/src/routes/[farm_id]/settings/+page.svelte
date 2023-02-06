@@ -4,17 +4,28 @@
   import Icon from "@iconify/svelte";
   import {beforeUpdate} from "svelte";
   import { invalidate, invalidateAll } from "$app/navigation"
-  import TimeSetting from "$lib/TimeSetting.svelte";
+  import LightSetting from "$lib/LightSetting.svelte";
   import ACSetting from "$lib/ACSetting.svelte";
+  import {onMount} from "svelte";
 
+  // The following fetches the data for the farm denoted by the farm id in the path
+  // parameter.
   export let data: PageData;
   let light_switch, ac_switch, humidifier_switch;
   $: light_switch = data.farm_data.light
   $: ac_switch = data.farm_data.ac
   $: humidifier_switch = data.farm_data.humidifier
+  let settings
+  // This makes our app respond to changes
+  onMount(() => {
+      // get the farm's current settings:
+      // let settings;
+      // await fetch (something)
+      // set settings = the thing we fetched
+  })
   beforeUpdate(() => {
     // This makes the load function run again, this will update the state on our page
-    // invalidateAll()
+    invalidateAll();
   })
   function toggle_switch(type: string, farm_id: string, state: boolean){
       // integration to the api to turn on and off the lights goes here
@@ -27,6 +38,12 @@
     else if ( type == "humidifier"){
         data.farm_data.humidifier = !state
     }
+  }
+
+  function save_settings(){
+      // check if data in settings var == FarmSettings Store
+      // if equal do nothing
+      // else write changes to DB
   }
 </script>
 
@@ -64,9 +81,12 @@
         </div>
     </div>
     <div class="flex">
-        <TimeSetting farm_id={data.farm_id}/>
+        <LightSetting farm_id={data.farm_id}/>
     </div>
     <div class="flex">
-        <ACSetting></ACSetting>
+        <ACSetting farm_id=A{data.farm_id}/>
+    </div>
+    <div class="flex">
+        <button class="btn btn-primary" on:click={save_settings}>Save</button>
     </div>
 </div>

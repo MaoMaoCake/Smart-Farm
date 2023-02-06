@@ -1,19 +1,20 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
-    import TimeSet from "$lib/TimeSet.svelte";
+    import LightSet from "$lib/LightSet.svelte";
+    import {FarmSettings} from "$lib/SettingStores";
     export let farm_id;
 
-    let timeset = [{time_start: "08:50", time_end: "12:00", preset: "preset1"},
+    $FarmSettings.light_schedule = [{time_start: "08:50", time_end: "12:00", preset: "preset1"},
                     {time_start: "12:00", time_end: "14:00", preset: "preset2"}]
     function info(type: string){
         alert(type)
     }
     function addTime(){
-        timeset = [...timeset, {time_start: "00:00", time_end: "00:00", preset: "null"}]
+        $FarmSettings.light_schedule = [...$FarmSettings.light_schedule, {time_start: "00:00", time_end: "00:00", preset: "null"}]
     }
     function rmTime(index: number){
-        timeset.splice(index, 1)
-        timeset = timeset
+        $FarmSettings.light_schedule.splice(index, 1)
+        $FarmSettings.light_schedule = $FarmSettings.light_schedule
     }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
@@ -28,8 +29,8 @@
         <div class="divider w-full ml-2"></div>
     </div>
     <div class="flex flex-col pl-5">
-        {#each timeset as time, i}
-            <TimeSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i + 1}/>
+        {#each $FarmSettings.light_schedule as time, i}
+            <LightSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i + 1}/>
             <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}> remove</button>
         {/each}
     </div>
