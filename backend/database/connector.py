@@ -5,8 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner
-from .schemas import UserDb, FarmOwnerDB, FarmDb
+from farm.models import FarmOwner, FarmStats
+from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
                        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
@@ -52,3 +52,25 @@ def check_farm_owning(user_id: int, farm_id: int) -> int | None:
                                                 and FarmOwnerDB.userId == user_id ).first()
 
     return farm_owning.id if farm_owning else None
+
+def list_farms_from_user_id(user_id: int) -> [FarmStats]:
+    farm_owning = session.query(FarmOwnerDB.farmId).filter(FarmOwnerDB.userId == user_id).all()
+    farm_ids = [farm[0] for farm in farm_owning]
+
+    farms = session.query(FarmDb.name,
+                          TemperatureSensorDB.temperature,
+                          ACDB.status,
+                          HumiditySensorDB.humidity,
+                          DehumidifierDB.status,
+                          FarmDb.lightStatus,
+                          CO2SensorDB.CO2,
+                          CO2ControllerDB.status,
+                    ).join(TemperatureSensorDB, FarmDb.id == TemperatureSensorDB.farmId
+                    ).join(ACDB, FarmDb.id == ACDB.farmId
+                    ).join(HumiditySensorDB, FarmDb.id == HumiditySensorDB.farmId
+                    ).join(DehumidifierDB, FarmDb.id == DehumidifierDB.farmId
+                    ).join(CO2SensorDB, FarmDb.id == CO2SensorDB.farmId
+                    ).join(CO2ControllerDB, FarmDb.id == CO2ControllerDB.farmId
+                    ).filter(FarmDb.id.in_(farm_ids)).all()
+
+    return [FarmStats(*farm) for farm in farms]
