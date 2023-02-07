@@ -15,7 +15,10 @@ from fastapi import Depends, HTTPException, status
 # import env variable tools
 import os
 
-from database.connector import get_user_from_db
+from database.connector import get_user_from_db, create_user, get_dup_email
+from database.enum_list import Role
+
+from response.error_codes import get_http_exception
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -104,3 +107,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     return current_user
+
+def create_new_user(
+        username: str,
+        password: str,
+        email: str,
+        role: str,
+        create_by: str
+    ) -> User:
+    if get_user_from_db(username):
+        get_http_exception('US401')
+
+    if get_dup_email(email):
+        get_http_exception('US402')
+
+    return create_user(username, get_password_hash(password), email, str(role.value), create_by)

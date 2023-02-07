@@ -14,20 +14,27 @@ engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.
 Session = sessionmaker(bind=engine)
 session = Session()
 
-def create_user(username: str, password_hashed: str, email: str, role: str) -> None:
+def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str) -> User:
     new_user = UserDb(username=username,
                     password=password_hashed,
                     email=email,
                     role=role,
-                    createBy=username,
-                    updateBy=username
+                    createBy=create_by,
+                    updateBy=create_by
                     )
     session.add(new_user)
     session.commit()
 
+    return User(id=new_user.id, username=new_user.username, email=new_user.email, role=str(new_user.role.value))
+
 
 def get_user_from_db(username: str) -> User | None:
     user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password).filter(UserDb.username==username).first()
+
+    return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value)) if user else None
+
+def get_dup_email(email: str) -> User | None:
+    user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password).filter(UserDb.email==email).first()
 
     return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value)) if user else None
 
