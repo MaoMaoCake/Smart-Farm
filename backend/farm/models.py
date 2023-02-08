@@ -35,3 +35,11 @@ class FarmStats(BaseModel):
         CO2Level = co2_level,
         CO2controllerStatus = co2_controller_status
         )
+
+class Light(BaseModel):
+    lightName: str
+    isAutomation: bool
+    naturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+

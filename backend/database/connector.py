@@ -5,14 +5,16 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats
-from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB
+from farm.models import FarmOwner, FarmStats, Light
+from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB
+from response.error_codes import get_http_exception
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
                        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
 
 def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str) -> User:
     new_user = UserDb(username=username,
@@ -33,10 +35,12 @@ def get_user_from_db(username: str) -> User | None:
 
     return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value)) if user else None
 
+
 def get_dup_email(email: str) -> User | None:
     user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password).filter(UserDb.email==email).first()
 
     return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value)) if user else None
+
 
 def add_farm_to_user_db(user: User, farm_id:str) -> FarmOwner | None:
     try:
@@ -49,16 +53,19 @@ def add_farm_to_user_db(user: User, farm_id:str) -> FarmOwner | None:
 
     return FarmOwner(id=farm_owner.id, farmId=farm_owner.farmId, userId=farm_owner.userId)
 
+
 def check_farm_key_exist(farm_key: str) -> int | None:
     farm = session.query(FarmDb.id).filter(FarmDb.farmKey == farm_key).first()
 
     return farm.id if farm else None
 
+
 def check_farm_owning(user_id: int, farm_id: int) -> int | None:
     farm_owning = session.query(FarmOwnerDB.id).filter(FarmOwnerDB.farmId == farm_id
-                                                and FarmOwnerDB.userId == user_id ).first()
+                                                 ,FarmOwnerDB.userId == user_id).first()
 
     return farm_owning.id if farm_owning else None
+
 
 def list_farms_from_user_id(user_id: int) -> [FarmStats]:
     farm_owning = session.query(FarmOwnerDB.farmId).filter(FarmOwnerDB.userId == user_id).all()
@@ -81,3 +88,24 @@ def list_farms_from_user_id(user_id: int) -> [FarmStats]:
                     ).filter(FarmDb.id.in_(farm_ids)).all()
 
     return [FarmStats(*farm) for farm in farms]
+
+
+def check_farm_exist(farm_id: int) -> None:
+    farm = session.query(FarmDb.id).filter(FarmDb.id == farm_id).first()
+    if not farm:
+        get_http_exception('FM404')
+    return None
+
+
+def get_lights_from_db(farm_id: int) -> [Light]:
+    farm_lights = session.query(LightDB).filter(LightDB.farmId == farm_id).all()
+
+    return [Light(lightName=light.name,
+                    isAutomation=light.automation,
+                    UVLightDensity=light.UVLightDensity,
+                    IRLightDensity=light.IRLightDensity,
+                    naturalLightDensity=light.naturalLightDensity)
+              for light in farm_lights]
+
+
+

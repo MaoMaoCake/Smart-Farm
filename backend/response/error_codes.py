@@ -59,7 +59,7 @@ ERROR_CODES = [
         successful = False,
         status_code = 401,
     ),
-ErrorException(
+    ErrorException(
         error_code = 'US402',
         message = 'Duplicate email',
         successful = False,
