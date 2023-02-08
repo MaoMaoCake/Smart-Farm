@@ -1,7 +1,7 @@
 import {writable} from "svelte/store";
 
 export let FarmSettings = writable({
-    farm_id: "",
+    farm_id: "1",
     light_schedule: [],
     ac_schedule: [],
     co2: 0,
