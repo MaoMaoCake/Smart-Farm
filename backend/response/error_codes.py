@@ -48,6 +48,12 @@ ERROR_CODES = [
         status_code = 404,
     ),
     ErrorException(
+        error_code='PS404',
+        message='Preset not found',
+        successful=False,
+        status_code=404,
+    ),
+    ErrorException(
         error_code = 'US404',
         message = 'User not found',
         successful = False,

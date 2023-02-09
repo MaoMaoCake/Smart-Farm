@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 
+
 class FarmOwner(BaseModel):
     id: int
     farmId: int
     userId: int
+
 
 class FarmStats(BaseModel):
     farmName: str
@@ -36,10 +38,43 @@ class FarmStats(BaseModel):
         CO2controllerStatus = co2_controller_status
         )
 
+
 class Light(BaseModel):
+    lightId: int
     lightName: str
     isAutomation: bool
     naturalLightDensity: int
     UVLightDensity: int
     IRLightDensity: int
+
+
+class LightCombination(BaseModel):
+    lightName: str
+    presetId: int
+    lightId: int
+    naturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+
+    def __init__(self,
+                 light_name: str,
+                preset_id: int,
+                light_id: int,
+                natural_lightDensity: int,
+                UV_lightDensity: int,
+                IR_lightDensity: int
+                ):
+        super().__init__(
+            lightName=light_name,
+            presetId=preset_id,
+            lightId=light_id,
+            naturalLightDensity=natural_lightDensity,
+            UVLightDensity=UV_lightDensity,
+            IRLightDensity=IR_lightDensity
+        )
+
+
+# class FarmLightPreset(BaseModel):
+#     name: str
+#     preset_id: int
 

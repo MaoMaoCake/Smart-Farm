@@ -5,8 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light
-from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB
+from farm.models import FarmOwner, FarmStats, Light, LightCombination
+from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
@@ -100,7 +100,8 @@ def check_farm_exist(farm_id: int) -> None:
 def get_lights_from_db(farm_id: int) -> [Light]:
     farm_lights = session.query(LightDB).filter(LightDB.farmId == farm_id).all()
 
-    return [Light(lightName=light.name,
+    return [Light(lightId=light.id,
+                    lightName=light.name,
                     isAutomation=light.automation,
                     UVLightDensity=light.UVLightDensity,
                     IRLightDensity=light.IRLightDensity,
@@ -108,4 +109,38 @@ def get_lights_from_db(farm_id: int) -> [Light]:
               for light in farm_lights]
 
 
+def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
+    farm_lights = session.query(LightDB.name,
+                               LightCombinationDB.id,
+                               LightCombinationDB.lightId,
+                               LightCombinationDB.UVLightDensity,
+                               LightCombinationDB.IRLightDensity,
+                               LightCombinationDB.naturalLightDensity).\
+                                join(LightCombinationDB, LightCombinationDB.lightId == LightDB.id)\
+                                .filter(LightCombinationDB.farmLightPresetId == preset_id).all()
+
+    return [LightCombination(*light) for light in farm_lights]
+
+
+def check_preset_exist(preset_id: int) -> None:
+    farm = session.query(FarmLightPresetDB.id).filter(FarmLightPresetDB.id == preset_id).first()
+    if not farm:
+        get_http_exception('PS404')
+    return None
+
+
+def check_preset_owning(farm_id: int, preset_id: int) -> int | None:
+    preset_owning = session.query(FarmLightPresetDB.id, FarmLightPresetDB.farmId).filter(FarmLightPresetDB.farmId == farm_id
+                                                       , FarmLightPresetDB.id == preset_id).first()
+
+    return FarmLightPresetDB.id if preset_owning else None
+
+
+# def get_light_preset_from_db(farm_id: int) -> [FarmLightPreset]:
+#     farm_light_presets = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.farmId == farm_id).all()
+#
+#     return [FarmLightPreset(
+#         name=preset.name,
+#         preset_id=preset.farmId
+#     ) for preset in farm_light_presets]
 
