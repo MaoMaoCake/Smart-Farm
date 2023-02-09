@@ -9,4 +9,6 @@ export let FarmSettings = writable({
     watering_schedule: [],
     light_preset: [],
     ac_preset: [],
+    light_list: [],
+    ac_list: []
 })
