@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, FarmLightPreset, LightCombination
+from farm.models import FarmOwner, FarmStats, Light, LightCombination
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
 
@@ -109,7 +109,7 @@ def get_lights_from_db(farm_id: int) -> [Light]:
               for light in farm_lights]
 
 
-def get_light_from_preset_db(preset_id: int) -> [LightCombination]:
+def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
     farm_lights = session.query(LightDB.name,
                                LightCombinationDB.id,
                                LightCombinationDB.lightId,
@@ -125,15 +125,16 @@ def get_light_from_preset_db(preset_id: int) -> [LightCombination]:
 def check_preset_exist(preset_id: int) -> None:
     farm = session.query(FarmLightPresetDB.id).filter(FarmLightPresetDB.id == preset_id).first()
     if not farm:
-        get_http_exception('FM404')
+        get_http_exception('PS404')
     return None
 
 
 def check_preset_owning(farm_id: int, preset_id: int) -> int | None:
-    preset_owning = session.query(FarmLightPresetDB.id).filter(FarmOwnerDB.farmId == farm_id
+    preset_owning = session.query(FarmLightPresetDB.id, FarmLightPresetDB.farmId).filter(FarmLightPresetDB.farmId == farm_id
                                                        , FarmLightPresetDB.id == preset_id).first()
 
     return FarmLightPresetDB.id if preset_owning else None
+
 
 # def get_light_preset_from_db(farm_id: int) -> [FarmLightPreset]:
 #     farm_light_presets = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.farmId == farm_id).all()
