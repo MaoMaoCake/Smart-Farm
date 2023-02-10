@@ -132,7 +132,6 @@ class FarmLightPresetDB(BaseModel):
     __tablename__ = "farmLightPreset"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     name = Column(String, nullable=False)
-    #dont have preset_id???
 
     LightCombinations = relationship("LightCombinationDB")
 

@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC
+from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
 
@@ -112,7 +112,7 @@ def get_lights_from_db(farm_id: int) -> [Light]:
 
 def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
     farm_lights = session.query(LightDB.name,
-                               LightCombinationDB.id,
+                               LightCombinationDB.farmLightPresetId,
                                LightCombinationDB.lightId,
                                LightCombinationDB.UVLightDensity,
                                LightCombinationDB.IRLightDensity,
@@ -142,10 +142,37 @@ def get_light_presets_from_db(farm_id: int) -> [FarmLightPreset]:
 
     return [FarmLightPreset(
         name=preset.name,
-        preset_id=preset.farmId
+        preset_id=preset.id
     ) for preset in farm_light_presets]
 
 
+def get_light_strength_from_db(light_id: int) -> LightStrength:
+    light_strength_data = session.query(LightDB).filter(LightDB.id == light_id).first()
+
+    return LightStrength(
+        lightId=light_id,
+        name=light_strength_data.name,
+        automation=light_strength_data.automation,
+        NaturalLightDensity=light_strength_data.naturalLightDensity,
+        UVLightDensity=light_strength_data.UVLightDensity,
+        IRLightDensity=light_strength_data.IRLightDensity
+    )
+
+
+def check_light_exist(light_id: int):
+    preset = session.query(LightDB.farmId).filter(LightDB.id == light_id).first()
+    if not preset:
+        get_http_exception('LT404')
+    return None
+
+
+def check_light_exist_in_farm(farm_id: int, light_id: int):
+    light = session.query(LightDB.farmId).filter(LightDB.farmId == farm_id, LightDB.id == light_id).first()
+    if not light:
+        get_http_exception('10')
+    return None
+    
+    
 def get_acs_from_db(farm_id: int) -> [AC]:
     acs = session.query(ACDB).filter(ACDB.farmId == farm_id).all()
 

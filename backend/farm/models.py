@@ -82,6 +82,15 @@ class FarmLightPreset(BaseModel):
     preset_id: int
 
 
+class LightStrength(BaseModel):
+    lightId: int
+    name: str
+    automation: bool
+    NaturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+
+
 class AC(BaseModel):
     ACId: int
     ACName: str
