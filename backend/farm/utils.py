@@ -9,7 +9,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
-from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset
+from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength
 
 
 def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
@@ -65,7 +65,7 @@ def list_light(farm_id: int, username: str) -> ResponseDto[[Light]]:
     return get_response_status(data=get_lights_from_db(farm_id))
 
 
-def get_light_in_preset(farm_id: int, preset_id: int, username: str) -> ResponseDto[[Light]]:
+def get_light_in_preset(farm_id: int, preset_id: int, username: str) -> ResponseDto[[LightCombination]]:
     user = get_user_from_db(username)
 
     if not user:
@@ -84,7 +84,7 @@ def get_light_in_preset(farm_id: int, preset_id: int, username: str) -> Response
     return get_response_status(data=get_lights_from_preset_db(preset_id))
 
 
-def create_new_preset_from_current_setting(farm_id: int, username: str) -> ResponseDto[FarmLightPreset]:
+def create_new_preset(farm_id: int, username: str, is_default: bool) -> ResponseDto[FarmLightPreset]:
     user = get_user_from_db(username)
     if not user:
         get_http_exception('US404')
@@ -94,7 +94,7 @@ def create_new_preset_from_current_setting(farm_id: int, username: str) -> Respo
     if not check_farm_owning(user.id, farm_id):
         get_http_exception('10')
 
-    return get_response_status(data=create_preset(farm_id, username, False))
+    return get_response_status(data=create_preset(farm_id, username, is_default))
 
 
 def list_light_preset(farm_id: int, username: str) -> ResponseDto[[FarmLightPreset]]:
@@ -110,7 +110,7 @@ def list_light_preset(farm_id: int, username: str) -> ResponseDto[[FarmLightPres
     return get_response_status(data=get_light_presets_from_db(farm_id))
 
 
-def get_light_strength(light_id: int, farm_id: int,username: str) -> ResponseDto[[FarmLightPreset]]:
+def get_light_strength_setting(light_id: int, farm_id: int, username: str) -> ResponseDto[LightStrength]:
     user = get_user_from_db(username)
     if not user:
         get_http_exception('US404')

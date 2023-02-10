@@ -7,8 +7,8 @@ from response.response_dto import ResponseDto
 from auth.models import User
 from .utils import link_farm_to_user, list_farms,\
     list_light, get_light_in_preset, list_light_preset,\
-    list_acs, get_farm_stats_from_farm_id, get_list_light_strength,\
-    create_new_preset_from_current_setting
+    list_acs, get_farm_stats_from_farm_id, get_light_strength_setting,\
+    create_new_preset
 
 from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC, LightStrength
 
@@ -52,9 +52,9 @@ async def list_all_light_preset(farm_id: int, current_user: User = Depends(get_c
 
 
 @farmRouter.post("/farm/{farm_id}/light/preset/create_from_current", response_model=ResponseDto[FarmLightPreset], tags=["Farm"])
-async def create_preset_from_current_setting(farm_id: int, current_user: User = Depends(get_current_active_user)):
+async def create_preset(farm_id: int, is_current_setting:bool, current_user: User = Depends(get_current_active_user)):
 
-    return create_new_preset_from_current_setting(farm_id, current_user.username)
+    return create_new_preset(farm_id, current_user.username, not is_current_setting)
 
 
 @farmRouter.get("/farm/{farm_id}/AC/list/", response_model=ResponseDto[AC], tags=["Farm"])
@@ -64,8 +64,7 @@ async def list_all_acs(farm_id: int, current_user: User = Depends(get_current_ac
     
     
 @farmRouter.get("/farm/{farm_id}/light/{light_id}}", response_model=ResponseDto[LightStrength], tags=["Farm"])
-async def get_list_light_strength(light_id: int, farm_id: int, current_user: User = Depends(get_current_active_user)):
-
-    return get_light_strength(light_id, farm_id, current_user.username)
+async def get_light_strength(light_id: int, farm_id: int, current_user: User = Depends(get_current_active_user)):
+    return get_light_strength_setting(light_id, farm_id, current_user.username)
 
 
