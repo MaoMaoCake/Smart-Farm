@@ -5,9 +5,11 @@ from auth.utils import get_current_active_user
 from response.response_dto import ResponseDto
 
 from auth.models import User
-from .utils import link_farm_to_user, list_farms, list_light, get_light_in_preset, list_light_preset, list_acs, get_light_strength
+from .utils import link_farm_to_user, list_farms,\
+    list_light, get_light_in_preset, list_light_preset,\
+    list_acs, get_farm_stats_from_farm_id, get_list_light_strength
 
-from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength
+from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC, LightStrength
 
 farmRouter = APIRouter()
 
@@ -22,6 +24,12 @@ async def add_farm_to_user(farm_key: str, current_user: User = Depends(get_curre
 async def list_all_farms(current_user: User = Depends(get_current_active_user)):
 
     return list_farms(current_user.username)
+
+
+@farmRouter.get("/farm/{farm_id}/stats", response_model=ResponseDto[FarmStats], tags=["Farm"])
+async def get_farm_stats(farm_id: int, current_user: User = Depends(get_current_active_user)):
+
+    return get_farm_stats_from_farm_id(farm_id, current_user.username)
 
 
 @farmRouter.get("/farm/{farm_id}/light/list", response_model=ResponseDto[Light], tags=["Farm"])
@@ -41,8 +49,7 @@ async def list_all_light_preset(farm_id: int, current_user: User = Depends(get_c
 
     return list_light_preset(farm_id, current_user.username)
 
-
-@farmRouter.get("/farm/{farm_id}/AC/list/", response_model=ResponseDto[LightCombination], tags=["Farm"])
+@farmRouter.get("/farm/{farm_id}/AC/list/", response_model=ResponseDto[AC], tags=["Farm"])
 async def list_all_acs(farm_id: int, current_user: User = Depends(get_current_active_user)):
 
     return list_acs(farm_id, current_user.username)

@@ -91,6 +91,27 @@ def list_farms_from_user_id(user_id: int) -> [FarmStats]:
     return [FarmStats(*farm) for farm in farms]
 
 
+def get_farm_stats_from_db(farm_id: int) -> FarmStats:
+    farm = session.query(FarmDb.id,
+                          FarmDb.name,
+                          TemperatureSensorDB.temperature,
+                          ACDB.status,
+                          HumiditySensorDB.humidity,
+                          DehumidifierDB.status,
+                          FarmDb.lightStatus,
+                          CO2SensorDB.CO2,
+                          CO2ControllerDB.status,
+                    ).join(TemperatureSensorDB, FarmDb.id == TemperatureSensorDB.farmId
+                    ).join(ACDB, FarmDb.id == ACDB.farmId
+                    ).join(HumiditySensorDB, FarmDb.id == HumiditySensorDB.farmId
+                    ).join(DehumidifierDB, FarmDb.id == DehumidifierDB.farmId
+                    ).join(CO2SensorDB, FarmDb.id == CO2SensorDB.farmId
+                    ).join(CO2ControllerDB, FarmDb.id == CO2ControllerDB.farmId
+                    ).filter(FarmDb.id == farm_id).first()
+
+    return FarmStats(*farm)
+
+
 def check_farm_exist(farm_id: int) -> None:
     farm = session.query(FarmDb.id).filter(FarmDb.id == farm_id).first()
     if not farm:
