@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from typing import Optional
 
 # OAuth Libraries
 from auth.utils import get_current_active_user
@@ -8,9 +9,9 @@ from auth.models import User
 from .utils import link_farm_to_user, list_farms,\
     list_light, get_light_in_preset, list_light_preset,\
     list_acs, get_farm_stats_from_farm_id, get_light_strength_setting,\
-    create_new_preset
+    create_new_preset, create_new_light
 
-from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC, LightStrength
+from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC, LightStrength, CreateLightInput
 
 farmRouter = APIRouter()
 
@@ -31,6 +32,12 @@ async def list_all_farms(current_user: User = Depends(get_current_active_user)):
 async def get_farm_stats(farm_id: int, current_user: User = Depends(get_current_active_user)):
 
     return get_farm_stats_from_farm_id(farm_id, current_user.username)
+
+
+@farmRouter.post("/farm/{farm_id}/light/create", response_model=ResponseDto[Light], tags=["Farm"])
+async def create_light(farm_id: int, create_light_input: CreateLightInput, current_user: User = Depends(get_current_active_user)):
+
+    return create_new_light(farm_id, create_light_input, current_user.username)
 
 
 @farmRouter.get("/farm/{farm_id}/light/list", response_model=ResponseDto[Light], tags=["Farm"])

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
     list_farms_from_user_id, check_farm_exist,\
@@ -5,11 +7,12 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_preset_exist, check_preset_owning, \
     get_light_presets_from_db, get_light_strength_from_db, \
     check_light_exist_in_farm, check_light_exist,\
-    get_acs_from_db, get_farm_stats_from_db, create_preset
+    get_acs_from_db, get_farm_stats_from_db, create_preset,\
+    create_light
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
-from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength
+from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, CreateLightInput
 
 
 def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
@@ -50,6 +53,19 @@ def get_farm_stats_from_farm_id(farm_id: int, username: str) -> ResponseDto[Farm
         get_http_exception('10')
 
     return get_response_status(data=get_farm_stats_from_db(farm_id))
+
+
+def create_new_light(farm_id: int, create_light_input: CreateLightInput, username: str) -> ResponseDto[Light]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    return get_response_status(data=create_light(farm_id, create_light_input, username))
 
 
 def list_light(farm_id: int, username: str) -> ResponseDto[[Light]]:

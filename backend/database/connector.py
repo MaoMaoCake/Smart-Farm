@@ -1,11 +1,13 @@
 import os
 
+from typing import Optional
+
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC
+from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC, CreateLightInput
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
 
@@ -117,6 +119,48 @@ def check_farm_exist(farm_id: int) -> None:
     if not farm:
         get_http_exception('FM404')
     return None
+
+
+def create_light(farm_id: int, create_light_input: CreateLightInput, username: str) -> Light:
+    if not create_light_input.name:
+        light_amount = len(get_lights_from_db(farm_id))
+    try:
+        new_light = LightDB(farmId=farm_id,
+                            name=create_light_input.name if create_light_input.name else f'Light {light_amount}',
+                            status=create_light_input.name.status if create_light_input.status else False,
+                            isAvailable=True,
+                            automation=create_light_input.automation if create_light_input.automation else True,
+                            UVLightDensity=create_light_input.UVLightDensity if create_light_input.UVLightDensity else 50,
+                            IRLightDensity=create_light_input.IRLightDensity if create_light_input.IRLightDensity else 50,
+                            naturalLightDensity=create_light_input.NaturalLightDensity if create_light_input.NaturalLightDensity else 50,
+                            createBy=username,
+                            updateBy=username
+                            )
+        session.add(new_light)
+
+        presets = get_light_presets_from_db(farm_id)
+        light_combination_list = [LightCombinationDB(
+            lightId=new_light.id,
+            farmLightPresetId=preset.preset_id,
+            automation=new_light.automation,
+            UVLightDensity=new_light.UVLightDensity,
+            IRLightDensity=new_light.IRLightDensity,
+            naturalLightDensity=new_light.naturalLightDensity,
+            createBy=username,
+            updateBy=username
+        ) for preset in presets]
+        session.bulk_save_objects(light_combination_list)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+    return Light(lightId=new_light.id,
+                 lightName=new_light.name,
+                 isAutomation=new_light.automation,
+                 UVLightDensity=new_light.UVLightDensity,
+                 IRLightDensity=new_light.IRLightDensity,
+                 naturalLightDensity=new_light.naturalLightDensity)
 
 
 def get_lights_from_db(farm_id: int) -> [Light]:
