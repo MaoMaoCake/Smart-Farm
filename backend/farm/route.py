@@ -7,7 +7,8 @@ from response.response_dto import ResponseDto
 from auth.models import User
 from .utils import link_farm_to_user, list_farms,\
     list_light, get_light_in_preset, list_light_preset,\
-    list_acs, get_farm_stats_from_farm_id, get_list_light_strength
+    list_acs, get_farm_stats_from_farm_id, get_list_light_strength,\
+    create_new_preset_from_current_setting
 
 from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC, LightStrength
 
@@ -48,6 +49,13 @@ async def show_light_from_preset(farm_id: int, preset_id: int, current_user: Use
 async def list_all_light_preset(farm_id: int, current_user: User = Depends(get_current_active_user)):
 
     return list_light_preset(farm_id, current_user.username)
+
+
+@farmRouter.post("/farm/{farm_id}/light/preset/create_from_current", response_model=ResponseDto[FarmLightPreset], tags=["Farm"])
+async def create_preset_from_current_setting(farm_id: int, current_user: User = Depends(get_current_active_user)):
+
+    return create_new_preset_from_current_setting(farm_id, current_user.username)
+
 
 @farmRouter.get("/farm/{farm_id}/AC/list/", response_model=ResponseDto[AC], tags=["Farm"])
 async def list_all_acs(farm_id: int, current_user: User = Depends(get_current_active_user)):
