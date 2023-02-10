@@ -77,7 +77,7 @@ class LightCombination(BaseModel):
         )
 
 
-# class FarmLightPreset(BaseModel):
-#     name: str
-#     preset_id: int
+class FarmLightPreset(BaseModel):
+    name: str
+    preset_id: int
 

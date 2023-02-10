@@ -1,4 +1,9 @@
-from database.connector import get_user_from_db, add_farm_to_user_db, check_farm_key_exist, check_farm_owning, list_farms_from_user_id, check_farm_exist,get_lights_from_db, get_lights_from_preset_db, check_preset_exist, check_preset_owning
+from database.connector import get_user_from_db, add_farm_to_user_db, \
+    check_farm_key_exist, check_farm_owning, \
+    list_farms_from_user_id, check_farm_exist,\
+    get_lights_from_db, get_lights_from_preset_db, \
+    check_preset_exist, check_preset_owning, \
+    get_light_presets_from_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -64,16 +69,16 @@ def get_light_in_preset(farm_id: int, preset_id: int, username: str) -> Response
     return get_response_status(data=get_lights_from_preset_db(preset_id))
 
 
-# def list_light_preset(farm_id: int, username: str) -> ResponseDto[[FarmLightPreset]]:
-#     user = get_user_from_db(username)
-#     if not user:
-#         get_http_exception('US404')
-#
-#     check_farm_exist(farm_id)
-#
-#     if not check_farm_owning(user.id, farm_id):
-#         get_http_exception('10')
-#
-#     return get_response_status(data=get_lights_from_db(farm_id))
+def list_light_preset(farm_id: int, username: str) -> ResponseDto[[FarmLightPreset]]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    return get_response_status(data=get_light_presets_from_db(farm_id))
 
 
