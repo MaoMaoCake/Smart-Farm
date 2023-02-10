@@ -67,6 +67,7 @@ class TemperatureSensorDB(BaseModel):
 class ACDB(BaseModel):
     __tablename__ = "AC"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
+    name = Column(String, nullable=False)
     status = Column(Boolean, nullable=False)
     temperature = Column(Integer, nullable=False)
     fanLevel = Column(Integer, nullable=False)

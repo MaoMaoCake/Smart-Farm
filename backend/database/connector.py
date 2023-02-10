@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, LightCombination
+from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
 
@@ -145,3 +145,12 @@ def get_light_presets_from_db(farm_id: int) -> [FarmLightPreset]:
         preset_id=preset.farmId
     ) for preset in farm_light_presets]
 
+
+def get_acs_from_db(farm_id: int) -> [AC]:
+    acs = session.query(ACDB).filter(ACDB.farmId == farm_id).all()
+
+    return [AC(
+        ACId=ac.id,
+        ACName=ac.name,
+        ACStatus=ac.status
+    ) for ac in acs]
