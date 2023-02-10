@@ -71,7 +71,8 @@ def list_farms_from_user_id(user_id: int) -> [FarmStats]:
     farm_owning = session.query(FarmOwnerDB.farmId).filter(FarmOwnerDB.userId == user_id).all()
     farm_ids = [farm[0] for farm in farm_owning]
 
-    farms = session.query(FarmDb.name,
+    farms = session.query(FarmDb.id,
+                          FarmDb.name,
                           TemperatureSensorDB.temperature,
                           ACDB.status,
                           HumiditySensorDB.humidity,

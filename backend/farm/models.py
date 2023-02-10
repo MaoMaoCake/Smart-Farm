@@ -8,6 +8,7 @@ class FarmOwner(BaseModel):
 
 
 class FarmStats(BaseModel):
+    farmId: int
     farmName: str
     temperature: int
     ACStatus: bool
@@ -18,6 +19,7 @@ class FarmStats(BaseModel):
     CO2controllerStatus: bool
 
     def __init__(self,
+                farm_id: int,
                 farm_name: str,
                 temperature: int,
                 ac_status: bool,
@@ -28,6 +30,7 @@ class FarmStats(BaseModel):
                 co2_controller_status: bool
                 ):
         super().__init__(
+        farmId= farm_id,
         farmName = farm_name,
         temperature = temperature,
         ACStatus = ac_status,
