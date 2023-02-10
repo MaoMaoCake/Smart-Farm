@@ -124,8 +124,8 @@ def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
 
 
 def check_preset_exist(preset_id: int) -> None:
-    farm = session.query(FarmLightPresetDB.id).filter(FarmLightPresetDB.id == preset_id).first()
-    if not farm:
+    preset = session.query(FarmLightPresetDB.id).filter(FarmLightPresetDB.id == preset_id).first()
+    if not preset:
         get_http_exception('PS404')
     return None
 
@@ -137,11 +137,11 @@ def check_preset_owning(farm_id: int, preset_id: int) -> int | None:
     return FarmLightPresetDB.id if preset_owning else None
 
 
-# def get_light_preset_from_db(farm_id: int) -> [FarmLightPreset]:
-#     farm_light_presets = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.farmId == farm_id).all()
-#
-#     return [FarmLightPreset(
-#         name=preset.name,
-#         preset_id=preset.farmId
-#     ) for preset in farm_light_presets]
+def get_light_presets_from_db(farm_id: int) -> [FarmLightPreset]:
+    farm_light_presets = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.farmId == farm_id).all()
+
+    return [FarmLightPreset(
+        name=preset.name,
+        preset_id=preset.farmId
+    ) for preset in farm_light_presets]
 
