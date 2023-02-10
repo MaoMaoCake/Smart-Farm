@@ -5,7 +5,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_preset_exist, check_preset_owning, \
     get_light_presets_from_db, get_light_strength_from_db, \
     check_light_exist_in_farm, check_light_exist,\
-    get_acs_from_db
+    get_acs_from_db, get_farm_stats_from_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -37,6 +37,19 @@ def list_farms(username: str) -> ResponseDto[[FarmStats]]:
     farms = list_farms_from_user_id(user.id)
 
     return get_response_status(data=farms)
+
+
+def get_farm_stats_from_farm_id(farm_id: int, username: str) -> ResponseDto[FarmStats]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    return get_response_status(data=get_farm_stats_from_db(farm_id))
 
 
 def list_light(farm_id: int, username: str) -> ResponseDto[[Light]]:
