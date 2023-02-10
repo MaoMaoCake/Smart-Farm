@@ -202,3 +202,49 @@ def get_acs_from_db(farm_id: int) -> [AC]:
         ACName=ac.name,
         ACStatus=ac.status
     ) for ac in acs]
+
+def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPreset:
+    preset_amount = len(get_light_presets_from_db(farm_id))
+    try:
+        new_preset = FarmLightPresetDB( farmId=farm_id,
+                                        name=f'Preset {preset_amount+1}',
+                                        createBy=username,
+                                        updateBy=username
+                                        )
+        session.add(new_preset)
+        session.commit()
+
+        lights = get_lights_from_db(farm_id)
+
+        if default:
+            light_combination_list = [LightCombinationDB(
+                                        lightId=light.lightId,
+                                        farmLightPresetId=new_preset.id,
+                                        automation=True,
+                                        UVLightDensity=50,
+                                        IRLightDensity=50,
+                                        naturalLightDensity=50,
+                                        createBy=username,
+                                        updateBy=username
+                                        ) for light in lights]
+            session.bulk_save_objects(light_combination_list)
+            session.commit()
+        else:
+            light_combination_list = [LightCombinationDB(
+                                        lightId=light.lightId,
+                                        farmLightPresetId=new_preset.id,
+                                        automation=light.isAutomation,
+                                        UVLightDensity=light.UVLightDensity,
+                                        IRLightDensity=light.IRLightDensity,
+                                        naturalLightDensity=light.naturalLightDensity,
+                                        createBy = username,
+                                        updateBy = username
+                                        ) for light in lights]
+
+            session.bulk_save_objects(light_combination_list)
+            session.commit()
+
+        return FarmLightPreset(preset_id=new_preset.id, name=new_preset.name)
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
