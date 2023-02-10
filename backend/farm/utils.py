@@ -8,11 +8,13 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_light_presets_from_db, get_light_strength_from_db, \
     check_light_exist_in_farm, check_light_exist,\
     get_acs_from_db, get_farm_stats_from_db, create_preset,\
-    create_light
+    create_light, update_light_strength_to_all_light
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
-from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, CreateLightInput
+from .models import FarmOwner, FarmStats, Light,\
+    LightCombination, FarmLightPreset, LightStrength,\
+    CreateLightInput, UpdateLightStrengthInput
 
 
 def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
@@ -153,3 +155,31 @@ def list_acs(farm_id: int, username: str) -> ResponseDto[[FarmStats]]:
         get_http_exception('10')
 
     return get_response_status(data=get_acs_from_db(farm_id))
+
+def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStrengthInput,
+                                       farm_id: int,
+                                       username: str) -> ResponseDto[[Light]]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_light_density_limit(updateLightStrengthInput.NaturalLightDensity,
+                              updateLightStrengthInput.UVLightDensity,
+                              updateLightStrengthInput.IRLightDensity)
+
+    return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInput, farm_id, username))
+
+def check_light_density_limit( NaturalLightDensity: int,
+                                UVLightDensity: int,
+                                IRLightDensity: int):
+    if NaturalLightDensity > 100 or NaturalLightDensity < 0:
+        get_http_exception('LT401')
+    if UVLightDensity > 100 or UVLightDensity < 0:
+        get_http_exception('LT402')
+    if IRLightDensity > 100 or IRLightDensity < 0:
+        get_http_exception('LT403')

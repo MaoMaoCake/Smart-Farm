@@ -9,9 +9,10 @@ from auth.models import User
 from .utils import link_farm_to_user, list_farms,\
     list_light, get_light_in_preset, list_light_preset,\
     list_acs, get_farm_stats_from_farm_id, get_light_strength_setting,\
-    create_new_preset, create_new_light
+    create_new_preset, create_new_light, apply_light_strength_to_all_lights
 
-from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, AC, LightStrength, CreateLightInput
+from .models import FarmOwner, FarmStats, Light, LightCombination,\
+    FarmLightPreset, AC, LightStrength, CreateLightInput, UpdateLightStrengthInput
 
 farmRouter = APIRouter()
 
@@ -72,6 +73,13 @@ async def list_all_acs(farm_id: int, current_user: User = Depends(get_current_ac
     
 @farmRouter.get("/farm/{farm_id}/light/{light_id}}", response_model=ResponseDto[LightStrength], tags=["Farm"])
 async def get_light_strength(light_id: int, farm_id: int, current_user: User = Depends(get_current_active_user)):
+
     return get_light_strength_setting(light_id, farm_id, current_user.username)
 
 
+@farmRouter.patch("/farm/{farm_id}/light/{light_id}/update_all}", response_model=ResponseDto[Light], tags=["Farm"])
+async def apply_light_strength_to_all(updateLightStrengthInput: UpdateLightStrengthInput,
+                                      farm_id: int,
+                                      current_user: User = Depends(get_current_active_user)):
+
+    return apply_light_strength_to_all_lights(updateLightStrengthInput, farm_id, current_user.username)

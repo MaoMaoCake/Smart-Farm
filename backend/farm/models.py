@@ -98,8 +98,15 @@ class AC(BaseModel):
 
 class CreateLightInput(BaseModel):
     name: Optional[str]
-    status: Optional[bool]
     automation: Optional[bool]
     NaturalLightDensity: Optional[int]
     UVLightDensity: Optional[int]
     IRLightDensity: Optional[int]
+
+
+class UpdateLightStrengthInput(BaseModel):
+    automation: bool
+    NaturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+    

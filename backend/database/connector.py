@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC, CreateLightInput
+from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC, CreateLightInput, UpdateLightStrengthInput
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
 
@@ -127,7 +127,7 @@ def create_light(farm_id: int, create_light_input: CreateLightInput, username: s
     try:
         new_light = LightDB(farmId=farm_id,
                             name=create_light_input.name if create_light_input.name else f'Light {light_amount}',
-                            status=create_light_input.name.status if create_light_input.status else False,
+                            status=False,
                             isAvailable=True,
                             automation=create_light_input.automation if create_light_input.automation else True,
                             UVLightDensity=create_light_input.UVLightDensity if create_light_input.UVLightDensity else 50,
@@ -222,6 +222,21 @@ def get_light_strength_from_db(light_id: int) -> LightStrength:
         UVLightDensity=light_strength_data.UVLightDensity,
         IRLightDensity=light_strength_data.IRLightDensity
     )
+
+
+def update_light_strength_to_all_light(update_light_strength_input: UpdateLightStrengthInput,
+                                       farm_id: int,
+                                       username: str) -> [Light]:
+    session.query(LightDB
+                    ).filter(LightDB.farmId == farm_id
+                    ).update({  'automation': update_light_strength_input.automation,
+                                'UVLightDensity': update_light_strength_input.UVLightDensity,
+                                'IRLightDensity':  update_light_strength_input.IRLightDensity,
+                                'naturalLightDensity':  update_light_strength_input.NaturalLightDensity
+                    })
+    session.commit()
+
+    return get_lights_from_db(farm_id)
 
 
 def check_light_exist(light_id: int):
