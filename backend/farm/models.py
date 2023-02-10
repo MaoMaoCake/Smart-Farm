@@ -81,3 +81,8 @@ class FarmLightPreset(BaseModel):
     name: str
     preset_id: int
 
+
+class AC(BaseModel):
+    ACId: int
+    ACName: str
+    ACStatus: str

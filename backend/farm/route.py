@@ -5,7 +5,7 @@ from auth.utils import get_current_active_user
 from response.response_dto import ResponseDto
 
 from auth.models import User
-from .utils import link_farm_to_user, list_farms, list_light, get_light_in_preset, list_light_preset
+from .utils import link_farm_to_user, list_farms, list_light, get_light_in_preset, list_light_preset, list_acs
 
 from .models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset
 
@@ -41,7 +41,10 @@ async def list_all_light_preset(farm_id: int, current_user: User = Depends(get_c
 
     return list_light_preset(farm_id, current_user.username)
 
+@farmRouter.get("/farm/{farm_id}/AC/list/", response_model=ResponseDto[LightCombination], tags=["Farm"])
+async def list_all_acs(farm_id: int, current_user: User = Depends(get_current_active_user)):
 
+    return list_acs(farm_id, current_user.username)
 
 
 
