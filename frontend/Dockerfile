@@ -1,4 +1,4 @@
-FROM node:19.4.0 AS build
+FROM node:19 AS build
 
 # install dependencies
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # only copy the build app
-FROM node:19.4.0
+FROM node:19
 
 WORKDIR /app
 
