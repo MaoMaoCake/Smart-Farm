@@ -2,14 +2,12 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import time
 
-from .enum_list import HardwareType
-
 
 class AutomationInput(BaseModel):
     ESP_id: int
     start_time: time
     end_time: Optional[time]
-    hardware_type: HardwareType
+    hardware_type: str
     activate: Optional[bool]
     uv_percent: Optional[int]
     ir_percent: Optional[int]

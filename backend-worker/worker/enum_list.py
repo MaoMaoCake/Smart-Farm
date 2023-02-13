@@ -2,23 +2,23 @@ from enum import Enum
 
 
 class HardwareType(str, Enum):
-    LIGHT = "light"
+    LIGHT = "LIGHT"
     AC = "AC"
-    CO2_SENSOR = "CO2Sensor"
-    CO2_CONTROLLER = "CO2Controller"
-    DEHUMIDIFIER = "dehumidifier"
-    HUMIDITY_SENSOR = "humiditySensor"
-    TEMPERATURE_SENSOR = "temperatureSensor"
-    WATERING = "watering"
+    CO2_SENSOR = "CO2_SENSOR"
+    CO2_CONTROLLER = "CO2_CONTROLLER"
+    DEHUMIDIFIER = "DEHUMIDIFIER"
+    HUMIDITY_SENSOR = "HUMIDITY_SENSOR"
+    TEMPERATURE_SENSOR = "TEMPERATURE_SENSOR"
+    WATERING = "WATERING"
 
 
 class ESPType(str, Enum):
-    SENSOR = "sensor"
-    CO2_CONTROLLER = "co2_controller"
-    LIGHT_CONTROLLER = "light_controller"
-    AC_CONTROLLER = "ac_controller"
-    DEHUMIDIFIER_CONTROLLER = "dehumidifier_controller"
-    WATERING_SYSTEM = "watering_system"
+    SENSOR = "SENSOR"
+    CO2_CONTROLLER = "CO2_CONTROLLER"
+    LIGHT_CONTROLLER = "LIGHT_CONTROLLER"
+    AC_CONTROLLER = "AC_CONTROLLER"
+    DEHUMIDIFIER_CONTROLLER = "DEHUMIDIFIER_CONTROLLER"
+    WATERING_SYSTEM = "WATERING_SYSTEM"
 
 
 class AutomationInputField(str, Enum):

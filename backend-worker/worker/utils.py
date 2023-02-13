@@ -5,9 +5,10 @@ from .enum_list import HardwareType, AutomationInputField
 from response.error_codes import get_http_exception
 
 
-def run_task(automation_input: AutomationInput):
+def run_task(automation_input: AutomationInput, is_start: bool):
     print(f"Running task {automation_input.ESP_id}")
-    response = create_mqtt_request(topic=str(automation_input.ESP_id), message=str(create_payload(automation_input)))
+    response = create_mqtt_request(topic=str(automation_input.ESP_id), message=str(create_payload(automation_input,
+                                                                                                  is_start)))
 
     if response.status_code != 200:
         get_http_exception('03', message='MQTT connection failed')
@@ -34,17 +35,17 @@ def validate_input(automation_input: AutomationInput):
                                             f"[{automation_input.hardware_type}] --> {missing_field}")
 
 
-def create_payload(automation_input: AutomationInput):
+def create_payload(automation_input: AutomationInput, is_start: bool):
     match automation_input.hardware_type:
         case HardwareType.LIGHT:
-            return LightRequest(activate=automation_input.activate,
+            return LightRequest(activate=is_start,
                                 uv_percent=automation_input.uv_percent,
                                 ir_percent=automation_input.ir_percent,
                                 natural_percent=automation_input.natural_percent
                                 )
         case HardwareType.AC:
-            return ACRequest(activate=automation_input.activate,
+            return ACRequest(activate=is_start,
                              temperature=automation_input.temperature
                              )
         case HardwareType.WATERING:
-            return WateringRequest(activate=automation_input.activate)
+            return WateringRequest(activate=is_start)
