@@ -12,6 +12,16 @@ services:
       - 1883:1883
       - 9001:9001
 
+  mqtt-bridge:
+    image: rsteckler/docker-http-mqtt-bridge:v1
+    ports:
+      - 5000:5000
+    env_file:
+      - http-mqtt-bridge.env
+    depends_on:
+      - mqtt-broker
+    links:
+      - mqtt-broker:mqtt-broker
 #  reverse-proxy:
 #    image: traefik:v2.8
 #    # Enables the web UI and tells Traefik to listen to docker
