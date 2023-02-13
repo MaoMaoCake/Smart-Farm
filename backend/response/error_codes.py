@@ -54,6 +54,12 @@ ERROR_CODES = [
         status_code=404,
     ),
     ErrorException(
+        error_code='PC404',
+        message='Preset Combination not found',
+        successful=False,
+        status_code=404,
+    ),
+    ErrorException(
         error_code='LT404',
         message='Light not found',
         successful=False,
@@ -69,17 +75,35 @@ ERROR_CODES = [
         error_code='US401',
         message='Duplicate username',
         successful=False,
-        status_code=401,
+        status_code=400,
     ),
     ErrorException(
         error_code='US402',
         message='Duplicate email',
         successful=False,
-        status_code=401,
+        status_code=400,
     ),
     ErrorException(
         error_code='FO001',
         message='User already own this farm',
+        successful=False,
+        status_code=400,
+    ),
+    ErrorException(
+        error_code='LT401',
+        message='Natural light density must be between 0 to 100',
+        successful=False,
+        status_code=400,
+    ),
+    ErrorException(
+        error_code='LT402',
+        message='UV light density must be between 0 to 100',
+        successful=False,
+        status_code=400,
+    ),
+    ErrorException(
+        error_code='LT403',
+        message='Infrared light density must be between 0 to 100',
         successful=False,
         status_code=400,
     )

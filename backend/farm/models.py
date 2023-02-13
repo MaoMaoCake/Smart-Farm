@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from typing import Optional
 
 class FarmOwner(BaseModel):
     id: int
@@ -95,3 +95,18 @@ class AC(BaseModel):
     ACId: int
     ACName: str
     ACStatus: str
+
+class CreateLightInput(BaseModel):
+    name: Optional[str]
+    automation: Optional[bool]
+    NaturalLightDensity: Optional[int]
+    UVLightDensity: Optional[int]
+    IRLightDensity: Optional[int]
+
+
+class UpdateLightStrengthInput(BaseModel):
+    automation: bool
+    NaturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+    
