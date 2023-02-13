@@ -22,18 +22,26 @@
 
 </script>
 {#if data}
-    <div class="w-screen h-screen flex">
-        <div class="flex flex-col md:flex-row">
+    <div class="w-screen ">
+        <div class="flex flex-col items-center justify-center grow md:flex-row md:flex-wrap">
 
                 {#each data as farm}
                     <StatPreview farm_name="{farm.name}" temp="{farm.temp}" humidity={farm.humidity} light={farm.light}
                                  ac="{farm.ac}" humidifier={farm.humidifier} co2={farm.co2} co2_val={farm.co2_val}></StatPreview>
                 {/each}
         </div>
-
+        <div class="mb-24"></div> <!-- Spacing so we can see the stats of the last farm -->
+    </div>
+    <div class="flex justify-center items-center fixed bottom-10 left-1/2 right-1/2">
+        <a href="/add-farm" class="btn btn-secondary w-56 white">Add Farm</a>
     </div>
 {:else}
     <div class="flex items-center justify-center">
         <AddFarm/>
     </div>
 {/if}
+<style>
+    .white {
+        color: white
+    }
+</style>
