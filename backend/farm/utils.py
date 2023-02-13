@@ -10,7 +10,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_acs_from_db, get_farm_stats_from_db, create_preset,\
     create_light, update_light_strength_to_all_light,\
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
-    check_light_combination_owning
+    check_light_combination_owning, delete_light_preset_in_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -209,4 +209,19 @@ def check_light_density_limit( NaturalLightDensity: int,
         get_http_exception('LT403')
 
 
+def delete_light_preset(farm_id: int, preset_id: int, username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
 
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_preset_exist(preset_id)
+    if not check_preset_owning(farm_id, preset_id):
+        get_http_exception('10')
+
+    delete_light_preset_in_db(preset_id)
+    return get_response_status('delete success')

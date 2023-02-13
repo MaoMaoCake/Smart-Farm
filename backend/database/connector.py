@@ -345,3 +345,18 @@ def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPr
         get_http_exception(error_code='03', message=f'Database error: {e}')
 
 
+def delete_light_preset_in_db(preset_id: int) -> None:
+
+    try:
+        session.query(LightCombinationDB).filter(
+            LightCombinationDB.farmLightPresetId == preset_id).delete(synchronize_session='fetch')
+        session.commit()
+        print(1)
+        session.query(FarmLightPresetDB).filter(
+            FarmLightPresetDB.id == preset_id).delete(synchronize_session='fetch')
+        print(2)
+        session.commit()
+        return None
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
