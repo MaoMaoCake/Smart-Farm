@@ -15,11 +15,13 @@ from fastapi import Depends, HTTPException, status
 # import env variable tools
 import os
 
-from database.connector import get_user_from_db
+from database.connector import get_user_from_db, create_user, get_dup_email
+from database.enum_list import Role
+
+from response.error_codes import get_http_exception
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
@@ -47,10 +49,10 @@ def authenticate_user(username: str, password: str) -> User | None:
     :param password:
     :return:
     """
-    db_username, db_password, db_role = get_user_from_db(username)
+    user = get_user_from_db(username)
 
-    if verify_password(password, db_password):
-        return User(username=db_username, role=db_role)
+    if verify_password(password, user.password):
+        return User(username=user.username, role=user.role)
     else:
         return None
 
@@ -78,9 +80,9 @@ def get_user(username: str) -> User | None:
     :param username:
     :return: User class
     """
-    db_username, _db_password, db_role = get_user_from_db(username)
+    user = get_user_from_db(username)
 
-    return User(username=db_username, role=db_role)
+    return User(username=user.username, role=user.role)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -105,3 +107,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     return current_user
+
+def create_new_user(
+        username: str,
+        password: str,
+        email: str,
+        role: str,
+        create_by: str
+    ) -> User:
+    if get_user_from_db(username):
+        get_http_exception('US401')
+
+    if get_dup_email(email):
+        get_http_exception('US402')
+
+    return create_user(username, get_password_hash(password), email, str(role.value), create_by)
