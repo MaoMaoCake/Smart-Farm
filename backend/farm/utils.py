@@ -223,5 +223,4 @@ def delete_light_preset(farm_id: int, preset_id: int, username: str):
     if not check_preset_owning(farm_id, preset_id):
         get_http_exception('10')
 
-    delete_light_preset_in_db(preset_id)
-    return get_response_status('delete success')
+    return delete_light_preset_in_db(preset_id)
