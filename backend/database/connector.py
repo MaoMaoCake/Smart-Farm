@@ -7,9 +7,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC, CreateLightInput, UpdateLightStrengthInput
-from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
+from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
+    FarmLightPreset, LightStrength, AC, CreateLightInput, \
+    UpdateLightStrengthInput
+from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
+    ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
+    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
+from response.response_dto import ResponseDto, get_response_status
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
                        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
@@ -345,3 +350,16 @@ def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPr
         get_http_exception(error_code='03', message=f'Database error: {e}')
 
 
+def delete_light_preset_in_db(preset_id: int) -> None:
+
+    try:
+        session.query(LightCombinationDB).filter(
+            LightCombinationDB.farmLightPresetId == preset_id).delete(synchronize_session='fetch')
+        session.commit()
+        session.query(FarmLightPresetDB).filter(
+        FarmLightPresetDB.id == preset_id).delete(synchronize_session='fetch')
+        session.commit()
+        return get_response_status('delete success')
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
