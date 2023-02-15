@@ -8,11 +8,20 @@
     export let co2_val;
     export let co2;
 
+    export let farm_id
+
     import Icon from '@iconify/svelte';
 
 </script>
 <div class="grid grid-cols-7 grid-rows-4 max-w-md bg-gray-300 m-5 rounded-lg w-80 h-48">
-    <div class="col-start-1 col-span-7 row-start-1 flex justify-center bg-primary rounded-t-lg white">{farm_name}</div>
+    <div class="col-start-1 col-span-7 row-start-1 flex justify-center bg-primary rounded-t-lg white item-center pt-2">
+        {farm_name}
+        <a href="{farm_id}/settings">
+            {#if farm_id}
+                <Icon icon="icon-park-solid:setting-two" class="h-5 w-5 ml-2 pt-1"/>
+            {/if}
+        </a>
+    </div>
     <div class="col-start-1 col-span-3 row-start-2 row-span-3 flex items-center justify-evenly bg-blue-900 rounded-lg m-2 white flex-col">
 
         <div class="flex justify-evenly items-center">
