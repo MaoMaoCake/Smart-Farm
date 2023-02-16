@@ -54,6 +54,12 @@ ERROR_CODES = [
         status_code=404,
     ),
     ErrorException(
+        error_code='PC404',
+        message='Preset Combination not found',
+        successful=False,
+        status_code=404,
+    ),
+    ErrorException(
         error_code='LT404',
         message='Light not found',
         successful=False,

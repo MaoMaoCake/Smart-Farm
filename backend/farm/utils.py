@@ -8,7 +8,9 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_light_presets_from_db, get_light_strength_from_db, \
     check_light_exist_in_farm, check_light_exist,\
     get_acs_from_db, get_farm_stats_from_db, create_preset,\
-    create_light, update_light_strength_to_all_light
+    create_light, update_light_strength_to_all_light,\
+    get_light_strength_in_preset_from_db, check_light_combination_exist,\
+    check_light_combination_owning, delete_light_preset_in_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -144,6 +146,26 @@ def get_light_strength_setting(light_id: int, farm_id: int, username: str) -> Re
     return get_response_status(data=get_light_strength_from_db(light_id))
 
 
+def get_light_strength_setting_in_preset(light_combination_id: int, preset_id, farm_id: int, username: str) -> ResponseDto[LightStrength]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_preset_exist(preset_id)
+    if not check_preset_owning(farm_id, preset_id):
+        get_http_exception('10')
+
+    check_light_combination_exist(light_combination_id)
+    if not check_light_combination_owning(light_combination_id, preset_id):
+        get_http_exception('10')
+    return get_response_status(data=get_light_strength_in_preset_from_db(light_combination_id))
+
+
 def list_acs(farm_id: int, username: str) -> ResponseDto[[FarmStats]]:
     user = get_user_from_db(username)
     if not user:
@@ -155,6 +177,7 @@ def list_acs(farm_id: int, username: str) -> ResponseDto[[FarmStats]]:
         get_http_exception('10')
 
     return get_response_status(data=get_acs_from_db(farm_id))
+
 
 def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStrengthInput,
                                        farm_id: int,
@@ -174,6 +197,7 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
 
     return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInput, farm_id, username))
 
+
 def check_light_density_limit( NaturalLightDensity: int,
                                 UVLightDensity: int,
                                 IRLightDensity: int):
@@ -183,3 +207,20 @@ def check_light_density_limit( NaturalLightDensity: int,
         get_http_exception('LT402')
     if IRLightDensity > 100 or IRLightDensity < 0:
         get_http_exception('LT403')
+
+
+def delete_light_preset(farm_id: int, preset_id: int, username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_preset_exist(preset_id)
+    if not check_preset_owning(farm_id, preset_id):
+        get_http_exception('10')
+
+    return delete_light_preset_in_db(preset_id)

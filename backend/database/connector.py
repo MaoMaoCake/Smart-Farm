@@ -7,9 +7,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from auth.models import User
-from farm.models import FarmOwner, FarmStats, Light, LightCombination, FarmLightPreset, LightStrength, AC, CreateLightInput, UpdateLightStrengthInput
-from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
+from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
+    FarmLightPreset, LightStrength, AC, CreateLightInput, \
+    UpdateLightStrengthInput
+from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
+    ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
+    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
 from response.error_codes import get_http_exception
+from response.response_dto import ResponseDto, get_response_status
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
                        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
@@ -224,6 +229,42 @@ def get_light_strength_from_db(light_id: int) -> LightStrength:
     )
 
 
+def get_light_strength_in_preset_from_db(light_combination_id: int) -> LightStrength:
+    light_strength_data = session.query(LightCombinationDB).filter(LightCombinationDB.id == light_combination_id).first()
+    light_data = session.query(LightDB).filter(LightDB.id == light_strength_data.lightId).first()
+
+
+    return LightStrength(
+        lightId=light_strength_data.lightId,
+        name=light_data.name,
+        automation=light_strength_data.automation,
+        NaturalLightDensity=light_strength_data.naturalLightDensity,
+        UVLightDensity=light_strength_data.UVLightDensity,
+        IRLightDensity=light_strength_data.IRLightDensity
+    )
+
+
+def check_light_combination_exist(combination_id) -> None:
+    light_combination = session.query(LightCombinationDB.id).filter(LightCombinationDB.id == combination_id).first()
+    if not light_combination:
+        get_http_exception('PC404')
+    return None
+
+
+def check_light_combination_owning(light_combination_id: int, preset_id: int) -> int | None:
+    preset_owning = session.query(LightCombinationDB.id, LightCombinationDB.farmLightPresetId).filter(LightCombinationDB.farmLightPresetId == preset_id
+                                                       , LightCombinationDB.id == light_combination_id).first()
+    print(preset_owning)
+    return LightCombinationDB.id if preset_owning else None
+
+
+def check_light_owning(farm_id: int, preset_id: int) -> int | None:
+    preset_owning = session.query(FarmLightPresetDB.id, FarmLightPresetDB.farmId).filter(FarmLightPresetDB.farmId == farm_id
+                                                       , FarmLightPresetDB.id == preset_id).first()
+
+    return FarmLightPresetDB.id if preset_owning else None
+
+
 def update_light_strength_to_all_light(update_light_strength_input: UpdateLightStrengthInput,
                                        farm_id: int,
                                        username: str) -> [Light]:
@@ -304,6 +345,21 @@ def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPr
             session.commit()
 
         return FarmLightPreset(preset_id=new_preset.id, name=new_preset.name)
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def delete_light_preset_in_db(preset_id: int) -> None:
+
+    try:
+        session.query(LightCombinationDB).filter(
+            LightCombinationDB.farmLightPresetId == preset_id).delete(synchronize_session='fetch')
+        session.commit()
+        session.query(FarmLightPresetDB).filter(
+        FarmLightPresetDB.id == preset_id).delete(synchronize_session='fetch')
+        session.commit()
+        return get_response_status('delete success')
     except SQLAlchemyError as e:
         session.rollback()
         get_http_exception(error_code='03', message=f'Database error: {e}')
