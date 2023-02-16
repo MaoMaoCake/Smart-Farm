@@ -87,19 +87,19 @@
     <div class="flex w-full flex-col md:flex-row md:flex-wrap">
         <div class="flex">
             <LightSetting farm_id={data.farm_id}/>
-                </div>
-        <div class="flex">
-            <ACSetting farm_id={data.farm_id}/>
         </div>
-        <div class="flex">
-            <CO2Setting farm_id={data.farm_id}/>
-        </div>
-        <div class="flex">
-            <HumiditySetting farm_id={data.farm_id}/>
-        </div>
-        <div class="flex">
-            <WateringSetting farm_id={data.farm_id}/>
-        </div>
+<!--        <div class="flex">-->
+<!--            <ACSetting farm_id={data.farm_id}/>-->
+<!--        </div>-->
+<!--        <div class="flex">-->
+<!--            <CO2Setting farm_id={data.farm_id}/>-->
+<!--        </div>-->
+<!--        <div class="flex">-->
+<!--            <HumiditySetting farm_id={data.farm_id}/>-->
+<!--        </div>-->
+<!--        <div class="flex">-->
+<!--            <WateringSetting farm_id={data.farm_id}/>-->
+<!--        </div>-->
     </div>
     <div class="flex">
             <button class="btn btn-primary" on:click={save_settings}>Save</button>
