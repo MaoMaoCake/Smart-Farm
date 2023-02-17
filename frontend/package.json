@@ -39,6 +39,7 @@
 	"type": "module",
 	"dependencies": {
 		"daisyui": "^2.46.1",
+		"svelte-dialogs": "^1.2.2",
 		"theme-change": "^2.3.0"
 	}
 }
