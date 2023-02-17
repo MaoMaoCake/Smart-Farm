@@ -12,10 +12,6 @@
     function addTime(){
         $FarmSettings.light_schedule = [...$FarmSettings.light_schedule, {time_start: "00:00", time_end: "00:00", preset: "null"}]
     }
-    function rmTime(index: number){
-        $FarmSettings.light_schedule.splice(index, 1)
-        $FarmSettings.light_schedule = $FarmSettings.light_schedule
-    }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col">
     <div class="flex items-center w-full">
@@ -30,7 +26,7 @@
     </div>
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.light_schedule as time, i}
-            <LightSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i + 1}/>
+            <LightSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i} />
 <!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}> remove</button>-->
         {/each}
     </div>
