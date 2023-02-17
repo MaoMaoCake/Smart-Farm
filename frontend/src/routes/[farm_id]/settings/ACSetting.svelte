@@ -12,14 +12,10 @@
     function addTime(){
         $FarmSettings.ac_schedule = [...$FarmSettings.ac_schedule, {time_start: "00:00", time_end: "00:00", temp: 0}]
     }
-    function rmTime(index: number){
-        $FarmSettings.ac_schedule.splice(index, 1)
-        $FarmSettings.ac_schedule = $FarmSettings.ac_schedule
-    }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
     <div class="flex items-center w-full">
-        <div on:click={() => {info("light")}}>
+        <div on:click={() => {info("ac")}}>
             <Icon icon="mdi:information" class="h-5 w-5 ml-5" />
         </div>
         <p class="bg-blue-900 rounded min-w-fit ml-5 pl-5 pr-5 white">AC Setting</p>
@@ -31,7 +27,7 @@
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.ac_schedule as ac, i}
             <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i + 1}/>
-            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>
+<!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>-->
         {/each}
     </div>
     <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>

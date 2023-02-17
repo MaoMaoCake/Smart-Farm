@@ -88,9 +88,9 @@
         <div class="flex">
             <LightSetting farm_id={data.farm_id}/>
         </div>
-<!--        <div class="flex">-->
-<!--            <ACSetting farm_id={data.farm_id}/>-->
-<!--        </div>-->
+        <div class="flex">
+            <ACSetting farm_id={data.farm_id}/>
+        </div>
 <!--        <div class="flex">-->
 <!--            <CO2Setting farm_id={data.farm_id}/>-->
 <!--        </div>-->
