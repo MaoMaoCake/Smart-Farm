@@ -5,9 +5,10 @@
     export let t_start;
     export let t_end;
     export let preset;
-    export let rm_num;
+
 
     import {TimePicker} from 'svelte-time-picker'
+    import { dialogs } from "svelte-dialogs";
 
     let user_preset = [{name: 'preset 1', preset_id: "preset1"},
                         {name: 'preset 2', preset_id: "preset2"}]
@@ -15,7 +16,6 @@
 
     let s_open = false;
     let e_open = false;
-    let confirm_delete = false;
 
     let options = {
         /* Minutes increment */
@@ -48,14 +48,15 @@
         $FarmSettings.light_schedule = $FarmSettings.light_schedule
     }
 
-    function remove(){
+    async function remove(){
         //alert remove
-
-        if (ok){
-            rmTime(num);
+        if (await dialogs.confirm("Are You sure you want to delete this time?")){
+            rmTime(num)
         }
     }
+
 </script>
+
 <div class="flex justify-evenly">
     <div class="flex flex-row justify-evenly grow">
         <div class="flex items-start pt-2">
@@ -64,7 +65,7 @@
         <div class="flex flex-col grow">
             <div class="flex items-center">
                 <p class="ml-2">ON</p>
-                <p on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_start}</p>
+                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_start}</button>
                 {#if s_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0">
                     </div>
@@ -78,7 +79,7 @@
             </div>
             <div class="flex items-center">
                 <p class="pl-2">Off</p>
-                <p on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_end}</p>
+                <button on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_end}</button>
                 {#if e_open}
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2">
                         <div class="flex flex-col justify-center">
@@ -107,7 +108,7 @@
         </div>
         </div>
         <div class="flex grow items-center pl-5">
-            <button class="btn btn-error rounded-xl" on:click={() => {rmTime(num)}}>X</button>
+            <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
         </div>
     </div>
 </div>
