@@ -10,10 +10,11 @@ from .utils import link_farm_to_user, list_farms,\
     list_light, get_light_in_preset, list_light_preset,\
     list_acs, get_farm_stats_from_farm_id, get_light_strength_setting,\
     create_new_preset, create_new_light, apply_light_strength_to_all_lights,\
-    get_light_strength_setting_in_preset, delete_light_preset
+    get_light_strength_setting_in_preset, get_farm_settings, delete_light_preset
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
-    FarmLightPreset, AC, LightStrength, CreateLightInput, UpdateLightStrengthInput
+    FarmLightPreset, AC, LightStrength, CreateLightInput, \
+    UpdateLightStrengthInput, GetFarmSettings
 
 farmRouter = APIRouter()
 
@@ -92,7 +93,14 @@ async def get_light_strength_in_preset(light_combination_id: int, preset_id: int
     return get_light_strength_setting_in_preset(light_combination_id, preset_id, farm_id, current_user.username)
 
 
+@farmRouter.get("/farm/{farm_id}", response_model=ResponseDto[GetFarmSettings], tags=["Farm"])
+async def get_farm_setting(farm_id: int, current_user: User = Depends(get_current_active_user)):
+
+    return get_farm_settings(farm_id, current_user.username)
+
+
 @farmRouter.delete("/farm/{farm_id}/{preset_id}}", response_model=ResponseDto, tags=["Farm"])
 async def delete_preset(farm_id: int, preset_id: int, current_user: User = Depends(get_current_active_user)):
 
     return delete_light_preset(farm_id, preset_id, current_user.username)
+    

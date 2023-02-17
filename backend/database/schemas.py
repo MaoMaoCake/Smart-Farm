@@ -116,6 +116,14 @@ class WateringAutomationDB(BaseModel):
     endTime = Column(Time, nullable=False)
 
 
+class LightAutomationDB(BaseModel):
+    __tablename__ = "lightpresetautomation"
+    farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
+    startTime = Column(Time, nullable=False)
+    endTime = Column(Time, nullable=False)
+    farmLightPresetId = Column(Integer, nullable=False)
+
+
 class LightDB(BaseModel):
     __tablename__ = "light"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
@@ -156,3 +164,5 @@ class LightPresetAutomationDB(BaseModel):
     endTime = Column(Time, nullable=False)
 
     FarmLightPreset = relationship("FarmLightPresetDB")
+
+

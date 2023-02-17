@@ -9,10 +9,12 @@ from sqlalchemy.orm import sessionmaker
 from auth.models import User
 from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmLightPreset, LightStrength, AC, CreateLightInput, \
-    UpdateLightStrengthInput
+    UpdateLightStrengthInput, GetFarmSettings, LightAutomation, FarmLightPreset, \
+    ACAutomation, WateringAutomation
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
-    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
+    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
+    ACAutomationDB, WateringAutomationDB, LightAutomationDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
 
@@ -303,6 +305,7 @@ def get_acs_from_db(farm_id: int) -> [AC]:
         ACStatus=ac.status
     ) for ac in acs]
 
+
 def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPreset:
     preset_amount = len(get_light_presets_from_db(farm_id))
     try:
@@ -350,8 +353,39 @@ def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPr
         get_http_exception(error_code='03', message=f'Database error: {e}')
 
 
-def delete_light_preset_in_db(preset_id: int) -> None:
+def get_farm_setting_from_db(farm_id: int) -> GetFarmSettings:
+    light_automations = session.query(LightAutomationDB).filter(LightAutomationDB.farmId == farm_id).all()
+    farm_light_presets = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.farmId == farm_id).all()
+    ac_automations = session.query(ACAutomationDB).filter(ACAutomationDB.farmId == farm_id).all()
+    watering_automations = session.query(WateringAutomationDB).filter(WateringAutomationDB.farmId == farm_id).all()
+    farm_setting = session.query(FarmDb).filter(FarmDb.id == farm_id).first()
 
+    return GetFarmSettings(MinCO2Level=farm_setting.minCO2,
+                           MaxHumidityLevel=farm_setting.maxHumidity,
+                           LightAutomations=[LightAutomation(
+                               lightAutomationId=data.id,
+                               startTime=data.startTime,
+                               endTime=data.endTime,
+                               farmLightPresetId=data.farmLightPresetId) for data in light_automations],
+                           FarmLightPresets=[FarmLightPreset(
+                               name=data.name,
+                               preset_id=data.id
+                           ) for data in farm_light_presets],
+                           ACAutomations=[ACAutomation(
+                               ACAutomationId=data.id,
+                               startTime=data.startTime,
+                               endTime=data.endTime,
+                               temperature=data.temperature
+                           ) for data in ac_automations],
+                           WateringAutomations=[WateringAutomation(
+                               wateringAutomationId=data.id,
+                               wateringStartTime=data.startTime,
+                               wateringEndTime=data.endTime
+                           ) for data in watering_automations]
+                           )
+
+
+def delete_light_preset_in_db(preset_id: int) -> None:
     try:
         session.query(LightCombinationDB).filter(
             LightCombinationDB.farmLightPresetId == preset_id).delete(synchronize_session='fetch')
