@@ -70,11 +70,11 @@
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0">
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2">
-                            <div class="flex flex-col justify-center">
-                                <TimePicker {options} on:change={startCallback} />
-                                <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
-                            </div>
+                        <div class="flex flex-col justify-center">
+                            <TimePicker {options} on:change={startCallback} />
+                            <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
                         </div>
+                    </div>
                 {/if}
             </div>
             <div class="flex items-center">
@@ -94,20 +94,20 @@
         </div>
         <div class="flex flex-col grow justify-evenly">
             <div class="form-control w-full max-w-xs">
-            <label class="label input-group input-group-vertical">
-                <span class="label-text bg-base-100 ">Preset</span>
-            <select class="select bg-amber-500 rounded-lg white">
-                {#if selected.preset_id === "" }
-                    <option disabled selected>Pick one</option>
-                {:else}
-                    <option disabled selected>{selected.name}</option>
-                {/if}
-                {#each user_preset as choice}
-                    <option value={choice.preset_id}>{choice.name}</option>
-                {/each}
-            </select>`
-            </label>
-        </div>
+                <label class="label input-group input-group-vertical">
+                    <span class="label-text bg-base-100 ">Preset</span>
+                    <select class="select bg-amber-500 rounded-lg white">
+                        {#if selected.preset_id === "" }
+                            <option disabled selected>Pick one</option>
+                        {:else}
+                            <option disabled selected>{selected.name}</option>
+                        {/if}
+                        {#each user_preset as choice}
+                            <option value={choice.preset_id}>{choice.name}</option>
+                        {/each}
+                    </select>
+                </label>
+            </div>
         </div>
         <div class="flex grow items-center pl-5">
             <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
