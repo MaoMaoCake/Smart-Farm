@@ -26,7 +26,7 @@
     </div>
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.ac_schedule as ac, i}
-            <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i + 1}/>
+            <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i}/>
 <!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>-->
         {/each}
     </div>
