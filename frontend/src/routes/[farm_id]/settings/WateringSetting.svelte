@@ -12,10 +12,6 @@
     function addTime(){
         $FarmSettings.watering_schedule = [...$FarmSettings.watering_schedule, {time_start: "00:00"}]
     }
-    function rmTime(index: number){
-        $FarmSettings.watering_schedule.splice(index, 1)
-        $FarmSettings.watering_schedule = $FarmSettings.watering_schedule
-    }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
     <div class="flex items-center w-full">
@@ -30,8 +26,8 @@
     </div>
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.watering_schedule as water, i}
-            <WateringSet t_start={water.time_start} num={i + 1}/>
-            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>
+            <WateringSet t_start={water.time_start} num={i}/>
+<!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>-->
         {/each}
     </div>
     <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>

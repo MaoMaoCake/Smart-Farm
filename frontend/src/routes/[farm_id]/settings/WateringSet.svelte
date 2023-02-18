@@ -1,7 +1,9 @@
-<script>
+<script lang="ts">
+    import {dialogs} from "svelte-dialogs";
+    import {FarmSettings} from "$lib/SettingStores"
+
     export let num;
     export let t_start;
-    export let t_end;
 
 
     import {TimePicker} from 'svelte-time-picker'
@@ -32,22 +34,61 @@
             e_open = false
         }
     }
+
+    function rmTime(index: number) {
+        $FarmSettings.watering_schedule.splice(index, 1)
+        $FarmSettings.watering_schedule = $FarmSettings.watering_schedule
+    }
+
+    async function remove(){
+        //alert remove
+        if (await dialogs.confirm("Are You sure you want to delete this time?")){
+            rmTime(num)
+        }
+    }
 </script>
-<div class="flex w-screen justify-evenly">
-    <div class="flex">
-        <p class="mt-4">{num}</p>
-        <div class="flex flex-col pl-2 mt-2 mb-2">
-            <div class="flex flex-row pt-2 pb-2 justify-center items-center">
-                <p on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_start}</p>
-                {#if s_open}
-                    <div class="flex justify-center items-center absolute top-1/2 bottom-1/2 left-1/2 right-1/2">
-                        <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={startCallback} />
-                            <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
-                        </div>
+<div class="flex justify-evenly grow">
+    <div class="flex flex-col grow items-center">
+        <div class="flex justify-evenly grow">
+            <div>
+            <p class="text-bold">{num + 1}.</p>
+            </div>
+            <div>
+                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_start}</button>
+            {#if s_open}
+                <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
+                </div>
+                <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
+                    <div class="flex flex-col justify-center">
+                        <TimePicker {options} on:change={startCallback} />
+                        <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
                     </div>
-                {/if}
+                </div>
+            {/if}
+            </div>
+            <div class="flex grow items-center pl-5">
+                <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
             </div>
         </div>
     </div>
+<!--    <div class="flex flex-row justify-center grow">-->
+<!--        <div>-->
+<!--            <p class="text-bold">{num + 1}.</p>-->
+<!--        </div>-->
+<!--        <div class="flex flex-col grow">-->
+<!--            <div class="flex items-center justify-center">-->
+<!--                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_start}</button>-->
+<!--                {#if s_open}-->
+<!--                    <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">-->
+<!--                    </div>-->
+<!--                    <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">-->
+<!--                        <div class="flex flex-col justify-center">-->
+<!--                            <TimePicker {options} on:change={startCallback} />-->
+<!--                            <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                {/if}-->
+<!--        </div>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
