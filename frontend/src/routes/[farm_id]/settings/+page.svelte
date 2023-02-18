@@ -49,8 +49,8 @@
   }
 </script>
 
-<div class="flex w-full justify-center items-center flex-col md:flex-row md:w-fit">
-    <div class="flex flex-col">
+<div class="flex w-full justify-center items-center flex-col md:flex-row">
+    <div class="flex flex-col grow">
         <div>
         <StatPreview farm_name="{data.farm_data.name}" temp="{data.farm_data.temp}" humidity={data.farm_data.humidity}
                      light={data.farm_data.light} ac="{data.farm_data.ac}" humidifier={data.farm_data.humidifier}
@@ -84,27 +84,32 @@
         </div>
     </div>
     </div>
-    <div class="flex w-full flex-col md:flex-row md:flex-wrap">
-        <div class="flex">
-            <LightSetting farm_id={data.farm_id}/>
+    <div class="flex w-full flex-col md:flex-row md:flex-wrap grow md:pl-10 md:pr-10">
+        <div class="flex flex-col grow">
+            <div class="flex">
+                <LightSetting farm_id={data.farm_id}/>
+            </div>
+            <div class="flex">
+                <ACSetting farm_id={data.farm_id}/>
+            </div>
         </div>
-<!--        <div class="flex">-->
-<!--            <ACSetting farm_id={data.farm_id}/>-->
-<!--        </div>-->
-<!--        <div class="flex">-->
-<!--            <CO2Setting farm_id={data.farm_id}/>-->
-<!--        </div>-->
-<!--        <div class="flex">-->
-<!--            <HumiditySetting farm_id={data.farm_id}/>-->
-<!--        </div>-->
-<!--        <div class="flex">-->
-<!--            <WateringSetting farm_id={data.farm_id}/>-->
-<!--        </div>-->
+        <div class="flex flex-col grow">
+            <div class="flex">
+                <CO2Setting farm_id={data.farm_id}/>
+            </div>
+            <div class="flex">
+                <HumiditySetting farm_id={data.farm_id}/>
+            </div>
+            <div class="flex">
+                <WateringSetting farm_id={data.farm_id}/>
+            </div>
+        </div>
+        <div class="pb-40 md:hidden"></div> <!-- spacer for bottom -->
     </div>
-    <div class="flex">
-            <button class="btn btn-primary" on:click={save_settings}>Save</button>
-        </div>
 </div>
+<div class=" flex grow w-screen justify-center fixed bottom-10">
+            <button class="btn btn-primary w-10/12 md:w-1/2" on:click={save_settings}>Save</button>
+        </div>
 
 <style>
     .white {
