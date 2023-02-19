@@ -99,6 +99,7 @@
             <div class="flex">
                 <ACSetting farm_id={data.farm_id}/>
             </div>
+            <div class="pb-44 hidden md:block"></div> <!-- spacer for save button in desktop -->
         </div>
         <div class="flex flex-col grow">
             <div class="flex">
