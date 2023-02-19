@@ -16,14 +16,13 @@
 <div class="grid grid-cols-7 grid-rows-4 max-w-md bg-gray-300 m-5 rounded-lg w-80 h-48">
     <div class="col-start-1 col-span-7 row-start-1 flex justify-center bg-primary rounded-t-lg white item-center pt-2">
         {farm_name}
-        <a href="{farm_id}/settings">
-            {#if farm_id}
+        {#if farm_id}
+            <a href="{farm_id}/settings">
                 <Icon icon="icon-park-solid:setting-two" class="h-5 w-5 ml-2 pt-1"/>
-            {/if}
-        </a>
+            </a>
+        {/if}
     </div>
     <div class="col-start-1 col-span-3 row-start-2 row-span-3 flex items-center justify-evenly bg-blue-900 rounded-lg m-2 white flex-col">
-
         <div class="flex justify-evenly items-center">
             <Icon icon="fa-solid:thermometer-half" class="h-10 w-10"/>
             <p class="text-xl">{temp}°</p>
@@ -52,7 +51,6 @@
             {/if}
             <p>{humidifier ? 'On' : 'Off'}</p>
         </div>
-
     </div>
     <div class="col-start-4 col-span-2 row-start-3 row-span-2 bg-amber-500 flex justify-center items-center m-2 rounded-lg white">
         <div>
@@ -73,7 +71,6 @@
         </div>
     </div>
 </div>
-
 <style>
     .white {
         color: white;
