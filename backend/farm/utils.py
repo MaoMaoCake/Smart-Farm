@@ -1,5 +1,3 @@
-from typing import Optional
-
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
     list_farms_from_user_id, check_farm_exist,\
@@ -10,13 +8,18 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_acs_from_db, get_farm_stats_from_db, create_preset,\
     create_light, update_light_strength_to_all_light,\
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
-    check_light_combination_owning, delete_light_preset_in_db
+    check_light_combination_owning, delete_light_preset_in_db,\
+    get_esp_map
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
+from .config import create_mqtt_request
+
 from .models import FarmOwner, FarmStats, Light,\
     LightCombination, FarmLightPreset, LightStrength,\
-    CreateLightInput, UpdateLightStrengthInput
+    CreateLightInput, UpdateLightStrengthInput, LightRequest
+
+from .enum_list import HardwareType
 
 
 def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
@@ -224,3 +227,26 @@ def delete_light_preset(farm_id: int, preset_id: int, username: str):
         get_http_exception('10')
 
     return delete_light_preset_in_db(preset_id)
+
+
+def light_controlling(farm_id: int, is_turn_on: bool, username: str):
+    lights = list_light(farm_id, username).data
+    ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
+
+    for light in lights:
+        if light.isAutomation:
+            try:
+                response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
+                                               message=str(LightRequest(
+                                                   activate=is_turn_on,
+                                                   uv_percent=light.UVLightDensity,
+                                                   ir_percent=light.IRLightDensity,
+                                                   natural_percent=light.naturalLightDensity
+                                               )))
+
+                if response.status_code != 200:
+                    get_http_exception('03', message='MQTT connection failed')
+            except:
+                get_http_exception('03', message='MQTT connection failed')
+
+    return get_response_status(message='Successfully send requests to mqtt broker')

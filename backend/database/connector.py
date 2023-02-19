@@ -12,7 +12,8 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     UpdateLightStrengthInput
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
-    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
+    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB,\
+    MQTTMapDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
 
@@ -363,3 +364,13 @@ def delete_light_preset_in_db(preset_id: int) -> None:
     except SQLAlchemyError as e:
         session.rollback()
         get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def get_esp_map(hardware_type: str):
+    ESP_mapping = {}
+
+    mqtt_map = session.query(MQTTMapDB).filter(MQTTMapDB.hardwareType==hardware_type).all()
+    for mapping in mqtt_map:
+        ESP_mapping[f"{mapping.hardwareType.value}{mapping.hardwareId}"] = mapping.ESPId
+
+    return ESP_mapping
