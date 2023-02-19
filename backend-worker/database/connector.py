@@ -36,7 +36,6 @@ def get_all_lights_automation() -> list[AutomationInput]:
                                 .filter(LightCombinationDB.farmLightPresetId == LightPresetAutomationDB.id)\
                                 .all()
 
-# TODO match the database
         for light_setting in light_settings:
             if light_setting.LightCombinationDB.automation:
                 light_requests.append(AutomationInput(

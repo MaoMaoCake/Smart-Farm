@@ -5,6 +5,8 @@ from sqlalchemy.orm import relationship
 from .utils import current_datetime
 from .enum_list import Role
 
+from farm.enum_list import HardwareType, ESPType
+
 Base = declarative_base()
 
 
@@ -156,3 +158,11 @@ class LightPresetAutomationDB(BaseModel):
     endTime = Column(Time, nullable=False)
 
     FarmLightPreset = relationship("FarmLightPresetDB")
+
+
+class MQTTMapDB(BaseModel):
+    __tablename__ = "MQTTMap"
+    hardwareType = Column(Enum(HardwareType), nullable=False)
+    hardwareId = Column(Integer, nullable=False)
+    ESPId = Column(Integer, nullable=False)
+    ESPType = Column(Enum(ESPType), nullable=False)
