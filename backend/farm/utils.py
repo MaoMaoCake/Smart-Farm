@@ -1,3 +1,7 @@
+import requests
+import os
+import json
+
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
     list_farms_from_user_id, check_farm_exist,\
@@ -9,7 +13,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     create_light, update_light_strength_to_all_light,\
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
     check_light_combination_owning, delete_light_preset_in_db,\
-    get_esp_map
+    get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -17,8 +21,9 @@ from .config import create_mqtt_request
 
 from .models import FarmOwner, FarmStats, Light,\
     LightCombination, FarmLightPreset, LightStrength,\
-    CreateLightInput, UpdateLightStrengthInput, LightRequest, \
-    ACRequest, AC
+    CreateLightInput, UpdateLightStrengthInput, LightRequest,\
+    AutomationInput, ACRequest, DeleteAutomationInput, AutomationInputJSON,\
+    AC, ACAutomation
 
 from .enum_list import HardwareType
 
@@ -270,3 +275,83 @@ def ac_controlling(farm_id: int, is_turn_on: bool, _temperature: int ,username: 
                 get_http_exception('03', message='MQTT connection failed')
 
     return get_response_status(message='Successfully send requests to mqtt broker')
+
+
+def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    AC = check_ac_owning(farm_id, ac_id)
+    if not AC:
+        get_http_exception('10')
+
+    if AC.automation and is_turn_on:
+        get_http_exception(error_code='06', message='AC automation is already set to ON')
+    elif not AC.automation and not is_turn_on:
+        get_http_exception(error_code='06', message='AC automation is already set to OFF')
+
+    AC_automations = get_ac_automation(ac_id)
+    mapping = get_esp_map(HardwareType.AC)
+
+    url = os.getenv("WORKER_SERVICE_URL")
+    port = os.getenv("WORKER_SERVICE_PORT")
+    path = f"{url}:{port}/task"
+
+    if is_turn_on:
+        create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
+    elif not is_turn_on:
+        try:
+            for AC_automation in AC_automations:
+                body = DeleteAutomationInput(
+                    ESP_id=mapping[f"{HardwareType.AC.value}{ac_id}"],
+                    automation_id=AC_automation.ACId,
+                    hardware_type=HardwareType.AC.value
+                )
+                r = requests.delete(url=path, data=json.dumps(body.__dict__))
+                if r.status_code != 200:
+                    response_message = json.loads(r.content)
+                    get_http_exception('03', message=str(response_message["message"]))
+        except:
+            get_http_exception('03', message='Backend worker connection failed')
+
+        try:
+            response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
+                                           message=str(ACRequest(
+                                               activate=is_turn_on,
+                                               temperature=AC.temperature
+                                           )))
+
+            if response.status_code != 200:
+                get_http_exception('03', message='MQTT connection failed')
+        except:
+            create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
+            get_http_exception('03', message='MQTT connection failed')
+
+    return get_response_status(data=update_ac_automation_status(ac_id, is_turn_on))
+
+
+def create_ac_scheduler_task(AC_automations: ACAutomation, mapping, ac_id: int, path: str):
+    try:
+        for AC_automation in AC_automations:
+            body = AutomationInputJSON(
+                ESP_id=mapping[f"{HardwareType.AC.value}{ac_id}"],
+                start_time=str(AC_automation.startTime),
+                end_time=str(AC_automation.endTime),
+                automation_id=AC_automation.ACId,
+                hardware_type=HardwareType.AC,
+                activate=True,
+                temperature=AC_automation.temperature
+            )
+            r: requests.Response = requests.post(url=path, data=json.dumps(body.__dict__))
+            if r.status_code != 200:
+                response_message = json.loads(r.content)
+                get_http_exception('03', message=str(response_message["message"]))
+    except:
+        get_http_exception('03', message='Backend worker connection failed')
+

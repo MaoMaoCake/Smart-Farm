@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from typing import Optional
 
 # OAuth Libraries
 from auth.utils import get_current_active_user
@@ -10,7 +9,8 @@ from .utils import link_farm_to_user, list_farms,\
     list_light, get_light_in_preset, list_light_preset,\
     list_acs, get_farm_stats_from_farm_id, get_light_strength_setting,\
     create_new_preset, create_new_light, apply_light_strength_to_all_lights,\
-    get_light_strength_setting_in_preset, delete_light_preset, light_controlling, ac_controlling
+    get_light_strength_setting_in_preset, delete_light_preset, light_controlling,\
+    update_ac_automation_by_id, ac_controlling
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
     FarmLightPreset, AC, LightStrength, CreateLightInput, UpdateLightStrengthInput
@@ -109,3 +109,8 @@ async def control_ac(farm_id: int, is_turn_on: bool, temperature: int ,current_u
 
     return ac_controlling(farm_id, is_turn_on, temperature ,current_user.username)
 
+
+@farmRouter.patch("/farm/{farm_id}/AC/{ac_id}/automation", response_model=ResponseDto, tags=["Farm"])
+async def update_ac_automation(ac_id: int, farm_id: int, is_turn_on: bool, current_user: User = Depends(get_current_active_user)):
+
+    return update_ac_automation_by_id(ac_id, farm_id, is_turn_on, current_user.username)
