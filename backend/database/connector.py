@@ -301,7 +301,7 @@ def get_acs_from_db(farm_id: int) -> [AC]:
     return [AC(
         ACId=ac.id,
         ACName=ac.name,
-        ACStatus=ac.status
+        ACStatus=ac.automation
     ) for ac in acs]
 
 def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPreset:

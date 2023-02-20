@@ -17,7 +17,8 @@ from .config import create_mqtt_request
 
 from .models import FarmOwner, FarmStats, Light,\
     LightCombination, FarmLightPreset, LightStrength,\
-    CreateLightInput, UpdateLightStrengthInput, LightRequest
+    CreateLightInput, UpdateLightStrengthInput, LightRequest, \
+    ACRequest, AC
 
 from .enum_list import HardwareType
 
@@ -169,7 +170,7 @@ def get_light_strength_setting_in_preset(light_combination_id: int, preset_id, f
     return get_response_status(data=get_light_strength_in_preset_from_db(light_combination_id))
 
 
-def list_acs(farm_id: int, username: str) -> ResponseDto[[FarmStats]]:
+def list_acs(farm_id: int, username: str) -> ResponseDto[[AC]]:
     user = get_user_from_db(username)
     if not user:
         get_http_exception('US404')
@@ -232,9 +233,9 @@ def delete_light_preset(farm_id: int, preset_id: int, username: str):
 def light_controlling(farm_id: int, is_turn_on: bool, username: str):
     lights = list_light(farm_id, username).data
     ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
-
     for light in lights:
         if light.isAutomation:
+
             try:
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
                                                message=str(LightRequest(
@@ -243,9 +244,28 @@ def light_controlling(farm_id: int, is_turn_on: bool, username: str):
                                                    ir_percent=light.IRLightDensity,
                                                    natural_percent=light.naturalLightDensity
                                                )))
-
                 if response.status_code != 200:
                     get_http_exception('03', message='MQTT connection failed')
+            except:
+                get_http_exception('03', message='MQTT connection failed')
+
+    return get_response_status(message='Successfully send requests to mqtt broker')
+
+
+def ac_controlling(farm_id: int, is_turn_on: bool, _temperature: int ,username: str):
+    acs = list_acs(farm_id, username).data
+    ESP_mapping = get_esp_map(HardwareType.AC.value)
+    for ac in acs:
+        if ac.ACStatus:
+            try:
+                response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.AC.value}{ac.ACId}"]),
+                                               message=str(ACRequest(
+                                                   activate=is_turn_on,
+                                                   temperature=_temperature
+                                               )))
+
+                if response.status_code != 200:
+                    get_http_exception('03', message='MQTT connection failed!')
             except:
                 get_http_exception('03', message='MQTT connection failed')
 
