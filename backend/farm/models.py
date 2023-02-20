@@ -49,6 +49,7 @@ class FarmStats(BaseModel):
 class Light(BaseModel):
     lightId: int
     lightName: str
+    status: bool
     isAutomation: bool
     naturalLightDensity: int
     UVLightDensity: int

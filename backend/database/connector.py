@@ -190,6 +190,7 @@ def create_light(farm_id: int, create_light_input: CreateLightInput, username: s
 
     return Light(lightId=new_light.id,
                  lightName=new_light.name,
+                 status=new_light.status,
                  isAutomation=new_light.automation,
                  UVLightDensity=new_light.UVLightDensity,
                  IRLightDensity=new_light.IRLightDensity,
@@ -201,6 +202,7 @@ def get_lights_from_db(farm_id: int) -> [Light]:
 
     return [Light(lightId=light.id,
                     lightName=light.name,
+                    status=light.status,
                     isAutomation=light.automation,
                     UVLightDensity=light.UVLightDensity,
                     IRLightDensity=light.IRLightDensity,

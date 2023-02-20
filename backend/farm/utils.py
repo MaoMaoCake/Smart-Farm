@@ -205,6 +205,23 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
                               updateLightStrengthInput.UVLightDensity,
                               updateLightStrengthInput.IRLightDensity)
 
+    ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
+    lights = list_light(farm_id, username).data
+    for light in lights:
+        print(light)
+        try:
+            response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
+                                           message=str(LightRequest(
+                                               activate=light.status,
+                                               uv_percent=updateLightStrengthInput.UVLightDensity,
+                                               ir_percent= updateLightStrengthInput.IRLightDensity,
+                                               natural_percent=updateLightStrengthInput.NaturalLightDensity
+                                           )))
+            if response.status_code != 200:
+                get_http_exception('03', message='MQTT connection failed')
+        except:
+            get_http_exception('03', message='MQTT connection failed')
+
     return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInput, farm_id, username))
 
 
@@ -241,7 +258,6 @@ def light_controlling(farm_id: int, is_turn_on: bool, username: str):
     ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
     for light in lights:
         if light.isAutomation:
-
             try:
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
                                                message=str(LightRequest(
