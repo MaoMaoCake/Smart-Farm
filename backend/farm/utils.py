@@ -1,6 +1,7 @@
 import requests
 import os
 import json
+from distutils.util import strtobool
 
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
@@ -296,7 +297,7 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
     elif not AC.automation and not is_turn_on:
         get_http_exception(error_code='06', message='AC automation is already set to OFF')
 
-    AC_automations = get_ac_automation(ac_id)
+    AC_automations = get_ac_automation(farm_id)
     mapping = get_esp_map(HardwareType.AC)
 
     url = os.getenv("WORKER_SERVICE_URL")
@@ -306,20 +307,7 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
     if is_turn_on:
         create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
     elif not is_turn_on:
-        try:
-            for AC_automation in AC_automations:
-                body = DeleteAutomationInput(
-                    ESP_id=mapping[f"{HardwareType.AC.value}{ac_id}"],
-                    automation_id=AC_automation.ACId,
-                    hardware_type=HardwareType.AC.value
-                )
-                r = requests.delete(url=path, data=json.dumps(body.__dict__))
-                if r.status_code != 200:
-                    response_message = json.loads(r.content)
-                    get_http_exception('03', message=str(response_message["message"]))
-        except:
-            get_http_exception('03', message='Backend worker connection failed')
-
+        delete_ac_scheduler_task(AC_automations, mapping, ac_id, path)
         try:
             response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
                                            message=str(ACRequest(
@@ -355,3 +343,28 @@ def create_ac_scheduler_task(AC_automations: ACAutomation, mapping, ac_id: int, 
     except:
         get_http_exception('03', message='Backend worker connection failed')
 
+
+def delete_ac_scheduler_task(AC_automations: ACAutomation, mapping, ac_id: int, path: str):
+    try:
+        for AC_automation in AC_automations:
+            body = DeleteAutomationInput(
+                ESP_id=mapping[f"{HardwareType.AC.value}{ac_id}"],
+                automation_id=AC_automation.ACId,
+                hardware_type=HardwareType.AC.value
+            )
+            r = requests.delete(url=path, data=json.dumps(body.__dict__))
+            if r.status_code != 200:
+                response_message = json.loads(r.content)
+                get_http_exception('03', message=str(response_message["message"]))
+    except:
+        get_http_exception('03', message='Backend worker connection failed')
+
+
+def update_automation_to_all_acs(farm_id, is_turn_on: bool, username: str):
+    acs = list_acs(farm_id, username).data
+
+    for ac in acs:
+        if (bool(strtobool(ac.ACStatus)) and not is_turn_on) or (not bool(strtobool(ac.ACStatus)) and is_turn_on):
+            update_ac_automation_by_id(ac.ACId, farm_id, is_turn_on, username)
+
+    return get_response_status(message='update successfully')

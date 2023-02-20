@@ -82,8 +82,8 @@ def check_ac_owning(farm_id: int, ac_id: int) -> int | None:
     return ac_owning if ac_owning else None
 
 
-def get_ac_automation(ac_id: int) -> [AC]:
-    acs = session.query(ACAutomationDB).filter(ACAutomationDB.id == ac_id).all()
+def get_ac_automation(farm_id: int) -> [AC]:
+    acs = session.query(ACAutomationDB).filter(ACAutomationDB.farmId == farm_id).all()
 
     return [ACAutomation(
         ACId=ac.id,
