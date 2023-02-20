@@ -7,6 +7,7 @@ class AutomationInput(BaseModel):
     ESP_id: int
     start_time: time
     end_time: Optional[time]
+    automation_id: int
     hardware_type: str
     activate: Optional[bool]
     uv_percent: Optional[int]
@@ -15,6 +16,12 @@ class AutomationInput(BaseModel):
     co2_threshold: Optional[int]
     humidity_threshold: Optional[int]
     temperature: Optional[int]
+
+
+class DeleteAutomationInput(BaseModel):
+    ESP_id: int
+    automation_id: int
+    hardware_type: str
 
 
 class LightRequest(BaseModel):

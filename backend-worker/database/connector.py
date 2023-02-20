@@ -42,6 +42,7 @@ def get_all_lights_automation() -> list[AutomationInput]:
                     ESP_id=ESP_mapping[f"{HardwareType.LIGHT.value}{light_setting.LightDB.id}"],
                     start_time=light_automation.startTime,
                     end_time=light_automation.endTime,
+                    automation_id=light_automation.id,
                     hardware_type=HardwareType.LIGHT,
                     activate=True,
                     uv_percent=light_setting.LightCombinationDB.UVLightDensity,
@@ -71,6 +72,7 @@ def get_all_AC_automation() -> list[AutomationInput]:
                 ESP_id=ESP_mapping[f"{HardwareType.AC.value}{AC_setting.id}"],
                 start_time=AC_automation.startTime,
                 end_time=AC_automation.endTime,
+                automation_id=AC_automation.id,
                 hardware_type=HardwareType.AC,
                 activate=True,
                 temperature=AC_automation.temperature

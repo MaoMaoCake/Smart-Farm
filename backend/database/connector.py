@@ -9,11 +9,11 @@ from sqlalchemy.orm import sessionmaker
 from auth.models import User
 from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmLightPreset, LightStrength, AC, CreateLightInput, \
-    UpdateLightStrengthInput
+    UpdateLightStrengthInput, ACAutomation
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB,\
-    MQTTMapDB
+    MQTTMapDB, ACAutomationDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
 
@@ -75,6 +75,32 @@ def check_farm_owning(user_id: int, farm_id: int) -> int | None:
     return farm_owning.id if farm_owning else None
 
 
+def check_ac_owning(farm_id: int, ac_id: int) -> int | None:
+    ac_owning = session.query(ACDB).filter(ACDB.id == ac_id
+                                            ,ACDB.farmId == farm_id).first()
+
+    return ac_owning if ac_owning else None
+
+
+def get_ac_automation(ac_id: int) -> [AC]:
+    acs = session.query(ACAutomationDB).filter(ACAutomationDB.id == ac_id).all()
+
+    return [ACAutomation(
+        ACId=ac.id,
+        temperature=ac.temperature,
+        startTime=ac.startTime,
+        endTime=ac.endTime
+    ) for ac in acs]
+
+
+def update_ac_automation_status(ac_id: int, turn_on: bool) -> AC:
+    updated = session.query(ACDB).filter(ACDB.id == ac_id)\
+                             .update({'automation': turn_on})
+    session.commit()
+
+    return updated
+
+
 def list_farms_from_user_id(user_id: int) -> [FarmStats]:
     farm_owning = session.query(FarmOwnerDB.farmId).filter(FarmOwnerDB.userId == user_id).all()
     farm_ids = [farm[0] for farm in farm_owning]
@@ -104,6 +130,7 @@ def get_farm_stats_from_db(farm_id: int) -> FarmStats:
                           FarmDb.name,
                           TemperatureSensorDB.temperature,
                           ACDB.status,
+                          ACDB.temperature,
                           HumiditySensorDB.humidity,
                           DehumidifierDB.status,
                           FarmDb.lightStatus,

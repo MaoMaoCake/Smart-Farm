@@ -4,9 +4,10 @@ import time as t
 
 from response.response_dto import get_response_status, ResponseDto
 from database.connector import get_all_lights_automation, get_all_AC_automation
+from response.error_codes import get_http_exception
 
 from .utils import run_task, validate_input
-from .models import AutomationInput
+from .models import AutomationInput, DeleteAutomationInput
 
 workerRouter = APIRouter()
 tasks = {}
@@ -26,17 +27,20 @@ async def index():
 @workerRouter.post("/task", response_model=ResponseDto)
 async def add_task(automation_input: AutomationInput):
     validate_input(automation_input)
-    if f"{automation_input.ESP_id}_start" in tasks:
+    if f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+       f"_{automation_input.automation_id}_start" in tasks:
         await update_task(automation_input)
 
     job_id = schedule.every().day.at(automation_input.start_time.strftime("%H:%M")).do(run_task, automation_input, True)
-    tasks[f"{automation_input.ESP_id}_start"] = {"job_id": job_id}
+    tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+          f"_{automation_input.automation_id}_start"] = {"job_id": job_id}
 
     if automation_input.end_time:
         job_id = schedule.every().day.at(automation_input.end_time.strftime("%H:%M")).do(run_task,
                                                                                          automation_input,
                                                                                          False)
-        tasks[f"{automation_input.ESP_id}_end"] = {"job_id": job_id}
+        tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+          f"_{automation_input.automation_id}_end"] = {"job_id": job_id}
 
     return get_response_status(message=f"Task {automation_input.ESP_id} added to run at"
                                        f" {automation_input.start_time.hour}:{automation_input.start_time.minute}"
@@ -44,22 +48,27 @@ async def add_task(automation_input: AutomationInput):
                                        if automation_input.end_time else "")
 
 
-@workerRouter.put("/task/{task_id}", response_model=ResponseDto)
+@workerRouter.put("/task", response_model=ResponseDto)
 async def update_task(automation_input: AutomationInput):
     validate_input(automation_input)
-    if f"{automation_input.ESP_id}_start" in tasks:
-        schedule.cancel_job(tasks[f"{automation_input.ESP_id}_start"]["job_id"])
+    if f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+          f"_{automation_input.automation_id}_start" in tasks:
+        schedule.cancel_job(tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+                                  f"_{automation_input.automation_id}_start"]["job_id"])
 
         new_job_id = schedule.every().day.at(automation_input.start_time.strftime("%H:%M"))\
             .do(run_task, automation_input, True)
-        tasks[f"{automation_input.ESP_id}_start"] = {"job_id": new_job_id}
+        tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+              f"_{automation_input.automation_id}_start"] = {"job_id": new_job_id}
 
         if automation_input.end_time:
-            schedule.cancel_job(tasks[f"{automation_input.ESP_id}_end"]["job_id"])
+            schedule.cancel_job(tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+                                      f"_{automation_input.automation_id}_end"]["job_id"])
 
             new_job_id = schedule.every().day.at(automation_input.end_time.strftime("%H:%M"))\
                 .do(run_task, automation_input, False)
-            tasks[f"{automation_input.ESP_id}_end"] = {"job_id": new_job_id}
+            tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+                  f"_{automation_input.automation_id}_end"] = {"job_id": new_job_id}
 
         return get_response_status(message=f"Task {automation_input.ESP_id} updated to run at"
                                            f" {automation_input.start_time.hour}:{automation_input.start_time.minute}"
@@ -69,21 +78,26 @@ async def update_task(automation_input: AutomationInput):
         return get_response_status(message=f"Task {automation_input.ESP_id} not found")
 
 
-@workerRouter.delete("/task/{ESP_id}", response_model=ResponseDto)
-async def delete_task(ESP_id: int):
-    if f"{ESP_id}_start" in tasks:
-        job_id = tasks[f"{ESP_id}_start"]["job_id"]
+@workerRouter.delete("/task", response_model=ResponseDto)
+async def delete_task(delete_automation_input: DeleteAutomationInput):
+    if f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+       f"_{delete_automation_input.automation_id}_start" in tasks:
+        job_id = tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+                       f"_{delete_automation_input.automation_id}_start"]["job_id"]
         schedule.cancel_job(job_id)
-        del tasks[f"{ESP_id}_start"]
+        del tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+                  f"_{delete_automation_input.automation_id}_start"]
 
-        end_job_id = tasks[f"{ESP_id}_end"]["job_id"]
+        end_job_id = tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+                           f"_{delete_automation_input.automation_id}_end"]["job_id"]
         if end_job_id:
             schedule.cancel_job(end_job_id)
-            del tasks[f"{ESP_id}_end"]
+            del tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+                      f"_{delete_automation_input.automation_id}_end"]
 
-        return get_response_status(message=f"Task {ESP_id} is deleted")
+        return get_response_status(message=f"Task {delete_automation_input.ESP_id} is deleted")
     else:
-        return get_response_status(message=f"Task {ESP_id} not found")
+        return get_http_exception(error_code='03', message=f"Task {delete_automation_input.ESP_id} not found")
 
 
 async def initiate_scheduler_on_start():
