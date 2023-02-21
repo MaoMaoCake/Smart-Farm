@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import time
+from typing import List
 
 class FarmOwner(BaseModel):
     id: int
@@ -49,6 +50,7 @@ class FarmStats(BaseModel):
 class Light(BaseModel):
     lightId: int
     lightName: str
+    status: bool
     isAutomation: bool
     naturalLightDensity: int
     UVLightDensity: int
@@ -75,6 +77,35 @@ class LightCombination(BaseModel):
             lightName=light_name,
             presetId=preset_id,
             lightId=light_id,
+            naturalLightDensity=natural_lightDensity,
+            UVLightDensity=UV_lightDensity,
+            IRLightDensity=IR_lightDensity
+        )
+
+
+class UpdateLightCombination(BaseModel):
+    lightName: str
+    presetId: int
+    lightId: int
+    isAutomation: bool
+    naturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+
+    def __init__(self,
+                 light_name: str,
+                 preset_id: int,
+                 light_id: int,
+                 is_automation: bool,
+                 natural_lightDensity: int,
+                 UV_lightDensity: int,
+                 IR_lightDensity: int
+                 ):
+        super().__init__(
+            lightName=light_name,
+            presetId=preset_id,
+            lightId=light_id,
+            isAutomation=is_automation,
             naturalLightDensity=natural_lightDensity,
             UVLightDensity=UV_lightDensity,
             IRLightDensity=IR_lightDensity
@@ -115,6 +146,20 @@ class UpdateLightStrengthInput(BaseModel):
     IRLightDensity: int
 
 
+class UpdateLightStrengthInputInPreset(BaseModel):
+    automation: bool
+    NaturalLightDensity: int
+    UVLightDensity: int
+    IRLightDensity: int
+
+
+class LightAutomation(BaseModel):
+    lightAutomationId: int
+    startTime: time
+    endTime: time
+    farmLightPresetId: int
+    
+    
 class AutomationInput(BaseModel):
     ESP_id: int
     start_time: time
@@ -176,4 +221,39 @@ class DeleteAutomationInput(BaseModel):
     ESP_id: int
     automation_id: int
     hardware_type: str
+
+
+class WateringAutomation(BaseModel):
+    wateringAutomationId: int
+    wateringStartTime: time
+    wateringEndTime: time
+
+
+class GetFarmSettings(BaseModel):
+    MinCO2Level: int
+    MaxHumidityLevel: int
+    LightAutomations: List[LightAutomation]
+    FarmLightPresets: List[FarmLightPreset]
+    ACAutomations: List[ACAutomation]
+    WateringAutomations: List[WateringAutomation]
+
+    def __int__(self,
+                min_co2_level: int,
+                max_humidity: int,
+                light_automations: List[LightAutomation],
+                farm_light_presets: List[FarmLightPreset],
+                ac_automations: List[ACAutomation],
+                watering_automations: List[WateringAutomation]
+                ):
+        super().__init__(
+            MinCO2Level=min_co2_level,
+            MaxHumidityLevel=max_humidity,
+            LightAutomations=light_automations,
+            FarmLightPresets=farm_light_presets,
+            ACAutomations=ac_automations,
+            WateringAutomations=watering_automations
+        )
+
+
+
 

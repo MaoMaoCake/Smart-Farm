@@ -1,6 +1,7 @@
 import requests
 import os
 import json
+from distutils.util import strtobool
 
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
@@ -23,7 +24,7 @@ from .models import FarmOwner, FarmStats, Light,\
     LightCombination, FarmLightPreset, LightStrength,\
     CreateLightInput, UpdateLightStrengthInput, LightRequest,\
     AutomationInput, ACRequest, DeleteAutomationInput, AutomationInputJSON,\
-    AC, ACAutomation
+    AC, ACAutomation, GetFarmSettings, UpdateLightStrengthInputInPreset
 
 from .enum_list import HardwareType
 
@@ -204,10 +205,53 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
                               updateLightStrengthInput.UVLightDensity,
                               updateLightStrengthInput.IRLightDensity)
 
+    ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
+    lights = list_light(farm_id, username).data
+    for light in lights:
+        print(light)
+        try:
+            response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
+                                           message=str(LightRequest(
+                                               activate=light.status,
+                                               uv_percent=updateLightStrengthInput.UVLightDensity,
+                                               ir_percent= updateLightStrengthInput.IRLightDensity,
+                                               natural_percent=updateLightStrengthInput.NaturalLightDensity
+                                           )))
+            if response.status_code != 200:
+                get_http_exception('03', message='MQTT connection failed')
+        except:
+            get_http_exception('03', message='MQTT connection failed')
+
     return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInput, farm_id, username))
 
 
-def check_light_density_limit( NaturalLightDensity: int,
+def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPreset: UpdateLightStrengthInputInPreset,
+                                       farm_id: int,
+                                       preset_id: int,
+                                       username: str) -> ResponseDto[[Light]]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_preset_exist(preset_id)
+
+    if not check_preset_owning(farm_id, preset_id):
+        get_http_exception('10')
+
+    check_light_density_limit(updateLightStrengthInputInPreset.NaturalLightDensity,
+                              updateLightStrengthInputInPreset.UVLightDensity,
+                              updateLightStrengthInputInPreset.IRLightDensity)
+
+    return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInputInPreset, farm_id, username))
+
+
+
+def check_light_density_limit(NaturalLightDensity: int,
                                 UVLightDensity: int,
                                 IRLightDensity: int):
     if NaturalLightDensity > 100 or NaturalLightDensity < 0:
@@ -240,7 +284,6 @@ def light_controlling(farm_id: int, is_turn_on: bool, username: str):
     ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
     for light in lights:
         if light.isAutomation:
-
             try:
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
                                                message=str(LightRequest(
@@ -296,7 +339,7 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
     elif not AC.automation and not is_turn_on:
         get_http_exception(error_code='06', message='AC automation is already set to OFF')
 
-    AC_automations = get_ac_automation(ac_id)
+    AC_automations = get_ac_automation(farm_id)
     mapping = get_esp_map(HardwareType.AC)
 
     url = os.getenv("WORKER_SERVICE_URL")
@@ -306,20 +349,7 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
     if is_turn_on:
         create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
     elif not is_turn_on:
-        try:
-            for AC_automation in AC_automations:
-                body = DeleteAutomationInput(
-                    ESP_id=mapping[f"{HardwareType.AC.value}{ac_id}"],
-                    automation_id=AC_automation.ACId,
-                    hardware_type=HardwareType.AC.value
-                )
-                r = requests.delete(url=path, data=json.dumps(body.__dict__))
-                if r.status_code != 200:
-                    response_message = json.loads(r.content)
-                    get_http_exception('03', message=str(response_message["message"]))
-        except:
-            get_http_exception('03', message='Backend worker connection failed')
-
+        delete_ac_scheduler_task(AC_automations, mapping, ac_id, path)
         try:
             response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
                                            message=str(ACRequest(
@@ -355,3 +385,41 @@ def create_ac_scheduler_task(AC_automations: ACAutomation, mapping, ac_id: int, 
     except:
         get_http_exception('03', message='Backend worker connection failed')
 
+
+def delete_ac_scheduler_task(AC_automations: ACAutomation, mapping, ac_id: int, path: str):
+    try:
+        for AC_automation in AC_automations:
+            body = DeleteAutomationInput(
+                ESP_id=mapping[f"{HardwareType.AC.value}{ac_id}"],
+                automation_id=AC_automation.ACId,
+                hardware_type=HardwareType.AC.value
+            )
+            r = requests.delete(url=path, data=json.dumps(body.__dict__))
+            if r.status_code != 200:
+                response_message = json.loads(r.content)
+                get_http_exception('03', message=str(response_message["message"]))
+    except:
+        get_http_exception('03', message='Backend worker connection failed')
+
+
+def update_automation_to_all_acs(farm_id, is_turn_on: bool, username: str):
+    acs = list_acs(farm_id, username).data
+
+    for ac in acs:
+        if (bool(strtobool(ac.ACStatus)) and not is_turn_on) or (not bool(strtobool(ac.ACStatus)) and is_turn_on):
+            update_ac_automation_by_id(ac.ACId, farm_id, is_turn_on, username)
+
+    return get_response_status(message='update successfully')
+    
+
+def get_farm_settings(farm_id, username: str) -> GetFarmSettings:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    return get_response_status(data=get_farm_setting_from_db(farm_id))
