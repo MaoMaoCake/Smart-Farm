@@ -2,7 +2,7 @@ import requests
 import os
 import json
 from distutils.util import strtobool
-from typing import Optional
+from datetime import time, datetime
 
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
@@ -15,7 +15,8 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     create_light, update_light_strength_to_all_light,\
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
     check_light_combination_owning, delete_light_preset_in_db, get_farm_setting_from_db,\
-    get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status
+    get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status,\
+    check_preset_usage
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -247,8 +248,58 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                               updateLightStrengthInputInPreset.UVLightDensity,
                               updateLightStrengthInputInPreset.IRLightDensity)
 
-    return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInputInPreset, farm_id, username))
+    automations = check_preset_usage(preset_id)
+    ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
+    lights = list_light(farm_id, username).data
+    light_combinations = get_lights_from_preset_db(preset_id)
+    automation_map = {}
 
+    for light_combination in light_combinations:
+        automation_map[light_combination.lightId] = light_combination.automation
+
+    url = os.getenv("WORKER_SERVICE_URL")
+    port = os.getenv("WORKER_SERVICE_PORT")
+    path = f"{url}:{port}/task"
+
+    if len(automations) > 0:
+        for automation in automations:
+            for light in lights:
+                if light.isAutomation and automation_map[light.lightId]:
+                    if check_automation_running(automation.startTime, automation.endTime):
+                        try:
+                            response = create_mqtt_request(
+                                topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
+                                   message=str(LightRequest(
+                                       activate=True,
+                                       uv_percent=updateLightStrengthInputInPreset.UVLightDensity,
+                                       ir_percent=updateLightStrengthInputInPreset.IRLightDensity,
+                                       natural_percent=updateLightStrengthInputInPreset.NaturalLightDensity,
+                                   )))
+                            if response.status_code != 200:
+                                get_http_exception('03', message='MQTT connection failed')
+                        except:
+                            get_http_exception('03', message='MQTT connection failed')
+
+                    try:
+                        body = AutomationInputJSON(
+                            ESP_id=ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"],
+                            start_time=str(automation.startTime),
+                            end_time=str(automation.endTime),
+                            automation_id=automation.lightAutomationId,
+                            hardware_type=HardwareType.LIGHT,
+                            activate=True,
+                            uv_percent=updateLightStrengthInputInPreset.UVLightDensity,
+                            ir_percent=updateLightStrengthInputInPreset.IRLightDensity,
+                            natural_percent=updateLightStrengthInputInPreset.NaturalLightDensity,
+                        )
+                        r: requests.Response = requests.put(url=path, data=json.dumps(body.__dict__))
+                        if r.status_code != 200:
+                            response_message = json.loads(r.content)
+                            get_http_exception('03', message=str(response_message["message"]))
+                    except:
+                        get_http_exception('03', message='Backend worker connection failed')
+
+    return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInputInPreset, farm_id, username))
 
 
 def check_light_density_limit(NaturalLightDensity: int,
@@ -423,3 +474,14 @@ def get_farm_settings(farm_id, username: str) -> GetFarmSettings:
         get_http_exception('10')
 
     return get_response_status(data=get_farm_setting_from_db(farm_id))
+
+
+def check_automation_running(start_time: time, end_time: time) -> bool:
+    current_time = datetime.now().time()
+
+    if (start_time < end_time) and (start_time <= current_time <= end_time):
+        return True
+    elif (end_time < start_time) and not (end_time <= current_time <= start_time):
+        return True
+    else:
+        return False

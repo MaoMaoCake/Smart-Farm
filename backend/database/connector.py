@@ -217,6 +217,7 @@ def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
     farm_lights = session.query(LightDB.name,
                                 LightCombinationDB.farmLightPresetId,
                                 LightCombinationDB.lightId,
+                                LightCombinationDB.automation,
                                 LightCombinationDB.UVLightDensity,
                                 LightCombinationDB.IRLightDensity,
                                 LightCombinationDB.naturalLightDensity). \
@@ -457,3 +458,14 @@ def get_esp_map(hardware_type: str):
         ESP_mapping[f"{mapping.hardwareType.value}{mapping.hardwareId}"] = mapping.ESPId
 
     return ESP_mapping
+
+
+def check_preset_usage(preset_id: id) -> list[LightAutomation]:
+    automations = session.query(LightAutomationDB).filter(LightAutomationDB.farmLightPresetId == preset_id).all()
+
+    return [LightAutomation(
+        lightAutomationId=automation.id,
+        startTime=automation.startTime,
+        endTime=automation.endTime,
+        farmLightPresetId=automation.farmLightPresetId
+    ) for automation in automations]
