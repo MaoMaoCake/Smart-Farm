@@ -1,7 +1,10 @@
+from datetime import datetime, time
+
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import time
 from typing import List
+
 
 class FarmOwner(BaseModel):
     id: int
@@ -67,12 +70,12 @@ class LightCombination(BaseModel):
 
     def __init__(self,
                  light_name: str,
-                preset_id: int,
-                light_id: int,
-                natural_lightDensity: int,
-                UV_lightDensity: int,
-                IR_lightDensity: int
-                ):
+                 preset_id: int,
+                 light_id: int,
+                 natural_lightDensity: int,
+                 UV_lightDensity: int,
+                 IR_lightDensity: int
+                 ):
         super().__init__(
             lightName=light_name,
             presetId=preset_id,
@@ -130,6 +133,7 @@ class AC(BaseModel):
     ACId: int
     ACName: str
     ACStatus: str
+
 
 class CreateLightInput(BaseModel):
     name: Optional[str]
@@ -217,6 +221,12 @@ class ACAutomation(BaseModel):
     endTime: Optional[time]
 
 
+class FarmACAutomation(BaseModel):
+    temperature: int
+    startTime: time
+    endTime: Optional[time]
+
+
 class DeleteAutomationInput(BaseModel):
     ESP_id: int
     automation_id: int
@@ -234,7 +244,7 @@ class GetFarmSettings(BaseModel):
     MaxHumidityLevel: int
     LightAutomations: List[LightAutomation]
     FarmLightPresets: List[FarmLightPreset]
-    ACAutomations: List[ACAutomation]
+    ACAutomations: List[FarmACAutomation]
     WateringAutomations: List[WateringAutomation]
 
     def __int__(self,
@@ -242,7 +252,7 @@ class GetFarmSettings(BaseModel):
                 max_humidity: int,
                 light_automations: List[LightAutomation],
                 farm_light_presets: List[FarmLightPreset],
-                ac_automations: List[ACAutomation],
+                ac_automations: List[FarmACAutomation],
                 watering_automations: List[WateringAutomation]
                 ):
         super().__init__(
@@ -253,7 +263,3 @@ class GetFarmSettings(BaseModel):
             ACAutomations=ac_automations,
             WateringAutomations=watering_automations
         )
-
-
-
-
