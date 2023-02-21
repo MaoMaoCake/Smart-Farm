@@ -2,6 +2,7 @@ import requests
 import os
 import json
 from distutils.util import strtobool
+from typing import Optional
 
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
@@ -13,7 +14,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_acs_from_db, get_farm_stats_from_db, create_preset,\
     create_light, update_light_strength_to_all_light,\
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
-    check_light_combination_owning, delete_light_preset_in_db,\
+    check_light_combination_owning, delete_light_preset_in_db, get_farm_setting_from_db,\
     get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
@@ -208,7 +209,6 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
     ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
     lights = list_light(farm_id, username).data
     for light in lights:
-        print(light)
         try:
             response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
                                            message=str(LightRequest(
