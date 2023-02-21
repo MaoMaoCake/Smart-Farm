@@ -80,35 +80,6 @@ class LightCombination(BaseModel):
         )
 
 
-class UpdateLightCombination(BaseModel):
-    lightName: str
-    presetId: int
-    lightId: int
-    isAutomation: bool
-    naturalLightDensity: int
-    UVLightDensity: int
-    IRLightDensity: int
-
-    def __init__(self,
-                 light_name: str,
-                 preset_id: int,
-                 light_id: int,
-                 is_automation: bool,
-                 natural_lightDensity: int,
-                 UV_lightDensity: int,
-                 IR_lightDensity: int
-                 ):
-        super().__init__(
-            lightName=light_name,
-            presetId=preset_id,
-            lightId=light_id,
-            isAutomation=is_automation,
-            naturalLightDensity=natural_lightDensity,
-            UVLightDensity=UV_lightDensity,
-            IRLightDensity=IR_lightDensity
-        )
-
-
 class FarmLightPreset(BaseModel):
     name: str
     preset_id: int
@@ -138,13 +109,6 @@ class CreateLightInput(BaseModel):
 
 
 class UpdateLightStrengthInput(BaseModel):
-    automation: bool
-    NaturalLightDensity: int
-    UVLightDensity: int
-    IRLightDensity: int
-
-
-class UpdateLightStrengthInputInPreset(BaseModel):
     automation: bool
     NaturalLightDensity: int
     UVLightDensity: int
@@ -195,6 +159,3 @@ class GetFarmSettings(BaseModel):
             ACAutomations=ac_automations,
             WateringAutomations=watering_automations
         )
-
-
-

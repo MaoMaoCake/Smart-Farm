@@ -17,8 +17,7 @@ from response.error_codes import get_http_exception
 
 from .models import FarmOwner, FarmStats, Light,\
     LightCombination, FarmLightPreset, LightStrength,\
-    CreateLightInput, UpdateLightStrengthInput, GetFarmSettings, \
-    UpdateLightStrengthInputInPreset
+    CreateLightInput, UpdateLightStrengthInput, GetFarmSettings
 
 
 def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
@@ -200,32 +199,6 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
     return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInput, farm_id, username))
 
 
-def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPreset: UpdateLightStrengthInputInPreset,
-                                       farm_id: int,
-                                       preset_id: int,
-                                       username: str) -> ResponseDto[[Light]]:
-    user = get_user_from_db(username)
-    if not user:
-        get_http_exception('US404')
-
-    check_farm_exist(farm_id)
-
-    if not check_farm_owning(user.id, farm_id):
-        get_http_exception('10')
-
-    check_preset_exist(preset_id)
-
-    if not check_preset_owning(farm_id, preset_id):
-        get_http_exception('10')
-
-    check_light_density_limit(updateLightStrengthInputInPreset.NaturalLightDensity,
-                              updateLightStrengthInputInPreset.UVLightDensity,
-                              updateLightStrengthInputInPreset.IRLightDensity)
-
-    return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInputInPreset, farm_id, username))
-
-
-
 def check_light_density_limit(NaturalLightDensity: int,
                                 UVLightDensity: int,
                                 IRLightDensity: int):
@@ -265,3 +238,4 @@ def get_farm_settings(farm_id, username: str) -> GetFarmSettings:
         get_http_exception('10')
 
     return get_response_status(data=get_farm_setting_from_db(farm_id))
+    
