@@ -11,9 +11,9 @@
             <Icon icon="mdi:information" class="h-5 w-5 ml-5" />
         </div>
         <p class="bg-red-900 rounded min-w-fit ml-5 pl-5 pr-5 white">CO2 Setting</p>
-        <div>
-            <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
-        </div>
+<!--        <div>-->
+<!--            <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>-->
+<!--        </div>-->
         <div class="divider w-full ml-2"></div>
 
     </div>

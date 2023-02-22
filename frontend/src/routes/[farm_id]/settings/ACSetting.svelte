@@ -20,7 +20,9 @@
         </div>
         <p class="bg-blue-900 rounded min-w-fit ml-5 pl-5 pr-5 white">AC Setting</p>
         <div>
-            <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
+            <a href="/{farm_id}/ac_list">
+                <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
+            </a>
         </div>
         <div class="divider w-full ml-2"></div>
     </div>
