@@ -21,8 +21,3 @@
         <p>PPM</p>
     </div>
 </div>
-<style>
-    .white {
-        color: white
-    }
-</style>

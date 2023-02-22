@@ -42,8 +42,3 @@
         <AddFarm/>
     </div>
 {/if}
-<style>
-    .white {
-        color: white
-    }
-</style>

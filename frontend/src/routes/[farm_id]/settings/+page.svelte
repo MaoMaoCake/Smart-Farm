@@ -116,11 +116,5 @@
     </div>
 </div>
 <div class=" flex grow w-screen justify-center fixed bottom-10">
-            <button class="btn btn-primary w-10/12 md:w-1/2" on:click={save_settings}>Save</button>
-        </div>
-
-<style>
-    .white {
-        color: white
-    }
-</style>
+    <button class="btn btn-primary w-10/12 md:w-1/2" on:click={save_settings}>Save</button>
+</div>

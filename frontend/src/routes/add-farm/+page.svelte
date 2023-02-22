@@ -22,8 +22,3 @@
       </div>
   </div>
 </div>
-<style>
-    .white {
-        color: white
-    }
-</style>

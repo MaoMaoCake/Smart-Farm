@@ -34,9 +34,3 @@
     </div>
     <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>
 </div>
-
-<style>
-    .white {
-        color: white
-    }
-</style>
