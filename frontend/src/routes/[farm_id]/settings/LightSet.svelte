@@ -1,14 +1,12 @@
 <script lang="ts">
     import {FarmSettings} from "$lib/SettingStores.js";
+    import {TimePicker} from 'svelte-time-picker'
+    import { dialogs } from "svelte-dialogs";
 
     export let num;
     export let t_start;
     export let t_end;
     export let preset;
-
-
-    import {TimePicker} from 'svelte-time-picker'
-    import { dialogs } from "svelte-dialogs";
 
     let user_preset = [{name: 'preset 1', preset_id: "preset1"},
                         {name: 'preset 2', preset_id: "preset2"}]

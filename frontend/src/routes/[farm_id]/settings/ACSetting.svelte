@@ -2,6 +2,7 @@
     import Icon from "@iconify/svelte";
     import ACSet from "./ACSet.svelte";
     import {FarmSettings} from "$lib/SettingStores.js";
+
     export let farm_id;
 
     $FarmSettings.ac_schedule = [{time_start: "09:50", time_end: "12:00", temp: 25},
@@ -29,7 +30,6 @@
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.ac_schedule as ac, i}
             <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i}/>
-<!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>-->
         {/each}
     </div>
     <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>

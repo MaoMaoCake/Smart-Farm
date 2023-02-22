@@ -27,7 +27,6 @@
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.light_schedule as time, i}
             <LightSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i} />
-<!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}> remove</button>-->
         {/each}
     </div>
     <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>

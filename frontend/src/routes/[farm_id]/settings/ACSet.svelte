@@ -1,13 +1,12 @@
 <script lang="ts">
     import {FarmSettings} from "$lib/SettingStores";
+    import {TimePicker} from 'svelte-time-picker'
+    import { dialogs } from "svelte-dialogs";
 
     export let num;
     export let t_start;
     export let t_end;
     export let temp;
-
-    import {TimePicker} from 'svelte-time-picker'
-    import { dialogs } from "svelte-dialogs";
 
     $FarmSettings.ac_preset = [25, 26, 27, 28]
     let selected = temp
