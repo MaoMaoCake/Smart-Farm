@@ -279,18 +279,17 @@ def get_light_strength_in_preset_from_db(light_combination_id: int) -> LightStre
     )
 
 
-def check_light_combination_exist(combination_id) -> None:
-    light_combination = session.query(LightCombinationDB.id).filter(LightCombinationDB.id == combination_id).first()
+def check_light_combination_exist(combination_id) -> LightCombinationDB:
+    light_combination = session.query(LightCombinationDB).filter(LightCombinationDB.id == combination_id).first()
     if not light_combination:
         get_http_exception('PC404')
-    return None
+    return light_combination
 
 
 def check_light_combination_owning(light_combination_id: int, preset_id: int) -> int | None:
     preset_owning = session.query(LightCombinationDB.id, LightCombinationDB.farmLightPresetId).filter(
         LightCombinationDB.farmLightPresetId == preset_id
         , LightCombinationDB.id == light_combination_id).first()
-    print(preset_owning)
     return LightCombinationDB.id if preset_owning else None
 
 
@@ -320,7 +319,7 @@ def update_light_strength_to_all_light(update_light_strength_input: UpdateLightS
 
 def update_light_strength_in_db(update_light_strength_input: UpdateLightStrengthInput,
                                        light_id: int,
-                                       username: str) -> [Light]:
+                                       username: str) -> Light:
     session.query(LightDB
                   ).filter(LightDB.id == light_id
                            ).update({'automation': update_light_strength_input.automation,
@@ -357,6 +356,32 @@ def update_light_strength_to_all_light_in_preset(
     session.commit()
 
     return get_lights_from_preset_db(preset_id)
+
+
+def update_light_combination_strength_in_db(update_light_strength_input: UpdateLightStrengthInput,
+                                       light_combination_id: int,
+                                       username: str) -> LightCombination:
+    session.query(LightCombinationDB
+                  ).filter(LightCombinationDB.id == light_combination_id
+                           ).update({'automation': update_light_strength_input.automation,
+                                     'UVLightDensity': update_light_strength_input.UVLightDensity,
+                                     'IRLightDensity': update_light_strength_input.IRLightDensity,
+                                     'naturalLightDensity': update_light_strength_input.NaturalLightDensity,
+                                     'updateBy': username
+                                     })
+    session.commit()
+
+    light = session.query(LightCombinationDB).filter(LightCombinationDB.id == light_combination_id).first()
+    light_data = session.query(LightDB).filter(LightDB.id == light.lightId).first()
+    return LightCombination(
+        light_data.name,
+        light.farmLightPresetId,
+        light.id,
+        light.automation,
+        light.UVLightDensity,
+        light.IRLightDensity,
+        light.naturalLightDensity
+        )
 
 
 def check_light_exist(light_id: int):
