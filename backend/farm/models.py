@@ -1,7 +1,5 @@
-from datetime import datetime, time
-
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
 from datetime import time
 from typing import List
 
@@ -64,6 +62,7 @@ class LightCombination(BaseModel):
     lightName: str
     presetId: int
     lightId: int
+    automation: bool
     naturalLightDensity: int
     UVLightDensity: int
     IRLightDensity: int
@@ -72,6 +71,7 @@ class LightCombination(BaseModel):
                  light_name: str,
                  preset_id: int,
                  light_id: int,
+                 automation: bool,
                  natural_lightDensity: int,
                  UV_lightDensity: int,
                  IR_lightDensity: int
@@ -80,6 +80,7 @@ class LightCombination(BaseModel):
             lightName=light_name,
             presetId=preset_id,
             lightId=light_id,
+            automation=automation,
             naturalLightDensity=natural_lightDensity,
             UVLightDensity=UV_lightDensity,
             IRLightDensity=IR_lightDensity

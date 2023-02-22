@@ -33,11 +33,10 @@ def get_all_lights_automation() -> list[AutomationInput]:
     for light_automation in light_automations:
         light_settings = session.query(LightCombinationDB, LightDB)\
                                 .join(LightDB, LightCombinationDB.lightId == LightDB.id)\
-                                .filter(LightCombinationDB.farmLightPresetId == LightPresetAutomationDB.id)\
+                                .filter(LightCombinationDB.farmLightPresetId == light_automation.id)\
                                 .all()
-
         for light_setting in light_settings:
-            if light_setting.LightCombinationDB.automation:
+            if light_setting.LightCombinationDB.automation and light_setting.LightDB.automation:
                 light_requests.append(AutomationInput(
                     ESP_id=ESP_mapping[f"{HardwareType.LIGHT.value}{light_setting.LightDB.id}"],
                     start_time=light_automation.startTime,
