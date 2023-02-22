@@ -29,5 +29,5 @@
             <LightSet t_start={time.time_start} t_end={time.time_end} preset={time.preset} num={i} />
         {/each}
     </div>
-    <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>
+    <button class="btn btn-secondary ml-10 mr-10 mt-5 text-white" on:click={addTime}>Add Time</button>
 </div>

@@ -28,5 +28,5 @@
             <WateringSet t_start={water.time_start} num={i}/>
         {/each}
     </div>
-    <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>
+    <button class="btn btn-secondary ml-10 mr-10 mt-5 text-white" on:click={addTime}>Add Time</button>
 </div>

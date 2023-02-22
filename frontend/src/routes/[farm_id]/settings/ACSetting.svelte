@@ -32,5 +32,5 @@
             <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i}/>
         {/each}
     </div>
-    <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>
+    <button class="btn btn-secondary ml-10 mr-10 mt-5 text-white" on:click={addTime}>Add Time</button>
 </div>
