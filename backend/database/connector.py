@@ -151,10 +151,10 @@ def get_farm_stats_from_db(farm_id: int) -> FarmStats:
 
 
 def check_farm_exist(farm_id: int) -> None:
-    farm = session.query(FarmDb.id).filter(FarmDb.id == farm_id).first()
+    farm = session.query(FarmDb).filter(FarmDb.id == farm_id).first()
     if not farm:
         get_http_exception('FM404')
-    return None
+    return farm
 
 
 def create_light(farm_id: int, create_light_input: CreateLightInput, username: str) -> Light:
@@ -310,11 +310,37 @@ def update_light_strength_to_all_light(update_light_strength_input: UpdateLightS
                            ).update({'automation': update_light_strength_input.automation,
                                      'UVLightDensity': update_light_strength_input.UVLightDensity,
                                      'IRLightDensity': update_light_strength_input.IRLightDensity,
-                                     'naturalLightDensity': update_light_strength_input.NaturalLightDensity
+                                     'naturalLightDensity': update_light_strength_input.NaturalLightDensity,
+                                     'updateBy': username
                                      })
     session.commit()
 
     return get_lights_from_db(farm_id)
+
+
+def update_light_strength_in_db(update_light_strength_input: UpdateLightStrengthInput,
+                                       light_id: int,
+                                       username: str) -> [Light]:
+    session.query(LightDB
+                  ).filter(LightDB.id == light_id
+                           ).update({'automation': update_light_strength_input.automation,
+                                     'UVLightDensity': update_light_strength_input.UVLightDensity,
+                                     'IRLightDensity': update_light_strength_input.IRLightDensity,
+                                     'naturalLightDensity': update_light_strength_input.NaturalLightDensity,
+                                     'updateBy': username
+                                     })
+    session.commit()
+
+    light = session.query(LightDB).filter(LightDB.id == light_id).first()
+    return Light(
+        lightId=light.id,
+        lightName=light.name,
+        status=light.status,
+        isAutomation=light.automation,
+        UVLightDensity=light.UVLightDensity,
+        IRLightDensity=light.IRLightDensity,
+        naturalLightDensity=light.naturalLightDensity
+        )
 
 
 def update_light_strength_to_all_light_in_preset(
@@ -334,10 +360,10 @@ def update_light_strength_to_all_light_in_preset(
 
 
 def check_light_exist(light_id: int):
-    preset = session.query(LightDB.farmId).filter(LightDB.id == light_id).first()
-    if not preset:
+    light = session.query(LightDB).filter(LightDB.id == light_id).first()
+    if not light:
         get_http_exception('LT404')
-    return None
+    return light
 
 
 def check_light_exist_in_farm(farm_id: int, light_id: int):
