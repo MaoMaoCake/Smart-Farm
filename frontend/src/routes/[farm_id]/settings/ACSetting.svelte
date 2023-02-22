@@ -2,6 +2,7 @@
     import Icon from "@iconify/svelte";
     import ACSet from "./ACSet.svelte";
     import {FarmSettings} from "$lib/SettingStores.js";
+
     export let farm_id;
 
     $FarmSettings.ac_schedule = [{time_start: "09:50", time_end: "12:00", temp: 25},
@@ -20,21 +21,16 @@
         </div>
         <p class="bg-blue-900 rounded min-w-fit ml-5 pl-5 pr-5 white">AC Setting</p>
         <div>
-            <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
+            <a href="/{farm_id}/ac_list">
+                <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
+            </a>
         </div>
         <div class="divider w-full ml-2"></div>
     </div>
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.ac_schedule as ac, i}
             <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i}/>
-<!--            <button class="btn btn-error ml-5 mr-10" on:click={() => {rmTime(i)}}>remove</button>-->
         {/each}
     </div>
-    <button class="btn btn-secondary ml-10 mr-10 mt-5" on:click={addTime}>Add Time</button>
+    <button class="btn btn-secondary ml-10 mr-10 mt-5 text-white" on:click={addTime}>Add Time</button>
 </div>
-
-<style>
-    .white {
-        color: white
-    }
-</style>

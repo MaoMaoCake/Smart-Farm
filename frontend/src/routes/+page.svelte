@@ -35,15 +35,10 @@
         <div class="mb-24"></div> <!-- Spacing so we can see the stats of the last farm -->
     </div>
     <div class="flex justify-center items-center fixed bottom-10 left-1/2 right-1/2">
-        <a href="/add-farm" class="btn btn-secondary w-56 white">Add Farm</a>
+        <a href="/add-farm" class="btn btn-secondary w-56 text-white">Add Farm</a>
     </div>
 {:else}
     <div class="flex items-center justify-center">
         <AddFarm/>
     </div>
 {/if}
-<style>
-    .white {
-        color: white
-    }
-</style>

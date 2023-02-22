@@ -35,15 +35,9 @@
                  {#if logged_in}
                     Logged in
                 {:else}
-                    <a class="btn btn-secondary sm:m-2 white" href="/login">Login</a>
+                    <a class="btn btn-secondary sm:m-2 text-white" href="/login">Login</a>
                 {/if}
              </li>
          </ul>
     </div>
 </div>
-
-<style>
-    .white{
-        color: white;
-    }
-</style>

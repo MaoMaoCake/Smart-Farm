@@ -1,14 +1,12 @@
 <script lang="ts">
     import {FarmSettings} from "$lib/SettingStores.js";
+    import {TimePicker} from 'svelte-time-picker'
+    import { dialogs } from "svelte-dialogs";
 
     export let num;
     export let t_start;
     export let t_end;
     export let preset;
-
-
-    import {TimePicker} from 'svelte-time-picker'
-    import { dialogs } from "svelte-dialogs";
 
     let user_preset = [{name: 'preset 1', preset_id: "preset1"},
                         {name: 'preset 2', preset_id: "preset2"}]
@@ -65,7 +63,7 @@
         <div class="flex flex-col grow">
             <div class="flex items-center">
                 <p class="ml-2">ON</p>
-                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_start}</button>
+                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white">{t_start}</button>
                 {#if s_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                     </div>
@@ -79,7 +77,7 @@
             </div>
             <div class="flex items-center">
                 <p class="pl-2">Off</p>
-                <button on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24">{t_end}</button>
+                <button on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white">{t_end}</button>
                 {#if e_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                     </div>
@@ -114,8 +112,3 @@
         </div>
     </div>
 </div>
-<style>
-    .white {
-        color: white;
-    }
-</style>

@@ -1,6 +1,7 @@
 <script  lang="ts">
     import Icon from "@iconify/svelte";
     import {FarmSettings} from "$lib/SettingStores";
+
     function info(type: string){
         alert(type)
     }
@@ -11,9 +12,6 @@
             <Icon icon="mdi:information" class="h-5 w-5 ml-5" />
         </div>
         <p class="bg-teal-900 rounded min-w-fit ml-5 pl-5 pr-5 white">Humidity Setting</p>
-        <div>
-            <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
-        </div>
         <div class="divider w-full ml-2"></div>
 
     </div>
@@ -23,8 +21,3 @@
         <p>%</p>
     </div>
 </div>
-<style>
-    .white {
-        color: white
-    }
-</style>
