@@ -11,7 +11,8 @@ from .utils import link_farm_to_user, list_farms,\
     create_new_preset, create_new_light, apply_light_strength_to_all_lights,\
     get_light_strength_setting_in_preset, get_farm_settings, delete_light_preset, \
     apply_light_strength_to_all_lights_in_preset, light_controlling,\
-    update_ac_automation_by_id, ac_controlling, update_automation_to_all_acs
+    update_ac_automation_by_id, ac_controlling, update_automation_to_all_acs,\
+    update_light_strength
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
     FarmLightPreset, AC, LightStrength, CreateLightInput, \
@@ -138,3 +139,12 @@ async def apply_light_strength_to_all_in_preset(updateLightStrengthInputInPreset
                                         current_user: User = Depends(get_current_active_user)):
 
     return apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPreset, farm_id, preset_id, current_user.username)
+
+
+@farmRouter.patch("/farm/{farm_id}/light/{light_id}}", response_model=ResponseDto, tags=["Farm"])
+async def update_light_strength_in_farm(update_input: UpdateLightStrengthInput,
+                                        farm_id: int,
+                                        light_id: int,
+                                        current_user: User = Depends(get_current_active_user)):
+
+    return update_light_strength(update_input, farm_id, light_id, current_user.username)

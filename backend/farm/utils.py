@@ -16,7 +16,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
     check_light_combination_owning, delete_light_preset_in_db, get_farm_setting_from_db,\
     get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status,\
-    check_preset_usage
+    check_preset_usage, update_light_strength_in_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -485,3 +485,46 @@ def check_automation_running(start_time: time, end_time: time) -> bool:
         return True
     else:
         return False
+
+
+def update_light_strength(update_input: UpdateLightStrengthInput,
+                                        farm_id: int,
+                                        light_id: int,
+                                        username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    farm = check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    light = check_light_exist(light_id)
+    check_light_exist_in_farm(farm_id, light_id)
+
+    check_light_density_limit(update_input.NaturalLightDensity,
+                              update_input.UVLightDensity,
+                              update_input.IRLightDensity)
+
+    ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
+
+    is_on = farm.lightStatus and light.status and light.automation
+    if is_on:
+        try:
+            response = create_mqtt_request(
+                topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_id}"]),
+                message=str(LightRequest(
+                    activate=True,
+                    uv_percent=update_input.UVLightDensity,
+                    ir_percent=update_input.IRLightDensity,
+                    natural_percent=update_input.NaturalLightDensity,
+                )))
+            if response.status_code != 200:
+                get_http_exception('03', message='MQTT connection failed')
+        except:
+            get_http_exception('03', message='MQTT connection failed')
+        return get_response_status('Update has been sent to the device')
+    else:
+        update_light_strength_in_db(update_input, light_id, username)
+        return get_response_status('Light strength has been updated')
