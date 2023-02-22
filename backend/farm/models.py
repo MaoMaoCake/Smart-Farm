@@ -136,6 +136,11 @@ class AC(BaseModel):
     ACStatus: str
 
 
+class Dehumidifier(BaseModel):
+    DehumidifierId: int
+    DehumidifierIsAvailable: str
+
+
 class CreateLightInput(BaseModel):
     name: Optional[str]
     automation: Optional[bool]

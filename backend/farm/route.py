@@ -12,7 +12,7 @@ from .utils import link_farm_to_user, list_farms,\
     get_light_strength_setting_in_preset, get_farm_settings, delete_light_preset, \
     apply_light_strength_to_all_lights_in_preset, light_controlling,\
     update_ac_automation_by_id, ac_controlling, update_automation_to_all_acs,\
-    update_light_strength, update_light_combination_strength
+    update_light_strength, update_light_combination_strength, dehumidifier_controlling
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
     FarmLightPreset, AC, LightStrength, CreateLightInput, \
@@ -117,6 +117,12 @@ async def control_light(farm_id: int, is_turn_on: bool, current_user: User = Dep
 async def control_ac(farm_id: int, is_turn_on: bool, temperature: int ,current_user: User = Depends(get_current_active_user)):
 
     return ac_controlling(farm_id, is_turn_on, temperature ,current_user.username)
+
+
+@farmRouter.post("/farm/{farm_id}/dehumidifier/control}", response_model=ResponseDto, tags=["Farm"])
+async def control_dehumidifier(farm_id: int, is_turn_on: bool, current_user: User = Depends(get_current_active_user)):
+
+    return dehumidifier_controlling(farm_id, is_turn_on, current_user.username)
 
 
 @farmRouter.patch("/farm/{farm_id}/AC/{ac_id}/automation", response_model=ResponseDto, tags=["Farm"])
