@@ -41,7 +41,8 @@ def create_payload(automation_input: AutomationInput, is_start: bool):
             return LightRequest(activate=is_start,
                                 uv_percent=automation_input.uv_percent,
                                 ir_percent=automation_input.ir_percent,
-                                natural_percent=automation_input.natural_percent
+                                natural_percent=automation_input.natural_percent,
+                                light_combination_id=automation_input.light_combination_id
                                 )
         case HardwareType.AC:
             return ACRequest(activate=is_start,

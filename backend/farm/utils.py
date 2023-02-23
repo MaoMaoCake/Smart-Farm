@@ -16,7 +16,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
     check_light_combination_owning, delete_light_preset_in_db, get_farm_setting_from_db,\
     get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status,\
-    check_preset_usage, update_light_strength_in_db
+    check_preset_usage, update_light_strength_in_db, update_light_combination_strength_in_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -274,6 +274,7 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                                        uv_percent=updateLightStrengthInputInPreset.UVLightDensity,
                                        ir_percent=updateLightStrengthInputInPreset.IRLightDensity,
                                        natural_percent=updateLightStrengthInputInPreset.NaturalLightDensity,
+                                       light_combination_id=light_combination.id
                                    )))
                             if response.status_code != 200:
                                 get_http_exception('03', message='MQTT connection failed')
@@ -288,6 +289,7 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                             automation_id=automation.lightAutomationId,
                             hardware_type=HardwareType.LIGHT,
                             activate=True,
+                            light_combination_id=light_combination.id,
                             uv_percent=updateLightStrengthInputInPreset.UVLightDensity,
                             ir_percent=updateLightStrengthInputInPreset.IRLightDensity,
                             natural_percent=updateLightStrengthInputInPreset.NaturalLightDensity,
@@ -298,7 +300,7 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                             get_http_exception('03', message=str(response_message["message"]))
                     except:
                         get_http_exception('03', message='Backend worker connection failed')
-
+    # TODO check when integrate: possible bugs --> change to update only the one not turned on
     return get_response_status(data=update_light_strength_to_all_light(updateLightStrengthInputInPreset, farm_id, username))
 
 
@@ -526,5 +528,86 @@ def update_light_strength(update_input: UpdateLightStrengthInput,
             get_http_exception('03', message='MQTT connection failed')
         return get_response_status('Update has been sent to the device')
     else:
-        update_light_strength_in_db(update_input, light_id, username)
-        return get_response_status('Light strength has been updated')
+        updated_light = update_light_strength_in_db(update_input, light_id, username)
+        return get_response_status(message='Light strength has been updated', data=updated_light)
+
+
+def update_light_combination_strength(update_input: UpdateLightStrengthInput,
+                                        farm_id: int,
+                                        preset_id: int,
+                                        light_combination_id: int,
+                                        username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_preset_exist(preset_id)
+    if not check_preset_owning(farm_id, preset_id):
+        get_http_exception('10')
+
+    light_combination = check_light_combination_exist(light_combination_id)
+    if not check_light_combination_owning(light_combination_id, preset_id):
+        get_http_exception('10')
+
+    light = check_light_exist(light_combination.lightId)
+
+    check_light_density_limit(update_input.NaturalLightDensity,
+                              update_input.UVLightDensity,
+                              update_input.IRLightDensity)
+
+    automations = check_preset_usage(preset_id)
+    ESP_mapping = get_esp_map(HardwareType.LIGHT.value)
+
+    url = os.getenv("WORKER_SERVICE_URL")
+    port = os.getenv("WORKER_SERVICE_PORT")
+    path = f"{url}:{port}/task"
+
+    if len(automations) > 0:
+        for automation in automations:
+            if light.automation and light_combination.automation:
+                if check_automation_running(automation.startTime, automation.endTime):
+                    try:
+                        response = create_mqtt_request(
+                            topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_combination.lightId}"]),
+                            message=str(LightRequest(
+                                activate=True,
+                                uv_percent=update_input.UVLightDensity,
+                                ir_percent=update_input.IRLightDensity,
+                                natural_percent=update_input.NaturalLightDensity,
+                                light_combination_id=light_combination.id
+                            )))
+                        if response.status_code != 200:
+                            get_http_exception('03', message='MQTT connection failed')
+                    except:
+                        get_http_exception('03', message='MQTT connection failed')
+
+                try:
+                    body = AutomationInputJSON(
+                        ESP_id=ESP_mapping[f"{HardwareType.LIGHT.value}{light.id}"],
+                        start_time=str(automation.startTime),
+                        end_time=str(automation.endTime),
+                        automation_id=automation.lightAutomationId,
+                        hardware_type=HardwareType.LIGHT,
+                        activate=True,
+                        light_combination_id=light_combination.id,
+                        uv_percent=update_input.UVLightDensity,
+                        ir_percent=update_input.IRLightDensity,
+                        natural_percent=update_input.NaturalLightDensity,
+                    )
+                    r: requests.Response = requests.put(url=path, data=json.dumps(body.__dict__))
+                    if r.status_code != 200:
+                        response_message = json.loads(r.content)
+                        get_http_exception('03', message=str(response_message["message"]))
+                except:
+                    get_http_exception('03', message='Backend worker connection failed')
+
+                if check_automation_running(automation.startTime, automation.endTime):
+                    return get_response_status('Update has been sent to the device')
+
+            updated_light = update_light_combination_strength_in_db(update_input, light_combination_id, username)
+            return get_response_status(message='Light strength has been updated', data=updated_light)
