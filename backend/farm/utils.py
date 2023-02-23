@@ -18,7 +18,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status,\
     check_preset_usage, update_light_strength_in_db, update_light_combination_strength_in_db,\
     update_farm_name, update_preset_name, update_light_name, update_AC_name,\
-    get_dehumidifier_from_db
+    get_dehumidifier_from_db, check_preset_in_light_automation_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -331,6 +331,8 @@ def delete_light_preset(farm_id: int, preset_id: int, username: str):
     check_preset_exist(preset_id)
     if not check_preset_owning(farm_id, preset_id):
         get_http_exception('10')
+
+    check_preset_in_light_automation_db(farm_id, preset_id)
 
     return delete_light_preset_in_db(preset_id)
 

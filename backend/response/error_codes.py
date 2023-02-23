@@ -72,6 +72,12 @@ ERROR_CODES = [
         status_code=404,
     ),
     ErrorException(
+        error_code='PA404',
+        message='Preset found in automation',
+        successful=False,
+        status_code=404,
+    ),
+    ErrorException(
         error_code='US401',
         message='Duplicate username',
         successful=False,
