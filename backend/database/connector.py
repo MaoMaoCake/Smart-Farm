@@ -11,7 +11,7 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmLightPreset, LightStrength, AC, CreateLightInput, \
     UpdateLightStrengthInput, GetFarmSettings, LightAutomation, FarmLightPreset, \
     ACAutomation, WateringAutomation, UpdateLightStrengthInputInPreset, UpdateLightCombination,\
-    FarmACAutomation, Dehumidifier
+    FarmACAutomation, FarmLightPreset, Dehumidifier
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
@@ -529,3 +529,50 @@ def check_preset_usage(preset_id: id) -> list[LightAutomation]:
         endTime=automation.endTime,
         farmLightPresetId=automation.farmLightPresetId
     ) for automation in automations]
+
+
+def update_farm_name(name: str, farm_id: int, username: str) -> FarmStats:
+    session.query(FarmDb).filter(FarmDb.id == farm_id).update({'name': name, 'updateBy': username})
+    session.commit()
+
+    return get_farm_stats_from_db(farm_id)
+
+
+def update_preset_name(name: str, preset_id: int, username: str) -> FarmLightPreset:
+    session.query(FarmLightPresetDB).filter(FarmLightPresetDB.id == preset_id).update({'name': name, 'updateBy': username})
+    session.commit()
+
+    preset = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.id == preset_id).first()
+    return FarmLightPreset(
+        presetId=preset_id,
+        farmId=preset.farmId,
+        presetName=preset.name
+    )
+
+
+def update_light_name(name: str, light_id: int, username: str) -> Light:
+    session.query(LightDB).filter(LightDB.id == light_id).update({'name': name, 'updateBy': username})
+    session.commit()
+
+    light = session.query(LightDB).filter(LightDB.id == light_id).first()
+    return Light(
+        lightId=light.id,
+        lightName=light.name,
+        status=light.status,
+        isAutomation=light.automation,
+        UVLightDensity=light.UVLightDensity,
+        IRLightDensity=light.IRLightDensity,
+        naturalLightDensity=light.naturalLightDensity
+    )
+
+
+def update_AC_name(name: str, ac_id: int, username: str) -> AC:
+    session.query(ACDB).filter(ACDB.id == ac_id).update({'name': name, 'updateBy': username})
+    session.commit()
+
+    ac = session.query(ACDB).filter(ACDB.id == ac_id).first()
+    return AC(
+        ACId=ac.id,
+        ACName=ac.name,
+        ACStatus=ac.automation
+    )
