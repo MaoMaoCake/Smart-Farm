@@ -16,7 +16,8 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     get_light_strength_in_preset_from_db, check_light_combination_exist,\
     check_light_combination_owning, delete_light_preset_in_db, get_farm_setting_from_db,\
     get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status,\
-    check_preset_usage, update_light_strength_in_db, update_light_combination_strength_in_db
+    check_preset_usage, update_light_strength_in_db, update_light_combination_strength_in_db,\
+    get_dehumidifier_from_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -26,7 +27,8 @@ from .models import FarmOwner, FarmStats, Light,\
     LightCombination, FarmLightPreset, LightStrength,\
     CreateLightInput, UpdateLightStrengthInput, LightRequest,\
     AutomationInput, ACRequest, DeleteAutomationInput, AutomationInputJSON,\
-    AC, ACAutomation, GetFarmSettings, UpdateLightStrengthInputInPreset
+    AC, ACAutomation, GetFarmSettings, UpdateLightStrengthInputInPreset,\
+    Dehumidifier, DehumidifierRequest
 
 from .enum_list import HardwareType
 
@@ -611,3 +613,36 @@ def update_light_combination_strength(update_input: UpdateLightStrengthInput,
 
             updated_light = update_light_combination_strength_in_db(update_input, light_combination_id, username)
             return get_response_status(message='Light strength has been updated', data=updated_light)
+
+
+def list_dehumidifier(farm_id: int, username: str) -> ResponseDto[[Dehumidifier]]:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    return get_response_status(data=get_dehumidifier_from_db(farm_id))
+
+
+def dehumidifier_controlling(farm_id: int, is_turn_on: bool, username: str):
+    dehumidifiers = list_dehumidifier(farm_id, username).data
+    ESP_mapping = get_esp_map(HardwareType.DEHUMIDIFIER.value)
+    for dehumidifier in dehumidifiers:
+        if dehumidifier.DehumidifierIsAvailable:
+            try:
+                response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.DEHUMIDIFIER.value}"
+                                                                     f"{dehumidifier.DehumidifierId}"]),
+                                               message=str(DehumidifierRequest(
+                                                   activate=is_turn_on
+                                               )))
+                if response.status_code != 200:
+                    get_http_exception('03', message='MQTT connection failed!')
+            except:
+                get_http_exception('03', message='MQTT connection failed')
+
+    return get_response_status(message='Successfully send requests to mqtt broker')
+

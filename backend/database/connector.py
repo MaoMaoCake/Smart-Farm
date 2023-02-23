@@ -11,7 +11,7 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmLightPreset, LightStrength, AC, CreateLightInput, \
     UpdateLightStrengthInput, GetFarmSettings, LightAutomation, FarmLightPreset, \
     ACAutomation, WateringAutomation, UpdateLightStrengthInputInPreset, UpdateLightCombination,\
-    FarmACAutomation
+    FarmACAutomation, Dehumidifier
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
@@ -406,6 +406,15 @@ def get_acs_from_db(farm_id: int) -> [AC]:
         ACName=ac.name,
         ACStatus=ac.automation
     ) for ac in acs]
+
+
+def get_dehumidifier_from_db(farm_id: int) -> [Dehumidifier]:
+    dehumidifiers = session.query(DehumidifierDB).filter(DehumidifierDB.farmId == farm_id).all()
+
+    return [Dehumidifier(
+        DehumidifierId=dehumidifier.id,
+        DehumidifierIsAvailable=dehumidifier.isAvailable
+    ) for dehumidifier in dehumidifiers]
 
 
 def create_preset(farm_id: int, username: str, default:bool=True) -> FarmLightPreset:
