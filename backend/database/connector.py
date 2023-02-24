@@ -468,7 +468,7 @@ def check_preset_in_light_automation_db(farm_id: int, preset_id: int):
     preset_automation = session.query(LightAutomationDB).filter(LightAutomationDB.farmId == farm_id,
                                                                 LightAutomationDB.farmLightPresetId == preset_id).all()
     if preset_automation:
-        get_http_exception('PA404')
+        get_http_exception('PA400')
     return preset_automation
 
 def get_farm_setting_from_db(farm_id: int) -> GetFarmSettings:

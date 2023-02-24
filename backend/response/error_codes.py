@@ -72,10 +72,10 @@ ERROR_CODES = [
         status_code=404,
     ),
     ErrorException(
-        error_code='PA404',
+        error_code='PA400',
         message='Preset found in automation',
         successful=False,
-        status_code=404,
+        status_code=400,
     ),
     ErrorException(
         error_code='US401',
