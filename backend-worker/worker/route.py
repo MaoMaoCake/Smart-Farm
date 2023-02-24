@@ -3,7 +3,7 @@ import schedule
 import time as t
 
 from response.response_dto import get_response_status, ResponseDto
-from database.connector import get_all_lights_automation, get_all_AC_automation
+from database.connector import get_all_lights_automation, get_all_AC_automation, get_all_watering_automation
 from response.error_codes import get_http_exception
 
 from .utils import run_task, validate_input
@@ -101,15 +101,21 @@ async def delete_task(delete_automation_input: DeleteAutomationInput):
 
 
 async def initiate_scheduler_on_start():
-    lights_automation = get_all_lights_automation()
-    ACs_automation = get_all_AC_automation()
+    lights_automations = get_all_lights_automation()
+    ACs_automations = get_all_AC_automation()
+    watering_automations = get_all_watering_automation()
 
-    for light_automation in lights_automation:
+    for light_automation in lights_automations:
         print('initiate Light scheduler')
         print(f'create task {light_automation.ESP_id}')
         await add_task(light_automation)
 
-    for AC_automation in ACs_automation:
+    for AC_automation in ACs_automations:
         print('initiate AC scheduler')
         print(f'create task {AC_automation.ESP_id}')
         await add_task(AC_automation)
+
+    for watering_automation in watering_automations:
+        print('initiate watering scheduler')
+        print(f'create task {watering_automation.ESP_id}')
+        await add_task(watering_automation)

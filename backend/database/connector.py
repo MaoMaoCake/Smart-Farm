@@ -11,11 +11,13 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmLightPreset, LightStrength, AC, CreateLightInput, \
     UpdateLightStrengthInput, GetFarmSettings, LightAutomation, FarmLightPreset, \
     ACAutomation, WateringAutomation, UpdateLightStrengthInputInPreset, UpdateLightCombination,\
-    FarmACAutomation, FarmLightPreset, Dehumidifier
+    FarmACAutomation, FarmLightPreset, Dehumidifier, CreateLightAutomationInput,\
+    UpdateLightAutomationInput, CreateACAutomationInput, UpdateACAutomationInput, WaterController,\
+    CreateWateringAutomationInput, UpdateWateringAutomationInput
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
-    ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB
+    ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB, WaterControllerDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
 
@@ -214,7 +216,8 @@ def get_lights_from_db(farm_id: int) -> [Light]:
 
 
 def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
-    farm_lights = session.query(LightDB.name,
+    farm_lights = session.query(LightCombinationDB.id,
+                                LightDB.name,
                                 LightCombinationDB.farmLightPresetId,
                                 LightCombinationDB.lightId,
                                 LightCombinationDB.automation,
@@ -344,14 +347,16 @@ def update_light_strength_in_db(update_light_strength_input: UpdateLightStrength
 
 def update_light_strength_to_all_light_in_preset(
         update_light_strength_input_in_preset: UpdateLightStrengthInputInPreset,
-        preset_id: int
-        ) -> [UpdateLightCombination]:
+        preset_id: int,
+        username: str
+        ) -> [LightCombination]:
     session.query(LightCombinationDB
-                  ).filter(LightCombinationDB.presetId == preset_id
+                  ).filter(LightCombinationDB.farmLightPresetId == preset_id
                            ).update({'automation': update_light_strength_input_in_preset.automation,
                                      'UVLightDensity': update_light_strength_input_in_preset.UVLightDensity,
                                      'IRLightDensity': update_light_strength_input_in_preset.IRLightDensity,
-                                     'naturalLightDensity': update_light_strength_input_in_preset.NaturalLightDensity
+                                     'naturalLightDensity': update_light_strength_input_in_preset.NaturalLightDensity,
+                                     'updateBy': username
                                      })
     session.commit()
 
@@ -374,6 +379,7 @@ def update_light_combination_strength_in_db(update_light_strength_input: UpdateL
     light = session.query(LightCombinationDB).filter(LightCombinationDB.id == light_combination_id).first()
     light_data = session.query(LightDB).filter(LightDB.id == light.lightId).first()
     return LightCombination(
+        light_combination_id,
         light_data.name,
         light.farmLightPresetId,
         light.id,
@@ -477,9 +483,12 @@ def get_farm_setting_from_db(farm_id: int) -> GetFarmSettings:
     ac_automations = session.query(ACAutomationDB).filter(ACAutomationDB.farmId == farm_id).all()
     watering_automations = session.query(WateringAutomationDB).filter(WateringAutomationDB.farmId == farm_id).all()
     farm_setting = session.query(FarmDb).filter(FarmDb.id == farm_id).first()
+    water_controller = session.query(WaterControllerDB).filter(WaterControllerDB.farmId == farm_id).first()
 
     return GetFarmSettings(MinCO2Level=farm_setting.minCO2,
                            MaxHumidityLevel=farm_setting.maxHumidity,
+                           ACTemp=farm_setting.ACTemp,
+                           isWateringAutomation=water_controller.automation,
                            LightAutomations=[LightAutomation(
                                lightAutomationId=data.id,
                                startTime=data.startTime,
@@ -517,10 +526,14 @@ def delete_light_preset_in_db(preset_id: int) -> None:
         get_http_exception(error_code='03', message=f'Database error: {e}')
 
 
-def get_esp_map(hardware_type: str):
+def get_esp_map(hardware_type: Optional[str]=None):
     ESP_mapping = {}
 
-    mqtt_map = session.query(MQTTMapDB).filter(MQTTMapDB.hardwareType==hardware_type).all()
+    if hardware_type:
+        mqtt_map = session.query(MQTTMapDB).filter(MQTTMapDB.hardwareType==hardware_type).all()
+    else:
+        mqtt_map = session.query(MQTTMapDB).all()
+
     for mapping in mqtt_map:
         ESP_mapping[f"{mapping.hardwareType.value}{mapping.hardwareId}"] = mapping.ESPId
 
@@ -583,3 +596,157 @@ def update_AC_name(name: str, ac_id: int, username: str) -> AC:
         ACName=ac.name,
         ACStatus=ac.automation
     )
+
+
+def list_co2_sensors_id(farm_id: int) -> list[int]:
+    co2_sensors = session.query(CO2SensorDB).filter(CO2SensorDB.farmId == farm_id).all()
+
+    return [co2_sensor.id for co2_sensor in co2_sensors]
+
+
+def list_humidity_sensors_id(farm_id: int) -> list[int]:
+    humidity_sensors = session.query(HumiditySensorDB).filter(HumiditySensorDB.farmId == farm_id).all()
+
+    return [humidity_sensor.id for humidity_sensor in humidity_sensors]
+
+
+def delete_light_automation_in_db(automation_id: int) -> None:
+    try:
+        session.query(LightAutomationDB).filter(
+            LightAutomationDB.id == automation_id).delete(synchronize_session='fetch')
+        session.commit()
+        return get_response_status('delete success')
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_light_automation_in_db(create_automation_input: CreateLightAutomationInput) -> LightAutomation:
+    new_automation = LightAutomationDB(farmId=create_automation_input.farmId,
+                      startTime=create_automation_input.startTime,
+                      endTime=create_automation_input.endTime,
+                      farmLightPresetId=create_automation_input.farmLightPresetId,
+                      updateBy=create_automation_input.username,
+                      createBy=create_automation_input.username
+                      )
+    session.add(new_automation)
+    session.commit()
+
+    return LightAutomation(
+        lightAutomationId=new_automation.id,
+        startTime=new_automation.startTime,
+        endTime=new_automation.endTime,
+        farmLightPresetId=new_automation.farmLightPresetId,
+    )
+
+
+def update_light_automation_in_db(update_automation_input: UpdateLightAutomationInput) -> None:
+    session.query(LightAutomationDB
+                  ).filter(LightAutomationDB.id == update_automation_input.automationId
+                  ).update({
+                    "startTime": update_automation_input.startTime,
+                    "endTime": update_automation_input.endTime,
+                    "farmLightPresetId": update_automation_input.farmLightPresetId,
+                    "updateBy": update_automation_input.username
+                  })
+    session.commit()
+
+def delete_ac_automation_in_db(automation_id: int) -> None:
+    try:
+        session.query(ACAutomationDB).filter(
+            ACAutomationDB.id == automation_id).delete(synchronize_session='fetch')
+        session.commit()
+        return get_response_status('delete success')
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_ac_automation_in_db(create_automation_input: CreateACAutomationInput) -> FarmACAutomation:
+    new_automation = ACAutomationDB(farmId=create_automation_input.farmId,
+                      startTime=create_automation_input.startTime,
+                      endTime=create_automation_input.endTime,
+                      temperature=create_automation_input.temperature,
+                      updateBy=create_automation_input.username,
+                      createBy = create_automation_input.username
+                      )
+    session.add(new_automation)
+    session.commit()
+
+    return FarmACAutomation(
+        ACAutomationId=new_automation.id,
+        temperature=new_automation.temperature,
+        startTime=new_automation.startTime,
+        endTime=new_automation.endTime,
+    )
+
+
+def update_ac_automation_in_db(update_automation_input: UpdateACAutomationInput) -> None:
+    session.query(ACAutomationDB
+                  ).filter(ACAutomationDB.id == update_automation_input.automationId
+                  ).update({
+                    "startTime": update_automation_input.startTime,
+                    "endTime": update_automation_input.endTime,
+                    "temperature": update_automation_input.temperature,
+                    "updateBy": update_automation_input.username
+                  })
+    session.commit()
+
+
+def get_water_controller(farm_id: int) -> WaterController:
+    water_controller = session.query(WaterControllerDB).filter(WaterControllerDB.farmId == farm_id).first()
+
+    return WaterController(
+        waterControllerId=water_controller.id,
+        automation=water_controller.automation
+    )
+
+
+def update_water_controller(farm_id: int, automation: bool, username: str) -> WaterController:
+    session.query(WaterControllerDB
+                  ).filter(WaterControllerDB.farmId == farm_id
+                  ).update(
+                    {
+                        "automation":automation,
+                        "updateBy": username
+                  })
+    session.commit()
+
+
+def delete_watering_automation_in_db(automation_id: int) -> None:
+    try:
+        session.query(WateringAutomationDB).filter(
+            WateringAutomationDB.id == automation_id).delete(synchronize_session='fetch')
+        session.commit()
+        return get_response_status('delete success')
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_watering_automation_in_db(create_automation_input: CreateWateringAutomationInput) -> WateringAutomation:
+    new_automation = WateringAutomationDB(farmId=create_automation_input.farmId,
+                      startTime=create_automation_input.startTime,
+                      endTime=create_automation_input.endTime,
+                      updateBy=create_automation_input.username,
+                      createBy=create_automation_input.username
+                      )
+    session.add(new_automation)
+    session.commit()
+
+    return WateringAutomation(
+        wateringAutomationId=new_automation.id,
+        wateringStartTime=new_automation.startTime,
+        wateringEndTime=new_automation.endTime,
+    )
+
+
+def update_watering_automation_in_db(update_automation_input: UpdateWateringAutomationInput) -> None:
+    session.query(WateringAutomationDB
+                  ).filter(WateringAutomationDB.id == update_automation_input.automationId
+                  ).update({
+                    "startTime": update_automation_input.startTime,
+                    "endTime": update_automation_input.endTime,
+                    "updateBy": update_automation_input.username,
+                  })
+    session.commit()

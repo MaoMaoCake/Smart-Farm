@@ -12,7 +12,8 @@ from .schemas import LightPresetAutomationDB,\
                      MQTTMapDB,\
                      ACAutomationDB,\
                      ACDB,\
-                     WateringAutomationDB
+                     WateringAutomationDB,\
+                     WaterControllerDB
 
 engine = create_engine(f"{os.environ.get('DB_DIALECT')}://{os.environ.get('DB_USER')}:{os.environ.get('DB_PASSWORD')}"
                        f"@{os.environ.get('DB_HOST')}:{os.environ.get('DB_PORT')}/{os.environ.get('DB_DATABASE')}")
@@ -67,14 +68,43 @@ def get_all_AC_automation() -> list[AutomationInput]:
                                 .all()
 
         for AC_setting in AC_settings:
-            AC_requests.append(AutomationInput(
-                ESP_id=ESP_mapping[f"{HardwareType.AC.value}{AC_setting.id}"],
-                start_time=AC_automation.startTime,
-                end_time=AC_automation.endTime,
-                automation_id=AC_automation.id,
-                hardware_type=HardwareType.AC,
-                activate=True,
-                temperature=AC_automation.temperature
-            ))
+            if AC_setting.automation:
+                AC_requests.append(AutomationInput(
+                    ESP_id=ESP_mapping[f"{HardwareType.AC.value}{AC_setting.id}"],
+                    start_time=AC_automation.startTime,
+                    end_time=AC_automation.endTime,
+                    automation_id=AC_automation.id,
+                    hardware_type=HardwareType.AC,
+                    activate=True,
+                    temperature=AC_automation.temperature
+                ))
 
     return AC_requests
+
+
+def get_all_watering_automation() -> list[AutomationInput]:
+    watering_requests = []
+    ESP_mapping = {}
+
+    mqtt_map = session.query(MQTTMapDB).all()
+    for mapping in mqtt_map:
+        ESP_mapping[f"{mapping.hardwareType.value}{mapping.hardwareId}"] = mapping.ESPId
+
+    watering_automations = session.query(WateringAutomationDB).all()
+    for watering_automation in watering_automations:
+        watering_settings = session.query(WaterControllerDB)\
+                                .filter(WaterControllerDB.farmId == watering_automation.farmId)\
+                                .all()
+
+        for watering_setting in watering_settings:
+            if watering_setting.automation:
+                watering_requests.append(AutomationInput(
+                    ESP_id=ESP_mapping[f"{HardwareType.WATERING.value}{watering_setting.id}"],
+                    start_time=watering_automation.startTime,
+                    end_time=watering_automation.endTime,
+                    automation_id=watering_automation.id,
+                    hardware_type=HardwareType.WATERING,
+                    activate=True,
+                ))
+
+    return watering_requests
