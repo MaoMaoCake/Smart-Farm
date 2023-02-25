@@ -17,7 +17,8 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_light_combination_owning, delete_light_preset_in_db, get_farm_setting_from_db,\
     get_esp_map, check_ac_owning, get_ac_automation, update_ac_automation_status,\
     check_preset_usage, update_light_strength_in_db, update_light_combination_strength_in_db,\
-    get_dehumidifier_from_db
+    update_farm_name, update_preset_name, update_light_name, update_AC_name,\
+    get_dehumidifier_from_db, check_preset_in_light_automation_db
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -330,6 +331,8 @@ def delete_light_preset(farm_id: int, preset_id: int, username: str):
     check_preset_exist(preset_id)
     if not check_preset_owning(farm_id, preset_id):
         get_http_exception('10')
+
+    check_preset_in_light_automation_db(farm_id, preset_id)
 
     return delete_light_preset_in_db(preset_id)
 
@@ -646,3 +649,65 @@ def dehumidifier_controlling(farm_id: int, is_turn_on: bool, username: str):
 
     return get_response_status(message='Successfully send requests to mqtt broker')
 
+
+def update_farm_name_to_db(name: str, farm_id: int, username: str) -> ResponseDto:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    return get_response_status(data=update_farm_name(name, farm_id, username))
+
+
+def update_preset_name_to_db(name: str, farm_id: int, preset_id: int, username: str) -> ResponseDto:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_preset_exist(preset_id)
+    if not check_preset_owning(farm_id, preset_id):
+        get_http_exception('10')
+
+    return get_response_status(data=update_preset_name(name, preset_id, username))
+
+
+def update_light_name_to_db(name: str, farm_id: int, light_id: int, username: str) -> ResponseDto:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    check_light_exist(light_id)
+    check_light_exist_in_farm(farm_id, light_id)
+
+    return get_response_status(data=update_light_name(name, light_id, username))
+
+
+def update_AC_name_to_db(name: str, farm_id: int, ac_id: int, username: str) -> ResponseDto:
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    AC = check_ac_owning(farm_id, ac_id)
+    if not AC:
+        get_http_exception('10')
+
+    return get_response_status(data=update_AC_name(name, ac_id, username))

@@ -272,3 +272,9 @@ class GetFarmSettings(BaseModel):
             ACAutomations=ac_automations,
             WateringAutomations=watering_automations
         )
+
+
+class FarmLightPreset(BaseModel):
+    presetId: int
+    farmId: int
+    presetName: str
