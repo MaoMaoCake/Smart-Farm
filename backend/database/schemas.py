@@ -36,6 +36,7 @@ class FarmDb(BaseModel):
     maxHumidity = Column(Integer, nullable=False)
     minCO2 = Column(String, nullable=False)
     lightStatus = Column(Boolean, nullable=False)
+    ACTemp =Column(Integer, nullable=False)
     farmKey = Column(String, nullable=False, unique=True)
 
     temperatureSensors = relationship("TemperatureSensorDB")
@@ -49,6 +50,7 @@ class FarmDb(BaseModel):
     Lights = relationship("LightDB")
     FarmLightPresets = relationship("FarmLightPresetDB")
     LightPresetAutomations = relationship("LightPresetAutomationDB")
+    WaterController = relationship("WaterControllerDB")
 
 
 class FarmOwnerDB(BaseModel):
@@ -174,3 +176,10 @@ class MQTTMapDB(BaseModel):
     hardwareId = Column(Integer, nullable=False)
     ESPId = Column(Integer, nullable=False)
     ESPType = Column(Enum(ESPType), nullable=False)
+
+
+class WaterControllerDB(BaseModel):
+    __tablename__ = "waterController"
+    farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
+    automation = Column(Boolean, nullable=False)
+    isAvailable = Column(Boolean, nullable=False)

@@ -3,6 +3,8 @@ from typing import Optional
 from datetime import time
 from typing import List
 
+from .enum_list import ChangesType
+
 
 class FarmOwner(BaseModel):
     id: int
@@ -59,6 +61,7 @@ class Light(BaseModel):
 
 
 class LightCombination(BaseModel):
+    lightCombinationId: int
     lightName: str
     presetId: int
     lightId: int
@@ -68,6 +71,7 @@ class LightCombination(BaseModel):
     IRLightDensity: int
 
     def __init__(self,
+                 light_combination_id: int,
                  light_name: str,
                  preset_id: int,
                  light_id: int,
@@ -77,6 +81,7 @@ class LightCombination(BaseModel):
                  IR_lightDensity: int
                  ):
         super().__init__(
+            lightCombinationId=light_combination_id,
             lightName=light_name,
             presetId=preset_id,
             lightId=light_id,
@@ -133,7 +138,7 @@ class LightStrength(BaseModel):
 class AC(BaseModel):
     ACId: int
     ACName: str
-    ACStatus: str
+    ACStatus: bool
 
 
 class Dehumidifier(BaseModel):
@@ -164,10 +169,11 @@ class UpdateLightStrengthInputInPreset(BaseModel):
 
 
 class LightAutomation(BaseModel):
-    lightAutomationId: int
+    lightAutomationId: Optional[int]
     startTime: time
     endTime: time
     farmLightPresetId: int
+    changes_type: Optional[ChangesType]
     
     
 class AutomationInput(BaseModel):
@@ -201,6 +207,11 @@ class AutomationInputJSON(BaseModel):
     humidity_threshold: Optional[int]
     temperature: Optional[int]
 
+class DeleteAutomationInput(BaseModel):
+    ESP_id: int
+    automation_id: int
+    hardware_type: str
+
 
 class LightRequest(BaseModel):
     activate: bool
@@ -223,6 +234,12 @@ class ACRequest(BaseModel):
     temperature: int
 
 
+class SensorRequest(BaseModel):
+    co2_threshold: Optional[int]
+    humidity_threshold: Optional[int]
+    temperature_threshold: Optional[int]
+
+
 class ACAutomation(BaseModel):
     ACId: int
     temperature: int
@@ -231,9 +248,11 @@ class ACAutomation(BaseModel):
 
 
 class FarmACAutomation(BaseModel):
+    ACAutomationId: Optional[int]
     temperature: int
     startTime: time
     endTime: Optional[time]
+    changes_type: Optional[ChangesType]
 
 
 class DeleteAutomationInput(BaseModel):
@@ -243,14 +262,17 @@ class DeleteAutomationInput(BaseModel):
 
 
 class WateringAutomation(BaseModel):
-    wateringAutomationId: int
+    wateringAutomationId: Optional[int]
     wateringStartTime: time
     wateringEndTime: time
+    changes_type: Optional[ChangesType]
 
 
 class GetFarmSettings(BaseModel):
     MinCO2Level: int
     MaxHumidityLevel: int
+    ACTemp: int
+    isWateringAutomation: bool
     LightAutomations: List[LightAutomation]
     FarmLightPresets: List[FarmLightPreset]
     ACAutomations: List[FarmACAutomation]
@@ -278,3 +300,64 @@ class FarmLightPreset(BaseModel):
     presetId: int
     farmId: int
     presetName: str
+
+
+class UpdateFarmSettings(BaseModel):
+    MinCO2Level: Optional[int]
+    MaxHumidityLevel: Optional[int]
+    LightAutomations: Optional[List[LightAutomation]]
+    ACAutomations: Optional[List[FarmACAutomation]]
+    WateringAutomations: Optional[List[WateringAutomation]]
+    isWateringAutomation: bool
+
+
+class CreateLightAutomationInput(BaseModel):
+    startTime: time
+    endTime: time
+    farmLightPresetId: int
+    username: str
+    farmId: int
+    farmId: int
+
+
+class UpdateLightAutomationInput(BaseModel):
+    automationId: int
+    startTime: time
+    endTime: time
+    farmLightPresetId: int
+    username: str
+
+
+class CreateACAutomationInput(BaseModel):
+    farmId: int
+    startTime: time
+    endTime: time
+    temperature: int
+    username: str
+
+
+class UpdateACAutomationInput(BaseModel):
+    automationId: int
+    startTime: time
+    endTime: time
+    temperature: int
+    username: str
+
+
+class WaterController(BaseModel):
+    waterControllerId: int
+    automation: bool
+
+
+class CreateWateringAutomationInput(BaseModel):
+    farmId: int
+    startTime: time
+    endTime: time
+    username: str
+
+
+class UpdateWateringAutomationInput(BaseModel):
+    automationId: int
+    startTime: time
+    endTime: time
+    username: str
