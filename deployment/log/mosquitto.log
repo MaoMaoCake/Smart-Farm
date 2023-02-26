@@ -1,0 +1,250 @@
+1676528788: mosquitto version 2.0.15 starting
+1676528788: Config loaded from /mosquitto/config/mosquitto.conf.
+1676528788: Opening ipv4 listen socket on port 1883.
+1676528788: Opening ipv6 listen socket on port 1883.
+1676528788: mosquitto version 2.0.15 running
+1676528790: New connection from 172.18.0.3:44056 on port 1883.
+1676528790: New client connected from 172.18.0.3:44056 as mqttjs_52dd53ee (p2, c1, k60, u'admin').
+1676528879: Client mqttjs_52dd53ee closed its connection.
+1676530589: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1676531956: mosquitto version 2.0.15 terminating
+1676531956: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1676537036: mosquitto version 2.0.15 starting
+1676537036: Config loaded from /mosquitto/config/mosquitto.conf.
+1676537036: Opening ipv4 listen socket on port 1883.
+1676537036: Opening ipv6 listen socket on port 1883.
+1676537036: mosquitto version 2.0.15 running
+1676537148: New connection from 172.18.0.1:35970 on port 1883.
+1676537148: New connection from 172.18.0.1:35968 on port 1883.
+1676537148: Client <unknown> disconnected due to malformed packet.
+1676537150: Client <unknown> disconnected due to malformed packet.
+1676537150: New connection from 172.18.0.1:35974 on port 1883.
+1676537150: Client <unknown> disconnected due to malformed packet.
+1676537150: New connection from 172.18.0.1:35978 on port 1883.
+1676537150: Client <unknown> disconnected due to malformed packet.
+1676537155: New connection from 172.18.0.1:35982 on port 1883.
+1676537155: Client <unknown> disconnected due to malformed packet.
+1676537155: New connection from 172.18.0.1:35986 on port 1883.
+1676537185: Client <unknown> disconnected due to malformed packet.
+1676537185: New connection from 172.18.0.1:35990 on port 1883.
+1676537185: Client <unknown> disconnected due to malformed packet.
+1676537185: New connection from 172.18.0.1:35994 on port 1883.
+1676537185: Client <unknown> disconnected due to malformed packet.
+1676537245: New connection from 172.18.0.1:35998 on port 1883.
+1676537245: New connection from 172.18.0.1:36002 on port 1883.
+1676537245: Client <unknown> disconnected due to malformed packet.
+1676537333: Client <unknown> closed its connection.
+1676537333: New connection from 172.18.0.1:36008 on port 1883.
+1676537333: New connection from 172.18.0.1:36010 on port 1883.
+1676537333: Client <unknown> disconnected due to malformed packet.
+1676537333: Client <unknown> disconnected due to malformed packet.
+1676537333: New connection from 172.18.0.1:36014 on port 1883.
+1676537333: Client <unknown> disconnected due to malformed packet.
+1676537335: New connection from 172.18.0.1:36020 on port 1883.
+1676537335: New connection from 172.18.0.1:36022 on port 1883.
+1676537335: Client <unknown> disconnected due to malformed packet.
+1676537379: Client <unknown> closed its connection.
+1676537419: mosquitto version 2.0.15 terminating
+1676537419: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1676537919: mosquitto version 2.0.15 starting
+1676537919: Config loaded from /mosquitto/config/mosquitto.conf.
+1676537919: Opening ipv4 listen socket on port 1883.
+1676537919: Opening ipv6 listen socket on port 1883.
+1676537919: mosquitto version 2.0.15 running
+1676539720: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1676540462: New connection from 172.18.0.1:36052 on port 1883.
+1676540462: New client connected from 172.18.0.1:36052 as ESP32_1 (p2, c1, k15, u'admin').
+1676540535: Client ESP32_1 has exceeded timeout, disconnecting.
+1676540579: New connection from 172.18.0.1:36056 on port 1883.
+1676540579: New client connected from 172.18.0.1:36056 as ESP32Client-29ce (p2, c1, k15, u'admin').
+1676540580: Client ESP32Client-29ce closed its connection.
+1676540585: New connection from 172.18.0.1:36058 on port 1883.
+1676540585: New client connected from 172.18.0.1:36058 as ESP32Client-45cf (p2, c1, k15, u'admin').
+1676540649: New connection from 172.18.0.1:36066 on port 1883.
+1676540649: New connection from 172.18.0.1:36068 on port 1883.
+1676540649: Client <unknown> disconnected due to malformed packet.
+1676540650: Client <unknown> disconnected due to malformed packet.
+1676540650: New connection from 172.18.0.1:36072 on port 1883.
+1676540650: Client <unknown> disconnected due to malformed packet.
+1676540650: New connection from 172.18.0.1:36076 on port 1883.
+1676540650: Client <unknown> disconnected due to malformed packet.
+1676540726: New connection from 172.18.0.1:36082 on port 1883.
+1676540726: New connection from 172.18.0.1:36084 on port 1883.
+1676540726: Client <unknown> disconnected due to malformed packet.
+1676540726: Client <unknown> disconnected due to malformed packet.
+1676540726: New connection from 172.18.0.1:36088 on port 1883.
+1676540726: Client <unknown> disconnected due to malformed packet.
+1676540756: New connection from 172.18.0.1:36092 on port 1883.
+1676540756: Client <unknown> disconnected due to malformed packet.
+1676540756: New connection from 172.18.0.1:36096 on port 1883.
+1676540789: New connection from 172.18.0.1:36098 on port 1883.
+1676540789: Client <unknown> disconnected due to malformed packet.
+1676540790: New connection from 172.18.0.1:36100 on port 1883.
+1676540790: Client <unknown> disconnected due to malformed packet.
+1676540791: New connection from 172.18.0.1:36102 on port 1883.
+1676540791: Client <unknown> disconnected due to malformed packet.
+1676540792: New connection from 172.18.0.1:36104 on port 1883.
+1676540792: Client <unknown> disconnected due to malformed packet.
+1676540793: New connection from 172.18.0.1:36106 on port 1883.
+1676540793: Client <unknown> disconnected due to malformed packet.
+1676540794: New connection from 172.18.0.1:36108 on port 1883.
+1676540794: Client <unknown> disconnected due to malformed packet.
+1676540795: New connection from 172.18.0.1:36110 on port 1883.
+1676540795: Client <unknown> disconnected due to malformed packet.
+1676540796: New connection from 172.18.0.1:36112 on port 1883.
+1676540796: Client <unknown> disconnected due to malformed packet.
+1676540797: New connection from 172.18.0.1:36114 on port 1883.
+1676540797: Client <unknown> disconnected due to malformed packet.
+1676540797: New connection from 172.18.0.1:36116 on port 1883.
+1676540797: Client <unknown> disconnected due to malformed packet.
+1676540798: New connection from 172.18.0.1:36118 on port 1883.
+1676540798: Client <unknown> disconnected due to malformed packet.
+1676540799: New connection from 172.18.0.1:36120 on port 1883.
+1676540799: Client <unknown> disconnected due to malformed packet.
+1676540800: New connection from 172.18.0.1:36122 on port 1883.
+1676540800: Client <unknown> disconnected due to malformed packet.
+1676540802: New connection from 172.18.0.1:36124 on port 1883.
+1676540802: Client <unknown> disconnected due to malformed packet.
+1676540804: New connection from 172.18.0.1:36126 on port 1883.
+1676540804: Client <unknown> disconnected due to malformed packet.
+1676540805: New connection from 172.18.0.1:36128 on port 1883.
+1676540805: Client <unknown> disconnected due to malformed packet.
+1676540810: New connection from 172.18.0.1:36130 on port 1883.
+1676540810: Client <unknown> disconnected due to malformed packet.
+1676540814: New connection from 172.18.0.1:36132 on port 1883.
+1676540814: Client <unknown> disconnected due to malformed packet.
+1676540816: Client <unknown> closed its connection.
+1676540816: New connection from 172.18.0.1:36138 on port 1883.
+1676540816: New connection from 172.18.0.1:36140 on port 1883.
+1676540816: Client <unknown> disconnected due to malformed packet.
+1676540817: New connection from 172.18.0.1:36142 on port 1883.
+1676540817: Client <unknown> disconnected due to malformed packet.
+1676540820: New connection from 172.18.0.1:36144 on port 1883.
+1676540820: Client <unknown> disconnected due to malformed packet.
+1676540820: New connection from 172.18.0.1:36146 on port 1883.
+1676540820: New client connected from 172.18.0.1:36146 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1676540820771 (p2, c1, k10, u'admin').
+1676540886: Client <unknown> closed its connection.
+1676541010: New connection from 172.18.0.1:36148 on port 1883.
+1676541010: New client connected from 172.18.0.1:36148 as ESP32Client-a5b (p2, c1, k15, u'admin').
+1676541015: Client ESP32Client-45cf has exceeded timeout, disconnecting.
+1676541397: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1676540820771 closed its connection.
+1676541397: New connection from 172.18.0.1:36150 on port 1883.
+1676541397: New client connected from 172.18.0.1:36150 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1676540820771 (p2, c1, k10, u'admin').
+1676541398: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1676540820771 closed its connection.
+1676541398: New connection from 172.18.0.1:36152 on port 1883.
+1676541398: New client connected from 172.18.0.1:36152 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1676540820771 (p2, c1, k10, u'admin').
+1676541439: Client ESP32Client-a5b has exceeded timeout, disconnecting.
+1676541449: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1676540820771 closed its connection.
+1676541525: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1676604290: mosquitto version 2.0.15 terminating
+1676604290: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1677340033: mosquitto version 2.0.15 starting
+1677340033: Config loaded from /mosquitto/config/mosquitto.conf.
+1677340033: Opening ipv4 listen socket on port 1883.
+1677340033: Opening ipv6 listen socket on port 1883.
+1677340033: mosquitto version 2.0.15 running
+1677340117: New connection from 172.18.0.1:36154 on port 1883.
+1677340117: New client connected from 172.18.0.1:36154 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340117033 (p2, c1, k10, u'admin').
+1677340273: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340117033 closed its connection.
+1677340274: New connection from 172.18.0.1:36156 on port 1883.
+1677340274: New client connected from 172.18.0.1:36156 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340117033 (p2, c1, k10, u'admin').
+1677340385: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340117033 closed its connection.
+1677340420: New connection from 172.18.0.1:36158 on port 1883.
+1677340420: New client connected from 172.18.0.1:36158 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340420685 (p2, c1, k10, u'admin').
+1677340795: mosquitto version 2.0.15 terminating
+1677340795: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1677340804: mosquitto version 2.0.15 starting
+1677340804: Config loaded from /mosquitto/config/mosquitto.conf.
+1677340804: Opening ipv4 listen socket on port 1883.
+1677340804: Opening ipv6 listen socket on port 1883.
+1677340804: mosquitto version 2.0.15 running
+1677340804: New connection from 172.18.0.1:36160 on port 1883.
+1677340804: New client connected from 172.18.0.1:36160 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340420685 (p2, c1, k10, u'admin').
+1677340857: mosquitto version 2.0.15 terminating
+1677340857: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1677340867: mosquitto version 2.0.15 starting
+1677340867: Config loaded from /mosquitto/config/mosquitto.conf.
+1677340867: Opening ipv4 listen socket on port 1883.
+1677340867: Opening ipv6 listen socket on port 1883.
+1677340867: mosquitto version 2.0.15 running
+1677340868: New connection from 172.19.0.1:36162 on port 1883.
+1677340868: New client connected from 172.19.0.1:36162 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340420685 (p2, c1, k10, u'admin').
+1677340877: mosquitto version 2.0.15 terminating
+1677340877: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1677342089: mosquitto version 2.0.15 starting
+1677342089: Config loaded from /mosquitto/config/mosquitto.conf.
+1677342089: Opening ipv4 listen socket on port 1883.
+1677342089: Opening ipv6 listen socket on port 1883.
+1677342089: mosquitto version 2.0.15 running
+1677342089: New connection from 172.19.0.1:36246 on port 1883.
+1677342089: New client connected from 172.19.0.1:36246 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340420685 (p2, c1, k10, u'admin').
+1677342120: New connection from 172.19.0.1:36248 on port 1883.
+1677342120: New client connected from 172.19.0.1:36248 as python-mqtt-17 (p2, c1, k60, u'admin').
+1677342154: Client python-mqtt-17 closed its connection.
+1677342282: New connection from 172.19.0.1:36250 on port 1883.
+1677342282: New client connected from 172.19.0.1:36250 as python-mqtt-39 (p2, c1, k60, u'admin').
+1677342297: Client python-mqtt-39 closed its connection.
+1677342444: New connection from 172.19.0.1:36252 on port 1883.
+1677342444: New client connected from 172.19.0.1:36252 as python-mqtt-87 (p2, c1, k60, u'admin').
+1677342479: Client python-mqtt-87 closed its connection.
+1677342481: New connection from 172.19.0.1:36254 on port 1883.
+1677342481: New client connected from 172.19.0.1:36254 as python-mqtt-30 (p2, c1, k60, u'admin').
+1677342485: Client python-mqtt-30 closed its connection.
+1677342536: New connection from 172.19.0.1:36256 on port 1883.
+1677342536: New client connected from 172.19.0.1:36256 as python-mqtt-10 (p2, c1, k60, u'admin').
+1677342539: Client python-mqtt-10 closed its connection.
+1677342551: New connection from 172.19.0.1:36258 on port 1883.
+1677342551: New client connected from 172.19.0.1:36258 as python-mqtt-52 (p2, c1, k60, u'admin').
+1677342553: Client python-mqtt-52 closed its connection.
+1677342618: New connection from 172.19.0.1:36260 on port 1883.
+1677342618: New client connected from 172.19.0.1:36260 as python-mqtt-45 (p2, c1, k60, u'admin').
+1677342669: Client python-mqtt-45 closed its connection.
+1677342670: New connection from 172.19.0.1:36262 on port 1883.
+1677342670: New client connected from 172.19.0.1:36262 as python-mqtt-4 (p2, c1, k60, u'admin').
+1677342674: Client python-mqtt-4 closed its connection.
+1677342808: New connection from 172.19.0.1:36264 on port 1883.
+1677342808: New client connected from 172.19.0.1:36264 as python-mqtt-79 (p2, c1, k60, u'admin').
+1677342815: Client python-mqtt-79 closed its connection.
+1677342848: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677340420685 closed its connection.
+1677343890: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1677407867: mosquitto version 2.0.15 starting
+1677407867: Config loaded from /mosquitto/config/mosquitto.conf.
+1677407867: Opening ipv4 listen socket on port 1883.
+1677407867: Opening ipv6 listen socket on port 1883.
+1677407867: mosquitto version 2.0.15 running
+1677408223: New connection from 172.19.0.1:57520 on port 1883.
+1677408223: New client connected from 172.19.0.1:57520 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677408223655 (p2, c1, k10, u'admin').
+1677408449: New connection from 172.19.0.1:57586 on port 1883.
+1677408449: New client connected from 172.19.0.1:57586 as python-mqtt-45 (p2, c1, k60, u'admin').
+1677408769: Client python-mqtt-45 closed its connection.
+1677409668: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1677409789: New connection from 172.19.0.1:57594 on port 1883.
+1677409789: New client connected from 172.19.0.1:57594 as ESP32Client-a1bb (p2, c1, k15, u'admin').
+1677409824: New connection from 172.19.0.1:57596 on port 1883.
+1677409824: New client connected from 172.19.0.1:57596 as ESP32Client-86d5 (p2, c1, k15, u'admin').
+1677409847: Client ESP32Client-a1bb has exceeded timeout, disconnecting.
+1677409847: Client ESP32Client-86d5 has exceeded timeout, disconnecting.
+1677409855: New connection from 172.19.0.1:57598 on port 1883.
+1677409855: New client connected from 172.19.0.1:57598 as ESP32Client-2a26 (p2, c1, k15, u'admin').
+1677409883: Client ESP32Client-2a26 has exceeded timeout, disconnecting.
+1677409984: New connection from 172.19.0.1:57600 on port 1883.
+1677409984: New client connected from 172.19.0.1:57600 as ESP32Client-4892 (p2, c1, k15, u'admin').
+1677410507: Client ESP32Client-4892 has exceeded timeout, disconnecting.
+1677410800: New connection from 172.19.0.1:57602 on port 1883.
+1677410800: New client connected from 172.19.0.1:57602 as ESP32Client-dd9d (p2, c1, k15, u'admin').
+1677410836: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677408223655 closed its connection.
+1677410836: New connection from 172.19.0.1:57606 on port 1883.
+1677410836: New client connected from 172.19.0.1:57606 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677410836972 (p2, c1, k10, u'admin').
+1677410853: Client 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677410836972 closed its connection.
+1677410853: New connection from 172.19.0.1:57608 on port 1883.
+1677410853: New client connected from 172.19.0.1:57608 as 0ed8c81a-6c61-4dc1-856a-d8dd71c0c4de1677410853190 (p2, c1, k10, u'admin').
+1677410934: New connection from 172.19.0.1:57610 on port 1883.
+1677410934: New client connected from 172.19.0.1:57610 as ESP32Client-2a73 (p2, c1, k15, u'admin').
+1677410938: Client ESP32Client-dd9d closed its connection.
+1677410981: New connection from 172.19.0.1:57612 on port 1883.
+1677410981: New client connected from 172.19.0.1:57612 as ESP32Client-c352 (p2, c1, k15, u'admin').
+1677410988: Client ESP32Client-2a73 closed its connection.
+1677411115: Client ESP32Client-c352 closed its connection.
+1677411125: New connection from 172.19.0.1:57614 on port 1883.
+1677411125: New client connected from 172.19.0.1:57614 as ESP32Client-dea1 (p2, c1, k15, u'admin').
+1677411469: Saving in-memory database to /mosquitto/data//mosquitto.db.

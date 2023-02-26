@@ -2,68 +2,43 @@ version: "3"
 
 # todo update container image names
 services:
-  mqtt-broker:
-    image: eclipse-mosquitto:2
-    volumes:
-      - ./config/:/mosquitto/config/:ro
-      - ./log/:/mosquitto/log/
-      - ./data/:/mosquitto/data/
-    ports:
-      - 1883:1883
-      - 9001:9001
+  # mqtt-broker:
+  #   image: eclipse-mosquitto:2
+  #   volumes:
+  #     - ./config/:/mosquitto/config/:ro
+  #     - ./log/:/mosquitto/log/
+  #     - ./data/:/mosquitto/data/
+  #   ports:
+  #     - 1883:1883
+  #     - 9001:9001
 
-  mqtt-bridge:
-    image: rsteckler/docker-http-mqtt-bridge:v1
-    ports:
-      - 5000:5000
-    env_file:
-      - http-mqtt-bridge.env
-    depends_on:
-      - mqtt-broker
-    links:
-      - mqtt-broker:mqtt-broker
-
-  reverse-proxy:
-    image: traefik:v2.8
-    # Enables the web UI and tells Traefik to listen to docker
-    # Disable webUI in production
-    command: --api.insecure=true --providers.docker
-    ports:
-      # The HTTP port
-      - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
-    volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  frontend:
-    container_name: frontend
-    image: registry.gitlab.com/maomaocake/smart-farm/frontend:latest
-    restart: unless-stopped
-    expose:
-      - 3000
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.frontend.entrypoints=http'
-      - "traefik.http.routers.frontend.rule=Host(`smartfarm.localhost`)"
-      # change the URL
-
-  backend:
-    container_name: backend
-    image: registry.gitlab.com/maomaocake/smart-farm/backend:latest
-    restart: unless-stopped
-    expose:
-      - 8000
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.backend.entrypoints=http'
-      - "traefik.http.routers.backend.rule=Host(`smartfarm.localhost`) && PathPrefix(`/api/`) && Path(`/token`)"
-      # change the URL
-
-#  backend-worker:
-#    container_name: worker
-#    image: registry.gitlab.com/maomaocake/smart-farm/worker:latest
+  # mqtt-bridge:
+  #   image: rsteckler/docker-http-mqtt-bridge:v1
+  #   ports:
+  #     - 5000:5000
+  #   env_file:
+  #     - http-mqtt-bridge.env
+  #   depends_on:
+  #     - mqtt-broker
+  #   links:
+  #     - mqtt-broker:mqtt-broker
+#  reverse-proxy:
+#    image: traefik:v2.8
+#    # Enables the web UI and tells Traefik to listen to docker
+#    # Disable webUI in production
+#    command: --api.insecure=true --providers.docker
+#    ports:
+#      # The HTTP port
+#      - "80:80"
+#      # The Web UI (enabled by --api.insecure=true)
+#      - "8080:8080"
+#    volumes:
+#      # So that Traefik can listen to the Docker events
+#      - /var/run/docker.sock:/var/run/docker.sock
+#
+#  frontend:
+#    container_name: frontend
+#    image: catsmao/frontend:latest
 #    restart: unless-stopped
 #    expose:
 #      - 8000
@@ -78,18 +53,23 @@ services:
 #    labels:
 #      - 'traefik.enable=true'
 #      - 'traefik.http.routers.backend.entrypoints=http'
+#      - "traefik.http.routers.backend.rule=Host(`fishtank.localhost`) && PathPrefix(`/api/`) && Path(`/token`)"
+#
+#  database:
+#    container_name: db
+#    image: postgres
+#    restart: unless-stopped
+#    expose:
+#      - 5432
+#    env_file:
+#      - .env
+#    labels:
+#      - 'traefik.enable=true'
 
-  database:
-    container_name: db
-    image: mysql:latest
-    restart: unless-stopped
-    expose:
-      - 5432
-    env_file:
-      - .env
-    labels:
-      - 'traefik.enable=true'
-
-#  mongo:
-#    container_name: mongo_db
-#    image: mongo:latest
+  cartdb:
+    image: mongo:4.4 # need to specify the version to prevent code corruption
+    environment: # variable of the server or OS
+      MONGO_INITDB_ROOT_USERNAME: touch
+      MONGO_INITDB_ROOT_PASSWORD: touchja
+    ports:
+      - "27017:27017"
