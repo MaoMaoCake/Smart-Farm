@@ -222,13 +222,14 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
     lights = list_light(farm_id, username).data
     for light in lights:
         try:
+            body = LightRequest(
+               activate=light.status,
+               uv_percent=updateLightStrengthInput.UVLightDensity,
+               ir_percent= updateLightStrengthInput.IRLightDensity,
+               natural_percent=updateLightStrengthInput.NaturalLightDensity
+            )
             response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
-                                           message=str(LightRequest(
-                                               activate=light.status,
-                                               uv_percent=updateLightStrengthInput.UVLightDensity,
-                                               ir_percent= updateLightStrengthInput.IRLightDensity,
-                                               natural_percent=updateLightStrengthInput.NaturalLightDensity
-                                           )))
+                                           message=json.dumps(body.__dict__))
             if response.status_code != 200:
                 get_http_exception('03', message='MQTT connection failed')
         except:
@@ -280,15 +281,16 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                 if light.isAutomation and automation_map[light.lightId]:
                     if check_automation_running(automation.startTime, automation.endTime):
                         try:
-                            response = create_mqtt_request(
-                                topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
-                                   message=str(LightRequest(
+                            body = LightRequest(
                                        activate=True,
                                        uv_percent=updateLightStrengthInputInPreset.UVLightDensity,
                                        ir_percent=updateLightStrengthInputInPreset.IRLightDensity,
                                        natural_percent=updateLightStrengthInputInPreset.NaturalLightDensity,
                                        light_combination_id= light_combination_map[light.lightId]
-                                   )))
+                             )
+                            response = create_mqtt_request(
+                                topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
+                                   message=json.dumps(body.__dict__))
                             if response.status_code != 200:
                                 get_http_exception('03', message='MQTT connection failed')
                         except:
@@ -353,13 +355,14 @@ def light_controlling(farm_id: int, is_turn_on: bool, username: str):
     for light in lights:
         if light.isAutomation:
             try:
+                body = LightRequest(
+                   activate=is_turn_on,
+                   uv_percent=light.UVLightDensity,
+                   ir_percent=light.IRLightDensity,
+                   natural_percent=light.naturalLightDensity
+                )
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
-                                               message=str(LightRequest(
-                                                   activate=is_turn_on,
-                                                   uv_percent=light.UVLightDensity,
-                                                   ir_percent=light.IRLightDensity,
-                                                   natural_percent=light.naturalLightDensity
-                                               )))
+                                               message=json.dumps(body.__dict__))
                 if response.status_code != 200:
                     get_http_exception('03', message='MQTT connection failed')
             except:
@@ -374,11 +377,12 @@ def ac_controlling(farm_id: int, is_turn_on: bool, _temperature: int ,username: 
     for ac in acs:
         if ac.ACStatus:
             try:
+                body = ACRequest(
+                   activate=is_turn_on,
+                   temperature=_temperature
+                )
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.AC.value}{ac.ACId}"]),
-                                               message=str(ACRequest(
-                                                   activate=is_turn_on,
-                                                   temperature=_temperature
-                                               )))
+                                               message=json.dumps(body.__dict__))
 
                 if response.status_code != 200:
                     get_http_exception('03', message='MQTT connection failed!')
@@ -419,11 +423,12 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
     elif not is_turn_on:
         delete_ac_scheduler_task(AC_automations, mapping, ac_id, path)
         try:
+            body = ACRequest(
+               activate=is_turn_on,
+               temperature=AC.temperature
+             )
             response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
-                                           message=str(ACRequest(
-                                               activate=is_turn_on,
-                                               temperature=AC.temperature
-                                           )))
+                                           message=json.dumps(body.__dict__))
 
             if response.status_code != 200:
                 get_http_exception('03', message='MQTT connection failed')
@@ -529,14 +534,15 @@ def update_light_strength(update_input: UpdateLightStrengthInput,
     is_on = farm.lightStatus and light.status and light.automation
     if is_on:
         try:
-            response = create_mqtt_request(
-                topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_id}"]),
-                message=str(LightRequest(
+            body = LightRequest(
                     activate=True,
                     uv_percent=update_input.UVLightDensity,
                     ir_percent=update_input.IRLightDensity,
                     natural_percent=update_input.NaturalLightDensity,
-                )))
+                )
+            response = create_mqtt_request(
+                topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_id}"]),
+                message=json.dumps(body.__dict__))
             if response.status_code != 200:
                 get_http_exception('03', message='MQTT connection failed')
         except:
@@ -587,15 +593,16 @@ def update_light_combination_strength(update_input: UpdateLightStrengthInput,
             if light.automation and light_combination.automation:
                 if check_automation_running(automation.startTime, automation.endTime):
                     try:
-                        response = create_mqtt_request(
-                            topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_combination.lightId}"]),
-                            message=str(LightRequest(
+                        body = LightRequest(
                                 activate=True,
                                 uv_percent=update_input.UVLightDensity,
                                 ir_percent=update_input.IRLightDensity,
                                 natural_percent=update_input.NaturalLightDensity,
                                 light_combination_id=light_combination.id
-                            )))
+                            )
+                        response = create_mqtt_request(
+                            topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_combination.lightId}"]),
+                            message=json.dumps(body.__dict__))
                         if response.status_code != 200:
                             get_http_exception('03', message='MQTT connection failed')
                     except:
@@ -647,11 +654,10 @@ def dehumidifier_controlling(farm_id: int, is_turn_on: bool, username: str):
     for dehumidifier in dehumidifiers:
         if dehumidifier.DehumidifierIsAvailable:
             try:
+                body = DehumidifierRequest(activate=is_turn_on)
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.DEHUMIDIFIER.value}"
                                                                      f"{dehumidifier.DehumidifierId}"]),
-                                               message=str(DehumidifierRequest(
-                                                   activate=is_turn_on
-                                               )))
+                                               message=json.dumps(body.__dict__))
                 if response.status_code != 200:
                     get_http_exception('03', message='MQTT connection failed!')
             except:
@@ -770,11 +776,10 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
         co2_sensor_ids = list_co2_sensors_id(farm_id)
         for co2_sensor_id in co2_sensor_ids:
             try:
+                body = SensorRequest(co2_threshold=update_farm_input.MinCO2Level)
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.CO2_SENSOR.value}"
                                                                      f"{co2_sensor_id}"]),
-                                               message=str(SensorRequest(
-                                                   co2_threshold=update_farm_input.MinCO2Level,
-                                               )))
+                                               message=json.dumps(body.__dict__))
                 if response.status_code != 200:
                     get_http_exception('03', message='MQTT connection failed!')
             except:
@@ -786,11 +791,10 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
         humidity_sensor_ids = list_humidity_sensors_id(farm_id)
         for humidity_sensor_id in humidity_sensor_ids:
             try:
+                body = SensorRequest(humidity_threshold=update_farm_input.MaxHumidityLevel)
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.HUMIDITY_SENSOR.value}"
                                                                      f"{humidity_sensor_id}"]),
-                                               message=str(SensorRequest(
-                                                   humidity_threshold=update_farm_input.MaxHumidityLevel,
-                                               )))
+                                               message=json.dumps(body.__dict__))
                 if response.status_code != 200:
                     get_http_exception('03', message='MQTT connection failed!')
             except:
@@ -1130,5 +1134,3 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
             update_water_controller(farm_id, update_farm_input.isWateringAutomation, username)
 
     return get_response_status('Update has been sent to devices')
-
-
