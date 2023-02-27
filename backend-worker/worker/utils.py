@@ -1,6 +1,7 @@
 from .config import create_mqtt_request
 from .models import AutomationInput, LightRequest, WateringRequest, ACRequest
 from .enum_list import HardwareType, AutomationInputField
+import json
 
 from response.error_codes import get_http_exception
 
@@ -38,15 +39,17 @@ def validate_input(automation_input: AutomationInput):
 def create_payload(automation_input: AutomationInput, is_start: bool):
     match automation_input.hardware_type:
         case HardwareType.LIGHT:
-            return LightRequest(activate=is_start,
+            body = LightRequest(activate=is_start,
                                 uv_percent=automation_input.uv_percent,
                                 ir_percent=automation_input.ir_percent,
                                 natural_percent=automation_input.natural_percent,
                                 light_combination_id=automation_input.light_combination_id
                                 )
         case HardwareType.AC:
-            return ACRequest(activate=is_start,
+            body = ACRequest(activate=is_start,
                              temperature=automation_input.temperature
                              )
         case HardwareType.WATERING:
-            return WateringRequest(activate=is_start)
+            body = WateringRequest(activate=is_start)
+
+    return json.dumps(body.__dict__)
