@@ -356,7 +356,7 @@ def update_light_strength_to_all_light_in_preset(
                                      'UVLightDensity': update_light_strength_input_in_preset.UVLightDensity,
                                      'IRLightDensity': update_light_strength_input_in_preset.IRLightDensity,
                                      'naturalLightDensity': update_light_strength_input_in_preset.NaturalLightDensity,
-                                     'updateBy': username
+                                     'updateBy': username=
                                      })
     session.commit()
 
@@ -388,8 +388,6 @@ def update_light_combination_strength_in_db(update_light_strength_input: UpdateL
         light.IRLightDensity,
         light.naturalLightDensity
         )
-
-
 def check_light_exist(light_id: int):
     light = session.query(LightDB).filter(LightDB.id == light_id).first()
     if not light:

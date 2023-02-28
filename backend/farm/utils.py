@@ -4,6 +4,7 @@ import json
 from distutils.util import strtobool
 from datetime import time, datetime
 
+
 from database.connector import get_user_from_db, add_farm_to_user_db, \
     check_farm_key_exist, check_farm_owning, \
     list_farms_from_user_id, check_farm_exist,\
@@ -24,6 +25,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     delete_watering_automation_in_db, create_watering_automation_in_db,\
     update_watering_automation_in_db, update_light_strength_to_all_light_in_preset,\
     delete_light_automation_in_db, check_preset_in_light_automation_db, update_water_controller
+    
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
 
@@ -242,6 +244,7 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                                        farm_id: int,
                                        preset_id: int,
                                        username: str) -> ResponseDto[[LightCombination]]:
+
     user = get_user_from_db(username)
     if not user:
         get_http_exception('US404')
