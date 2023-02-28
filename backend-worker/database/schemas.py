@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from .utils import current_datetime
 from .enum_list import Role
 
-from farm.enum_list import HardwareType, ESPType
+from worker.enum_list import HardwareType, ESPType
 
 Base = declarative_base()
 
@@ -118,14 +118,6 @@ class WateringAutomationDB(BaseModel):
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     startTime = Column(Time, nullable=False)
     endTime = Column(Time, nullable=False)
-
-
-class LightAutomationDB(BaseModel):
-    __tablename__ = "lightpresetautomation"
-    farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
-    startTime = Column(Time, nullable=False)
-    endTime = Column(Time, nullable=False)
-    farmLightPresetId = Column(Integer, nullable=False)
 
 
 class LightDB(BaseModel):
