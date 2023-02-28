@@ -356,7 +356,7 @@ def update_light_strength_to_all_light_in_preset(
                                      'UVLightDensity': update_light_strength_input_in_preset.UVLightDensity,
                                      'IRLightDensity': update_light_strength_input_in_preset.IRLightDensity,
                                      'naturalLightDensity': update_light_strength_input_in_preset.NaturalLightDensity,
-                                     'updateBy': username=
+                                     'updateBy': username
                                      })
     session.commit()
 
