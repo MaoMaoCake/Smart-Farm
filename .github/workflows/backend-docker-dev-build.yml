@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the backend Docker image and uploads it to gitlab CR
-      run: docker build backend --file Dockerfile --tag registry.gitlab.com/maomaocake/smart-farm/backend:latest-dev && docker login registry.gitlab.com -u maomaocake -p ${{ secrets.GITLAB_REGISTRY_SECRET }} && docker push registry.gitlab.com/maomaocake/smart-farm/backend:latest-dev
+      run: docker build backend --file backend/Dockerfile --tag registry.gitlab.com/maomaocake/smart-farm/backend:latest-dev && docker login registry.gitlab.com -u maomaocake -p ${{ secrets.GITLAB_REGISTRY_SECRET }} && docker push registry.gitlab.com/maomaocake/smart-farm/backend:latest-dev
