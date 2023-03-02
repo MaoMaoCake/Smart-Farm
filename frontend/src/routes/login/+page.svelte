@@ -1,11 +1,17 @@
 <script lang="js">
   import {goto} from '$app/navigation'
-  import {logged_in} from "./SettingStores";
+  import {logged_in} from "$lib/SettingStores";
+  import {onMount} from "svelte";
 
   let username = "gnnchya3";
   let password = "gunn";
   const endpoint = "http://127.0.0.1:8000/token";
 
+  onMount(() => {
+    if (!$logged_in) {
+      goto("/login")
+    }
+  })
 
   async function login() {
     if (username == "" || password == "") {
@@ -37,7 +43,7 @@
       console.log(response.message)
       alert(response.message);
     } else if (response.status_code  === 200) {
-      localStorage.setItem('token', response.access_token);
+      localStorage.setItem('token', response.data.access_token);
       $logged_in.set(true)
       goto('/');
     }

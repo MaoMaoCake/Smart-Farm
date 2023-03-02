@@ -2,11 +2,17 @@
     import { onMount } from 'svelte'
     import {logged_in} from "./SettingStores";
     import { themeChange } from 'theme-change'
+    import {goto} from '$app/navigation'
     let checked = localStorage.getItem("theme") === 'sf_light'
 
     onMount(() => {
       themeChange(false);
     })
+
+    function logout(){
+        localStorage.removeItem("token")
+        goto("/login")
+    }
 </script>
 <div class="h-16"> <!-- This is to make the navbar spacing -->
 </div>
@@ -32,7 +38,7 @@
              </li>
              <li>
                  {#if $logged_in}
-                    Logged in
+                    <a class="btn btn-secondary sm:m-2 text-white" on:click={logout}>Logout</a>
                 {:else}
                     <a class="btn btn-secondary sm:m-2 text-white" href="/login">Login</a>
                 {/if}
