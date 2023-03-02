@@ -5,21 +5,30 @@
 
     export let farm_id;
 
+    let tooltip = false;
     $FarmSettings.ac_schedule = [{time_start: "09:50", time_end: "12:00", temp: 25},
         {time_start: "12:00", time_end: "14:00", temp: 26}]
-    function info(type: string){
-        alert(type)
-    }
+
     function addTime(){
         $FarmSettings.ac_schedule = [...$FarmSettings.ac_schedule, {time_start: "00:00", time_end: "00:00", temp: 0}]
     }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
-    <div class="flex items-center w-full">
-        <div on:click={() => {info("ac")}}>
+    <div class="flex items-center w-full relative">
+        <div on:click={() => {tooltip = true}} on:mouseenter={() => {tooltip = true}} on:mouseleave={() => {tooltip = false}}>
             <Icon icon="mdi:information" class="h-5 w-5 ml-5" />
         </div>
         <p class="bg-blue-900 rounded min-w-fit ml-5 pl-5 pr-5 white">AC Setting</p>
+        {#if tooltip}
+            <div class="absolute left-10 top-10">
+                <div class="bg-yellow-200 w-56 h-52 rounded-xl relative z-30">
+                    <div class="text-black">
+                        <p>This is a button</p>
+                        <p>this button is very very cool</p>
+                    </div>
+                </div>
+            </div>
+        {/if}
         <div>
             <a href="/{farm_id}/ac_list">
                 <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
