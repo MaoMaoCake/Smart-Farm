@@ -1,7 +1,14 @@
 <script lang="ts">
     import StatPreview from "$lib/StatPreview.svelte";
     import AddFarm from "$lib/AddFarm.svelte";
-
+    import {onMount} from "svelte";
+    import {goto} from '$app/navigation'
+    import {logged_in} from "$lib/SettingStores";
+    onMount(() => {
+        if (!$logged_in) {
+            goto("/login")
+        }
+    })
     interface FarmData {
         name: string,
         temp: number,
