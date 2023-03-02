@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from auth.route import authRouter
 from farm.route import farmRouter
+from starlette.middleware.cors import CORSMiddleware
 
 from response.error_codes import ErrorException
 
@@ -9,6 +10,15 @@ from dotenv import load_dotenv
 load_dotenv('backend.env')
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*', 'localhost:5173', '127.0.0.1:5173'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(authRouter)
 app.include_router(farmRouter)
 
