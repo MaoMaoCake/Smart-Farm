@@ -2,7 +2,8 @@
     import { onMount } from 'svelte'
     import { themeChange } from 'theme-change'
     let checked = localStorage.getItem("theme") === 'sf_light'
-    let logged_in = !(localStorage.getItem("token") == null)
+    let logged_in = false;
+    $: logged_in = !(localStorage.getItem("token") == null)
 
     onMount(() => {
       themeChange(false);
