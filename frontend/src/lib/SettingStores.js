@@ -12,3 +12,5 @@ export let FarmSettings = writable({
     light_list: [],
     ac_list: []
 })
+
+export let logged_in = writable(!(localStorage.getItem("token") == null || localStorage.getItem("token") === undefined))

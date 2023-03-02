@@ -1,5 +1,7 @@
 <script lang="js">
   import {goto} from '$app/navigation'
+  import {logged_in} from "./SettingStores";
+
   let username = "gnnchya3";
   let password = "gunn";
   const endpoint = "http://127.0.0.1:8000/token";
@@ -36,6 +38,7 @@
       alert(response.message);
     } else if (response.status_code  === 200) {
       localStorage.setItem('token', response.access_token);
+      $logged_in.set(true)
       goto('/');
     }
   }

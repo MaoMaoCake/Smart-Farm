@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { onMount, beforeUpdate } from 'svelte'
+    import { onMount } from 'svelte'
+    import {logged_in} from "./SettingStores";
     import { themeChange } from 'theme-change'
     let checked = localStorage.getItem("theme") === 'sf_light'
-    let logged_in = false;
-    beforeUpdate(() => {
-        logged_in = !(localStorage.getItem("token") == null || localStorage.getItem("token") == undefined)
-    })
 
     onMount(() => {
       themeChange(false);
@@ -34,7 +31,7 @@
                 </label>
              </li>
              <li>
-                 {#if logged_in}
+                 {#if $logged_in}
                     Logged in
                 {:else}
                     <a class="btn btn-secondary sm:m-2 text-white" href="/login">Login</a>
