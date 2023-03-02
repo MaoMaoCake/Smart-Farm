@@ -1,14 +1,45 @@
-<script lang="ts">
-  let username = "";
-  let password = "";
+<script lang="js">
+  import {goto} from '$app/navigation'
+  let username = "gnnchya3";
+  let password = "gunn";
+  const endpoint = "http://127.0.0.1:8000/token";
 
-  function login() {
-    if (username == "" || password == ""){
+
+  async function login() {
+    if (username == "" || password == "") {
       alert("Username or password cannot be empty");
-    } else {
-      alert(`username: ${username} password: ${password}`);
+    }
+
+    const bodyFormData = new FormData()
+    bodyFormData.append('username', username);
+    bodyFormData.append('password', password);
+
+    const myHeaders = new Headers();
+    myHeaders.append("Origin", "");
+
+    let requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: bodyFormData,
+      redirect: 'follow',
+    };
+
+    fetch("http://127.0.0.1:8000/token", requestOptions)
+    .then(async response => response_handler(await response.json()))
+    .catch(error => console.log('error', error));
+  }
+
+  async function response_handler(response) {
+    console.log(response)
+    if (response.status_code === 401) {
+      console.log(response.message)
+      alert(response.message);
+    } else if (response.status_code  === 200) {
+      localStorage.setItem('token', response.access_token);
+      goto('/');
     }
   }
+
 </script>
 <div class="flex align-center justify-center">
   <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
