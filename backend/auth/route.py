@@ -12,11 +12,13 @@ from .models import Token, User
 from .utils import authenticate_user, create_new_user
 
 from database.enum_list import Role
+from response.response_dto import get_response_status, ResponseDto
+from response.error_codes import get_http_exception
 
 authRouter = APIRouter()
 
 
-@authRouter.post("/token", response_model=Token, tags=["Auth"])
+@authRouter.post("/token", response_model=ResponseDto, tags=["Auth"])
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> dict:
     """
     Takes Username and password from form data and signs a token
@@ -25,16 +27,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     """
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        get_http_exception('10','Incorrect username or password')
+
     access_token_expires = timedelta(minutes=float(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES')))
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return get_response_status(data=Token(access_token=access_token, token_type="bearer"))
 
 
 @authRouter.get("/users/me/", response_model=User)

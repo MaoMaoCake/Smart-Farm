@@ -16,7 +16,6 @@ from fastapi import Depends, HTTPException, status
 import os
 
 from database.connector import get_user_from_db, create_user, get_dup_email
-from database.enum_list import Role
 
 from response.error_codes import get_http_exception
 
@@ -51,6 +50,9 @@ def authenticate_user(username: str, password: str) -> User | None:
     """
     user = get_user_from_db(username)
 
+    if not user:
+        get_http_exception('10', 'username not found')
+
     if verify_password(password, user.password):
         return User(username=user.username, role=user.role)
     else:
@@ -81,6 +83,9 @@ def get_user(username: str) -> User | None:
     :return: User class
     """
     user = get_user_from_db(username)
+
+    if not user:
+        get_http_exception('10', 'username not found')
 
     return User(username=user.username, role=user.role)
 

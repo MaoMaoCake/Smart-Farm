@@ -55,6 +55,8 @@ services:
     restart: unless-stopped
     expose:
       - 8000
+    env_file:
+      - ../backend/backend.env
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.backend.entrypoints=http'
