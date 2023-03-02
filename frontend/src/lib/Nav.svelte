@@ -1,9 +1,11 @@
 <script lang="ts">
-    import { onMount } from 'svelte'
+    import { onMount, beforeUpdate } from 'svelte'
     import { themeChange } from 'theme-change'
     let checked = localStorage.getItem("theme") === 'sf_light'
     let logged_in = false;
-    $: logged_in = !(localStorage.getItem("token") == null)
+    beforeUpdate(() => {
+        logged_in = !(localStorage.getItem("token") == null || localStorage.getItem("token") == undefined)
+    })
 
     onMount(() => {
       themeChange(false);
