@@ -1,17 +1,23 @@
 <script lang="ts">
     import type {PageData} from "./$types";
     import LightValueSmall from "./LightValueSmall.svelte";
+    import LightValueLarge from "./LightValueLarge.svelte";
     export let data: PageData;
     let natural = 0;
     let uv = 0;
     let ir = 0;
 
-
+    let natural_now = 10;
+    let uv_now = 20;
+    let ir_now = 30;
 
 </script>
-<div class="flex grow flex-col justify-center items-center md:flex-row">
+<div class="flex grow flex-col justify-center items-center md:flex-row absolute top-1/2 bottom-1/2 left-0 right-0">
     <div class="flex md:hidden">
-        <LightValueSmall name={"light 1"} natural={23} uv={10} ir={12}/>
+        <LightValueSmall name={"light 1"} natural={natural_now} uv={uv_now} ir={ir_now}/>
+    </div>
+    <div class="flex hidden md:block w-2/3 mr-10 ml-10 justify-center items-center">
+        <LightValueLarge name={"light 1"} natural={natural_now} uv={uv_now} ir={ir_now}/>
     </div>
     <div class="w-full">
         <div class="flex flex-col grow ml-10 mr-10">
