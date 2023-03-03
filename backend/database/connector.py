@@ -111,24 +111,50 @@ def list_farms_from_user_id(user_id: int) -> [FarmStats]:
     farm_ids = [farm[0] for farm in farm_owning]
 
     farms = session.query(FarmDb.id,
-                          FarmDb.name,
-                          TemperatureSensorDB.temperature,
-                          ACDB.status,
-                          ACDB.temperature,
-                          HumiditySensorDB.humidity,
-                          DehumidifierDB.status,
-                          FarmDb.lightStatus,
-                          CO2SensorDB.CO2,
-                          CO2ControllerDB.status,
-                          ).join(TemperatureSensorDB, FarmDb.id == TemperatureSensorDB.farmId
-                                 ).join(ACDB, FarmDb.id == ACDB.farmId
-                                        ).join(HumiditySensorDB, FarmDb.id == HumiditySensorDB.farmId
-                                               ).join(DehumidifierDB, FarmDb.id == DehumidifierDB.farmId
-                                                      ).join(CO2SensorDB, FarmDb.id == CO2SensorDB.farmId
-                                                             ).join(CO2ControllerDB, FarmDb.id == CO2ControllerDB.farmId
-                                                                    ).filter(FarmDb.id.in_(farm_ids)).all()
+                         FarmDb.name,
+                         TemperatureSensorDB.temperature,
+                         ACDB.status,
+                         ACDB.temperature,
+                         HumiditySensorDB.humidity,
+                         DehumidifierDB.status,
+                         FarmDb.lightStatus,
+                         CO2SensorDB.CO2,
+                         CO2ControllerDB.status,
+                         ACDB.automation
+                         ).join(TemperatureSensorDB, FarmDb.id == TemperatureSensorDB.farmId
+                         ).join(ACDB, FarmDb.id == ACDB.farmId
+                         ).join(HumiditySensorDB, FarmDb.id == HumiditySensorDB.farmId
+                         ).join(DehumidifierDB, FarmDb.id == DehumidifierDB.farmId
+                         ).join(CO2SensorDB, FarmDb.id == CO2SensorDB.farmId
+                         ).join(CO2ControllerDB, FarmDb.id == CO2ControllerDB.farmId
+                         ).filter(FarmDb.id.in_(farm_ids)).all()
 
-    return [FarmStats(*farm) for farm in farms]
+    farm_ac_automation = {}
+    for farm in farms:
+        if not farm[0] in farm_ac_automation:
+            farm_ac_automation[farm[0]] = farm[3]
+        if farm[-1] and farm[3]:
+            farm_ac_automation[farm[0]] =farm[3]
+
+    farm_entry = []
+    farm_output = []
+    for farm in farms:
+        if farm[0] not in farm_entry:
+            farm_entry.append(farm[0])
+            farm_output.append(FarmStats(
+                farm_id=farm[0],
+                farm_name=farm[1],
+                temperature=farm[2],
+                ac_status=farm_ac_automation[farm[0]],
+                ac_temperature=farm[4],
+                humidity_level=farm[5],
+                dehumidifier_status=farm[6],
+                light_status=farm[7],
+                co2_level=farm[8],
+                co2_controller_status=farm[9]
+            ))
+
+    return farm_output
 
 
 def get_farm_stats_from_db(farm_id: int) -> FarmStats:

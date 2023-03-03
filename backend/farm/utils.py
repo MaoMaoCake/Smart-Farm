@@ -51,7 +51,7 @@ def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
 
     farm_id = check_farm_key_exist(farm_key)
     if not farm_id:
-        get_http_exception('FM404')
+        get_http_exception('FK404')
 
     if check_farm_owning(user.id, farm_id):
         get_http_exception('FO001')

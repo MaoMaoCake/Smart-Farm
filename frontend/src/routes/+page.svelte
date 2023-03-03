@@ -41,6 +41,7 @@
     function response_handler(response) {
         if (response.status_code === 401) {
           alert(response.message);
+          goto("/login")
         } else if (response.status_code  === 200) {
           data = response.data?.map((farm_data) => {
             return{

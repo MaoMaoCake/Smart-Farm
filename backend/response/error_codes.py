@@ -48,6 +48,12 @@ ERROR_CODES = [
         status_code = 404,
     ),
     ErrorException(
+        error_code = 'FK404',
+        message = 'Invalid farm key',
+        successful = False,
+        status_code = 404,
+    ),
+    ErrorException(
         error_code='PS404',
         message='Preset not found',
         successful=False,

@@ -30,6 +30,7 @@
   }
 
   async function response_handler(response) {
+    console.log(response)
     if (response.status_code === 401) {
       alert(response.message);
     } else if (response.status_code  === 200) {

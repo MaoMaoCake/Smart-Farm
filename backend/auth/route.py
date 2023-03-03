@@ -36,14 +36,14 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return get_response_status(data=Token(access_token=access_token, token_type="bearer"))
 
 
-@authRouter.get("/users/me/", response_model=User)
+@authRouter.get("/users/me/", response_model=ResponseDto)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     """
     Temporary endpoint to show how to use login
     :param current_user:
     :return:
     """
-    return current_user
+    return get_response_status(data=current_user)
 
 @authRouter.post("/users/create", response_model=User)
 async def create_user(
