@@ -1,7 +1,33 @@
 <script lang="ts">
+    import {goto} from "$app/navigation";
+
     let farm_key = "";
     function register_fk(){
-        alert(`fk: ${farm_key}`);
+      if (farm_key===""){
+        alert("Please enter farm key");
+      }
+
+      const myHeaders = new Headers();
+      myHeaders.append("Origin", "");
+      myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+      fetch(
+          `http://127.0.0.1:8000/add?farm_key=${farm_key}`,
+          {
+            method: 'POST',
+            headers: myHeaders,
+            redirect: 'follow'
+          })
+        .then(async response => response_handler(await response.json()))
+        .catch(error => console.log('error', error));
+    }
+
+     function response_handler(response) {
+        if (!response.successful) {
+          alert(response.message);
+        } else if (response.successful) {
+          goto('/');
+        };
     }
 </script>
 <div class="flex align-center justify-center">
