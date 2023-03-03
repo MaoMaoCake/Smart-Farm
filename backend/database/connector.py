@@ -114,6 +114,7 @@ def list_farms_from_user_id(user_id: int) -> [FarmStats]:
                           FarmDb.name,
                           TemperatureSensorDB.temperature,
                           ACDB.status,
+                          ACDB.temperature,
                           HumiditySensorDB.humidity,
                           DehumidifierDB.status,
                           FarmDb.lightStatus,

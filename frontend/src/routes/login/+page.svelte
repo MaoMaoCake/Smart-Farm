@@ -2,11 +2,8 @@
   import {goto} from '$app/navigation'
   import {logged_in} from "$lib/SettingStores";
 
-  let username = "gnnchya3";
-  let password = "gunn";
-  const endpoint = "http://127.0.0.1:8000/token";
-
-
+  let username = "";
+  let password = "";
 
   async function login() {
     if (username == "" || password == "") {
@@ -33,9 +30,7 @@
   }
 
   async function response_handler(response) {
-    console.log(response)
     if (response.status_code === 401) {
-      console.log(response.message)
       alert(response.message);
     } else if (response.status_code  === 200) {
       localStorage.setItem('token', response.data.access_token);
