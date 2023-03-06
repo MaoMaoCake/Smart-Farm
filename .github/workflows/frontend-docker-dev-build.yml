@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Build Frontend Dev Docker Image
 
 on:
   push:
@@ -12,5 +12,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the frontend Docker image and uploads it to gitlab CR
-      run: docker build frontend --file frontend/Dockerfile --tag registry.gitlab.com/maomaocake/smart-farm/frontend:latest-dev && docker login registry.gitlab.com -u maomaocake -p ${{ secrets.GITLAB_REGISTRY_SECRET }} && docker push registry.gitlab.com/maomaocake/smart-farm/frontend:latest-dev
+    - name: Login Into GitLab Registry
+      run: docker login registry.gitlab.com -u maomaocake -p ${{ secrets.GITLAB_REGISTRY_SECRET }}
+    - name: Build the frontend Docker image
+      run: docker build frontend --file frontend/Dockerfile --tag registry.gitlab.com/maomaocake/smart-farm/frontend:latest-dev
+    - name: Upload image to GitLab CR
+      run: docker push registry.gitlab.com/maomaocake/smart-farm/frontend:latest-dev
