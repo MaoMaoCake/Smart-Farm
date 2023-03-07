@@ -36,6 +36,22 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@authRouter.post("/token_swagger", response_model=Token, tags=["Auth"])
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
+    """
+    Takes Username and password from form data and signs a token
+    :param form_data:
+    :return:
+    """
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        get_http_exception('10','Incorrect username or password')
+
+    access_token_expires = timedelta(minutes=float(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES')))
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return Token(access_token=access_token, token_type="bearer")
 
 @authRouter.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
