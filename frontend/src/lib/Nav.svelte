@@ -11,6 +11,7 @@
 
     function logout(){
         localStorage.removeItem("token")
+        $logged_in = false
         goto("/login")
     }
 </script>

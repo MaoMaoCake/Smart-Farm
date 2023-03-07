@@ -775,3 +775,12 @@ def update_watering_automation_in_db(update_automation_input: UpdateWateringAuto
                     "updateBy": update_automation_input.username,
                   })
     session.commit()
+
+
+def update_ac_temp_db(farm_id: int, temperature: int) -> None:
+    session.query(FarmDb
+                  ).filter(FarmDb.id == farm_id
+                  ).update({
+                    "ACTemp": temperature
+                  })
+    session.commit()

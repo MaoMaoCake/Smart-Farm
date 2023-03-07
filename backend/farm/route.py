@@ -14,7 +14,7 @@ from .utils import link_farm_to_user, list_farms,\
     update_ac_automation_by_id, ac_controlling, update_automation_to_all_acs,\
     update_light_strength, update_light_combination_strength,update_farm_name_to_db,\
     update_preset_name_to_db, update_light_name_to_db, update_AC_name_to_db,\
-    dehumidifier_controlling, update_farm_setting_to_db
+    dehumidifier_controlling, update_farm_setting_to_db, change_ac_temp
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
     FarmLightPreset, AC, LightStrength, CreateLightInput, \
@@ -197,3 +197,9 @@ async def update_ac_name(name: str, farm_id: int, ac_id: int, current_user: User
 async def update_farm_setting(update_input: UpdateFarmSettings, farm_id: int, current_user: User = Depends(get_current_active_user)):
 
     return update_farm_setting_to_db(update_input, farm_id, current_user.username)
+
+
+@farmRouter.patch("/farm/{farm_id}/AC/temperature/change", response_model=ResponseDto, tags=["AC"])
+async def update_ac_temp(is_turn_on: bool, temperature: int, farm_id: int, current_user: User = Depends(get_current_active_user)):
+
+    return change_ac_temp(is_turn_on, temperature, farm_id, current_user.username)
