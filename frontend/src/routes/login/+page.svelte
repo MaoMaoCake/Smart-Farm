@@ -69,11 +69,12 @@
       placeholder="password"
       class="input input-bordered"
       value={password}
+      autocomplete="current-password"
       on:input={(e) => (password = e.target.value)}
       on:keydown={handlePasswordKeydown}
     />
     <button
-      class="absolute inset-y-0 left-20 pr-1 flex items-end"
+      class="absolute inset-y-0 left-20 pr-1"
       on:click={() => (showPassword = !showPassword)}
     >
       {#if showPassword}
@@ -100,8 +101,9 @@
 <style>
   .input {
     /* set a fixed height to align with the icon */
-    padding-right: 80px;
+    padding-right: 125px;
     height: 40px;
+    width: 320px;
   }
   /* adjust the position of the icon */
   .input + button {
