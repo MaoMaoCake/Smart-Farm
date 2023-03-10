@@ -79,7 +79,7 @@ ERROR_CODES = [
     ),
     ErrorException(
         error_code='PA400',
-        message='Preset found in automation',
+        message='Preset found in automation, this preset cannot be deleted',
         successful=False,
         status_code=400,
     ),

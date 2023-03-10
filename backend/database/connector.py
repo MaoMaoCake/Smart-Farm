@@ -13,7 +13,7 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     ACAutomation, WateringAutomation, UpdateLightStrengthInputInPreset, UpdateLightCombination,\
     FarmACAutomation, FarmLightPreset, Dehumidifier, CreateLightAutomationInput,\
     UpdateLightAutomationInput, CreateACAutomationInput, UpdateACAutomationInput, WaterController,\
-    CreateWateringAutomationInput, UpdateWateringAutomationInput
+    CreateWateringAutomationInput, UpdateWateringAutomationInput, FarmLightPresetUpdated
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
@@ -583,12 +583,12 @@ def update_farm_name(name: str, farm_id: int, username: str) -> FarmStats:
     return get_farm_stats_from_db(farm_id)
 
 
-def update_preset_name(name: str, preset_id: int, username: str) -> FarmLightPreset:
+def update_preset_name(name: str, preset_id: int, username: str) -> FarmLightPresetUpdated:
     session.query(FarmLightPresetDB).filter(FarmLightPresetDB.id == preset_id).update({'name': name, 'updateBy': username})
     session.commit()
 
     preset = session.query(FarmLightPresetDB).filter(FarmLightPresetDB.id == preset_id).first()
-    return FarmLightPreset(
+    return FarmLightPresetUpdated(
         presetId=preset_id,
         farmId=preset.farmId,
         presetName=preset.name

@@ -299,10 +299,10 @@ class GetFarmSettings(BaseModel):
         )
 
 
-# class FarmLightPreset(BaseModel):
-#     presetId: int
-#     farmId: int
-#     presetName: str
+class FarmLightPresetUpdated(BaseModel):
+    presetId: int
+    farmId: int
+    presetName: str
 
 
 class UpdateFarmSettings(BaseModel):
