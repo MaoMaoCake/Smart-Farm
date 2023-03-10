@@ -55,3 +55,12 @@ self.addEventListener('fetch', (evt) => {
           })
   );
 });
+
+self.addEventListener("push", function(event){
+    const payload = event.data ? event.data.text() : "no Payload";
+    event.waitUntil(
+        self.registration.showNotification("Smart Farm", {
+            body: payload,
+        })
+    )
+})
