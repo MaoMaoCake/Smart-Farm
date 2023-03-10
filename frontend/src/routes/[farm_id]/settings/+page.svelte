@@ -222,7 +222,6 @@
             alert(response.message)
             // goto(`/${data.farm_id}/settings`);
         } else {
-            console.log('success')
             location.reload();
         }
   }
