@@ -1,8 +1,23 @@
 <script  lang="ts">
     import Icon from "@iconify/svelte";
-    import {FarmSettings} from "$lib/SettingStores";
+    import {FarmSettings, changes} from "$lib/SettingStores";
 
+    let initial_humidity = 0;
     let tooltip = false;
+
+    $: {
+        if ($FarmSettings && (initial_humidity == 0)) {
+          initial_humidity = $FarmSettings.humidity;
+        }
+  }
+
+    async function handleHumidityChange(){
+        if ($FarmSettings.humidity == initial_humidity) {
+            $changes.humidity = false;
+        } else {
+            $changes.humidity = true;
+        }
+    }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
     <div class="flex items-center w-full relative">
@@ -24,7 +39,10 @@
     </div>
     <div class="flex justify-center items-center">
         <p class="ml-5 mr-5">Maximum Humidity Level</p>
-        <input type="text" bind:value={$FarmSettings.humidity} class="input w-32">
-        <p>%</p>
+        <input type="text"
+               bind:value={$FarmSettings.humidity}
+               on:input={handleHumidityChange}
+               class="input w-32 bg-gray-100 text-black">
+        <p class="ml-5 ">%</p>
     </div>
 </div>

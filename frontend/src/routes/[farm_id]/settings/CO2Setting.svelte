@@ -1,8 +1,24 @@
 <script  lang="ts">
+    import { onMount, afterUpdate } from 'svelte';
     import Icon from "@iconify/svelte";
-    import {FarmSettings} from "$lib/SettingStores";
+    import {FarmSettings, changes} from "$lib/SettingStores";
 
+    let initial_co2 = 0;
     let tooltip = false;
+
+    $: {
+        if ($FarmSettings && (initial_co2 == 0)) {
+          initial_co2 = $FarmSettings.co2;
+        }
+  }
+    async function handleCo2Change(){
+        console.log(initial_co2)
+        if ($FarmSettings.co2 == initial_co2) {
+            $changes.co2 = false;
+        } else {
+            $changes.co2 = true;
+        }
+    }
 
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
@@ -25,7 +41,10 @@
     </div>
     <div class="flex justify-center items-center">
         <p class="ml-5 mr-5">Minimum CO2 Level</p>
-        <input type="text" bind:value={$FarmSettings.co2} class="input w-32">
-        <p>PPM</p>
+            <input type="text"
+                   class="input w-32 bg-gray-100 text-black"
+                   bind:value={$FarmSettings.co2}
+                   on:input={handleCo2Change}>
+        <p class="ml-5">PPM</p>
     </div>
 </div>

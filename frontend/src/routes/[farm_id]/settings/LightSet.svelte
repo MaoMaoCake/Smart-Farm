@@ -8,10 +8,12 @@
     export let t_end;
     export let preset;
 
-    let user_preset = [{name: 'preset 1', preset_id: "preset1"},
-                        {name: 'preset 2', preset_id: "preset2"}]
-    let selected = {name: 'preset 1', preset_id: preset};
+    const initial_changes_type = $FarmSettings.light_schedule[num].changes_type;
+    const initial_option = $FarmSettings.light_schedule[num].farmLightPresetId;
+    let preset_change = false;
+    let time_change = false;
 
+    let user_preset = $FarmSettings.light_preset;
     let s_open = false;
     let e_open = false;
 
@@ -27,11 +29,27 @@
         return hours + ':' + minutes;
     }
     let startCallback = (event) => {
-        t_start = formatTime(event.detail)
+        t_start = formatTime(event.detail);
+        $FarmSettings.light_schedule[num].startTime = t_start;
+        switch ($FarmSettings.light_schedule[num].changes_type) {
+            case "NO_CHANGES":
+            case null:
+                $FarmSettings.light_schedule[num].changes_type = "UPDATE";
+                time_change = true;
+                break
+        }
     }
 
     let endCallback = (event) => {
-        t_end = formatTime(event.detail)
+        t_end = formatTime(event.detail);
+        $FarmSettings.light_schedule[num].endTime = t_end;
+        switch ($FarmSettings.light_schedule[num].changes_type) {
+            case "NO_CHANGES":
+            case null:
+                $FarmSettings.light_schedule[num].changes_type = "UPDATE";
+                time_change = true;
+                break
+        }
     }
     function save(state){
         if (state === 'on'){
@@ -42,14 +60,37 @@
         }
     }
     function rmTime(index: number){
-        $FarmSettings.light_schedule.splice(index, 1)
-        $FarmSettings.light_schedule = $FarmSettings.light_schedule
+        if ($FarmSettings.light_schedule[num].changes_type == "DELETE") {
+            if (preset_change || time_change) {
+                $FarmSettings.light_schedule[num].changes_type = "UPDATE";
+            } else {
+                $FarmSettings.light_schedule[num].changes_type = initial_changes_type;
+            }
+        } else if ($FarmSettings.light_schedule[num].changes_type == "CREATE") {
+            $FarmSettings.light_schedule.splice(index, 1);
+            $FarmSettings.light_schedule = $FarmSettings.light_schedule;
+        } else {
+            $FarmSettings.light_schedule[num].changes_type = "DELETE";
+        }
     }
 
     async function remove(){
-        //alert remove
-        if (await dialogs.confirm("Are You sure you want to delete this time?")){
+        if ($FarmSettings.light_schedule[num].changes_type == "DELETE") {
             rmTime(num)
+        } else {
+            if (await dialogs.confirm("Are You sure you want to delete this automation?")){
+                rmTime(num)
+            }
+        }
+    }
+
+    async function handleOptionChange(){
+        if ($FarmSettings.light_schedule[num].farmLightPresetId == initial_option) {
+            $FarmSettings.light_schedule[num].changes_type = initial_changes_type;
+            preset_change = false;
+        } else {
+            $FarmSettings.light_schedule[num].changes_type = "UPDATE";
+            preset_change = true;
         }
     }
 
@@ -58,12 +99,13 @@
 <div class="flex justify-evenly">
     <div class="flex flex-row justify-evenly grow">
         <div class="flex items-start pt-2">
-            <p class="text-bold">{num + 1}.</p>
+            <p class="text-bold pt-1">{num + 1}.</p>
         </div>
-        <div class="flex flex-col grow">
+        <div class="flex flex-col grow pl-2">
             <div class="flex items-center">
-                <p class="ml-2">ON</p>
-                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white">{t_start}</button>
+                <p class="ml-2 pr-0.5">On</p>
+                <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white"
+                        disabled={$FarmSettings.light_schedule[num].changes_type == "DELETE"}>{t_start}</button>
                 {#if s_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                     </div>
@@ -77,13 +119,14 @@
             </div>
             <div class="flex items-center">
                 <p class="pl-2">Off</p>
-                <button on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white">{t_end}</button>
+                <button on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white"
+                        disabled={$FarmSettings.light_schedule[num].changes_type == "DELETE"}>{t_end}</button>
                 {#if e_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                         <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={endCallback} />
+                            <TimePicker {options} on:change={endCallback}/>
                             <button class="btn btn-primary" on:click={() => {save("off")}}>Save</button>
                         </div>
                     </div>
@@ -94,11 +137,14 @@
             <div class="form-control w-full max-w-xs">
                 <label class="label input-group input-group-vertical">
                     <span class="label-text bg-base-100 ">Preset</span>
-                    <select class="select bg-amber-500 rounded-lg white">
-                        {#if selected.preset_id === "" }
+                    <select class="select bg-amber-500 rounded-lg white"
+                            disabled={$FarmSettings.light_schedule[num].changes_type == "DELETE"}
+                            bind:value={$FarmSettings.light_schedule[num].farmLightPresetId}
+                            on:change={() => handleOptionChange()}>
+                        {#if preset.preset_id === "" }
                             <option disabled selected>Pick one</option>
                         {:else}
-                            <option disabled selected>{selected.name}</option>
+                            <option disabled selected>{preset.name}</option>
                         {/if}
                         {#each user_preset as choice}
                             <option value={choice.preset_id}>{choice.name}</option>
@@ -108,7 +154,11 @@
             </div>
         </div>
         <div class="flex grow items-center pl-5">
-            <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
+             {#if $FarmSettings.light_schedule[num].changes_type != "DELETE"}
+                <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
+             {:else}
+                 <button class="btn rounded-xl bg-gray-300 text-black hover:text-white" on:click={remove}>Undo</button>
+             {/if}
         </div>
     </div>
 </div>
