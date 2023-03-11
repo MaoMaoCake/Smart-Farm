@@ -3,6 +3,8 @@
     export let natural;
     export let uv;
     export let ir;
+
+    export let automation;
 </script>
 <div>
     <div class="flex grow flex-col bg-gray-300 rounded-xl">
@@ -10,8 +12,9 @@
             <p>{name}</p>
         </div>
         <div class="flex flex-col">
-            <div class="flex justify-evenly items-center bg-amber-500 h-32 rounded-xl m-2">
-                <div class="flex flex-col items-center grow white">
+            {#if !automation}
+                <div class="flex justify-evenly items-center bg-gray-500 h-32 rounded-xl m-2">
+                    <div class="flex flex-col items-center grow white">
                     <p>Natural</p>
                     <p>Light</p>
                 </div>
@@ -19,7 +22,20 @@
                     {natural}%
                 </div>
             </div>
-            <div class="flex justify-evenly items-center bg-blue-900 h-32 rounded-xl m-2">
+            {:else}
+                <div class="flex justify-evenly items-center bg-amber-500 h-32 rounded-xl m-2">
+                    <div class="flex flex-col items-center grow white">
+                    <p>Natural</p>
+                    <p>Light</p>
+                </div>
+                <div class="flex grow items-center justify-center white">
+                    {natural}%
+                </div>
+            </div>
+            {/if}
+
+             {#if !automation}
+                <div class="flex justify-evenly items-center bg-gray-900 h-32 rounded-xl m-2">
                 <div class="flex flex-col items-center grow white">
                     <p>UV</p>
                     <p>Light</p>
@@ -28,7 +44,20 @@
                     {uv}%
                 </div>
             </div>
-            <div class="flex justify-evenly items-center bg-red-900 h-32 rounded-xl m-2">
+            {:else}
+                <div class="flex justify-evenly items-center bg-blue-900 h-32 rounded-xl m-2">
+                <div class="flex flex-col items-center grow white">
+                    <p>UV</p>
+                    <p>Light</p>
+                </div>
+                <div class="flex grow items-center justify-center white">
+                    {uv}%
+                </div>
+            </div>
+            {/if}
+
+             {#if !automation}
+               <div class="flex justify-evenly items-center bg-gray-900 h-32 rounded-xl m-2">
                 <div class="flex flex-col items-center grow white">
                     <p>Infrared</p>
                     <p>Light</p>
@@ -37,6 +66,18 @@
                     {ir}%
                 </div>
             </div>
+            {:else}
+               <div class="flex justify-evenly items-center bg-red-900 h-32 rounded-xl m-2">
+                <div class="flex flex-col items-center grow white">
+                    <p>Infrared</p>
+                    <p>Light</p>
+                </div>
+                <div class="flex grow items-center justify-center white">
+                    {ir}%
+                </div>
+            </div>
+            {/if}
+
         </div>
     </div>
 </div>
