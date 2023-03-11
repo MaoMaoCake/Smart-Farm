@@ -74,7 +74,6 @@
     }
 
     async function remove(){
-        console.log($FarmSettings.ac_schedule)
         if ($FarmSettings.ac_schedule[num].changes_type == "DELETE") {
             rmTime(num)
         } else {
