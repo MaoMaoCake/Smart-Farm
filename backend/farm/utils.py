@@ -443,6 +443,22 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
 
     if is_turn_on:
         create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
+        for AC_automation in AC_automations:
+            if check_automation_running(AC_automation.startTime, AC_automation.endTime):
+                try:
+                    body = ACRequest(
+                        activate=is_turn_on,
+                        temperature=AC.temperature
+                    )
+                    response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
+                                                   message=json.dumps(body.__dict__))
+
+                    if response.status_code != 200:
+                        get_http_exception('03', message='MQTT connection failed')
+                except:
+                    create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
+                    get_http_exception('03', message='MQTT connection failed')
+
     elif not is_turn_on:
         delete_ac_scheduler_task(AC_automations, mapping, ac_id, path)
         try:
@@ -502,7 +518,7 @@ def update_automation_to_all_acs(farm_id, is_turn_on: bool, username: str):
     acs = list_acs(farm_id, username).data
 
     for ac in acs:
-        if (bool(strtobool(ac.ACStatus)) and not is_turn_on) or (not bool(strtobool(ac.ACStatus)) and is_turn_on):
+        if (ac.ACStatus and not is_turn_on) or (not ac.ACStatus and is_turn_on):
             update_ac_automation_by_id(ac.ACId, farm_id, is_turn_on, username)
 
     return get_response_status(message='update successfully')

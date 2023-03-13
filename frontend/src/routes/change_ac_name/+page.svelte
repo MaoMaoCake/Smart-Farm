@@ -2,24 +2,26 @@
     import {goto} from "$app/navigation";
     import { onMount } from 'svelte';
 
-    let farm_name = null;
+    let ac_name = null;
     let farm_id;
+    let ac_id;
     let initial_name = null;
 
     onMount(() => {
       const urlParams = new URLSearchParams(window.location.search);
-      farm_name = urlParams.get('farm_name');
+      ac_name = urlParams.get('ac_name');
       farm_id = urlParams.get('farm_id');
+      ac_id = urlParams.get('ac_id');
     });
 
     $: {
-        if (farm_name && initial_name == null) {
-          initial_name = farm_name;
+        if (ac_name && initial_name == null) {
+          initial_name = ac_name;
         }
     }
 
     function change_name(){
-      if (/^ *$/.test(farm_name)){
+      if (/^ *$/.test(ac_name)){
         alert("Farm name cannot be empty or solely spaces");
       }
 
@@ -28,7 +30,7 @@
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
       fetch(
-          `http://127.0.0.1:8000/farm/${farm_id}?name=${farm_name}`,
+          `http://127.0.0.1:8000/farm/${farm_id}/AC/${ac_id}?name=${ac_name}`,
           {
             method: 'PUT',
             headers: myHeaders,
@@ -40,10 +42,10 @@
 
      function response_handler(response) {
         if (!response.successful) {
-          alert(response.message);
+            alert(response.message);
         } else if (response.successful) {
             alert('Name has been changed successfully!');
-            goto(`${farm_id}/settings`);
+            goto(`/${farm_id}/ac_list`);
         };
     }
 </script>
@@ -52,18 +54,18 @@
       <div class="card-body">
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Enter farm name</span>
+            <span class="label-text">Enter new AC name</span>
           </label>
-          <input type="text" class="input input-bordered" bind:value={farm_name}/>
+          <input type="text" class="input input-bordered" bind:value={ac_name}/>
         </div>
         <div class="form-control mt-5">
           <button class="btn btn-secondary white"
                   on:click={change_name}
-                  disabled={farm_name == initial_name || /^ *$/.test(farm_name)}
+                  disabled={ac_name == initial_name || /^ *$/.test(ac_name)}
           >Enter</button>
         </div>
         <div class="form-control mt-5">
-            <a href="{farm_id}/settings" class="btn btn-primary white">Cancel</a>
+            <a href="{farm_id}/light_preset" class="btn btn-primary white">Cancel</a>
         </div>
       </div>
   </div>

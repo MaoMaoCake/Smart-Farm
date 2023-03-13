@@ -435,7 +435,8 @@ def get_acs_from_db(farm_id: int) -> [AC]:
     return [AC(
         ACId=ac.id,
         ACName=ac.name,
-        ACStatus=ac.automation
+        ACStatus=ac.automation,
+        ACTemperature=ac.temperature
     ) for ac in acs]
 
 
