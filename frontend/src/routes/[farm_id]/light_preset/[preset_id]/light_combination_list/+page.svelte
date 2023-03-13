@@ -148,7 +148,7 @@
                  {#each light_combinations as ll, index}
                   <tr >
                       <th>{index+1}</th>
-                      <a href="/{$page.params.farm_id}/light_preset/{$page.params.preset_id}/light_combination_list/edit/{ll.lightCombinationId}">
+                      <a href="/{$page.params.farm_id}/light_preset/{$page.params.preset_id}/light_combination_list/edit/{ll.lightCombinationId}?preset_name={preset_name}">
                         <td class="underline text-center underline-offset-2 flex">{ll.lightName}
                           <Icon icon="icon-park-solid:setting-two" class="h-4 w-4 ml-2 mt-1"/>
                         </td>

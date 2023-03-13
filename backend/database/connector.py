@@ -248,9 +248,9 @@ def get_lights_from_preset_db(preset_id: int) -> [LightCombination]:
                                 LightCombinationDB.farmLightPresetId,
                                 LightCombinationDB.lightId,
                                 LightCombinationDB.automation,
+                                LightCombinationDB.naturalLightDensity,
                                 LightCombinationDB.UVLightDensity,
-                                LightCombinationDB.IRLightDensity,
-                                LightCombinationDB.naturalLightDensity). \
+                                LightCombinationDB.IRLightDensity). \
         join(LightCombinationDB, LightCombinationDB.lightId == LightDB.id) \
         .filter(LightCombinationDB.farmLightPresetId == preset_id).all()
 
