@@ -141,6 +141,7 @@ class AC(BaseModel):
     ACId: int
     ACName: str
     ACStatus: bool
+    ACTemperature: Optional[int]
 
 
 class Dehumidifier(BaseModel):

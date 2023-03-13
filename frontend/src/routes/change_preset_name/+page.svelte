@@ -42,9 +42,10 @@
 
      function response_handler(response) {
         if (!response.successful) {
-          alert(response.message);
+            alert(response.message);
         } else if (response.successful) {
-          goto(`/${farm_id}/light_preset`);
+            alert('Name has been changed successfully!');
+            goto(`/${farm_id}/light_preset`);
         };
     }
 </script>

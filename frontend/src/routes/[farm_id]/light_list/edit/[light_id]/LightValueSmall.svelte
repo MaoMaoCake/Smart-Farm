@@ -2,13 +2,19 @@
     export let name;
     export let natural
     export let ir;
-    export let uv
-
+    export let uv;
     export let automation;
+    export let farm_id;
+    export let light_id;
+
+    import Icon from "@iconify/svelte";
 </script>
 <div class="flex grow flex-col bg-gray-300 rounded-xl m-5">
     <div class="white flex bg-secondary grow h-10 items-center rounded-t-xl justify-center">
         <p class="min-w-max">{name}</p>
+        <a href="/change_light_name?light_name={name}&farm_id={farm_id}&light_id={light_id}">
+            <Icon icon="mdi:pen" class="h-4 w-4 ml-2 mt-1" />
+        </a>
     </div>
     <div class="flex grow justify-evenly">
           {#if !automation}

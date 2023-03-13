@@ -35,7 +35,7 @@
             {/if}
 
              {#if !automation}
-                <div class="flex justify-evenly items-center bg-gray-900 h-32 rounded-xl m-2">
+                <div class="flex justify-evenly items-center bg-gray-500 h-32 rounded-xl m-2">
                 <div class="flex flex-col items-center grow white">
                     <p>UV</p>
                     <p>Light</p>
@@ -57,7 +57,7 @@
             {/if}
 
              {#if !automation}
-               <div class="flex justify-evenly items-center bg-gray-900 h-32 rounded-xl m-2">
+               <div class="flex justify-evenly items-center bg-gray-500 h-32 rounded-xl m-2">
                 <div class="flex flex-col items-center grow white">
                     <p>Infrared</p>
                     <p>Light</p>

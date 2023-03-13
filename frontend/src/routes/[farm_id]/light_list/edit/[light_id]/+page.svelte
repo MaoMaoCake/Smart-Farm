@@ -99,7 +99,7 @@
    </div>
 <div class="flex grow flex-col justify-center items-center md:flex-row  top-1/2 bottom-1/2 left-0 right-0 mt-5">
     <div class="flex flex-col md:hidden">
-        <LightValueSmall name={light_name} natural={natural_now} uv={uv_now} ir={ir_now} automation={is_automation}/>
+        <LightValueSmall name={light_name} natural={natural_now} uv={uv_now} ir={ir_now} automation={is_automation} farm_id={$page.params.farm_id} light_id={$page.params.light_id}/>
         <div class="flex grow flex-col items-center w-full pb-5">
             <div class="flex justify-evenly w-full">
                 <button class="btn bg-black text-white"
@@ -112,7 +112,7 @@
         </div>
     </div>
     <div class="flex hidden md:block w-2/3 mr-10 ml-10 justify-center items-center">
-        <LightValueLarge name={light_name} natural={natural_now} uv={uv_now} ir={ir_now} automation={is_automation}/>
+        <LightValueLarge name={light_name} natural={natural_now} uv={uv_now} ir={ir_now} automation={is_automation} farm_id={$page.params.farm_id} light_id={$page.params.light_id}/>
         <div class="flex grow flex-col items-center w-full pb-5 pt-10">
             <div class="flex justify-evenly w-full">
                 <button class="btn bg-black text-white"

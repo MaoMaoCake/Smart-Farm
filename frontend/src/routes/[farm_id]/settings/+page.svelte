@@ -40,6 +40,7 @@
   $: ac_switching = ac_switch;
   $: humidifier_switching = humidifier_switch;
   let isDisabled = true;
+  let done = false;
 
   $: {
     const values = Object.values($changes);
@@ -163,6 +164,7 @@
       })
 
       ac_temp_original = $FarmSettings.ac_temp;
+      done = true;
     }
   }
 
@@ -227,7 +229,7 @@
   }
 
 </script>
-{#if farm_stats}
+{#if farm_stats && done}
     <div class="flex w-full justify-center items-center flex-col md:flex-row">
         <div class="flex flex-col grow md:w-1/3 md:h-5/6 items-center justify-center">
             <div class="flex grow md:hidden">
