@@ -9,16 +9,21 @@
     export let co2;
 
     export let farm_id
+    export let type
 
     import Icon from '@iconify/svelte';
 
 </script>
 <div class="grid grid-cols-7 grid-rows-4 max-w-md bg-gray-300 m-5 rounded-lg w-80 h-48">
-    <div class="col-start-1 col-span-7 row-start-1 flex justify-center bg-primary rounded-t-lg white item-center pt-2">
+    <div class="col-start-1 col-span-7 row-start-1 flex justify-center bg-primary rounded-t-lg white item-center pt-3 pl-4">
         {farm_name}
-        {#if farm_id}
+        {#if !type}
             <a href="{farm_id}/settings">
-                <Icon icon="icon-park-solid:setting-two" class="h-5 w-5 ml-2 pt-1"/>
+                <Icon icon="icon-park-solid:setting-two" class="h-4 w-4 ml-2 mt-1"/>
+            </a>
+        {:else}
+            <a href="/change_farm_name?farm_name={farm_name}&farm_id={farm_id}">
+                <Icon icon="mdi:pen" class="h-4 w-4 ml-2 mt-1" />
             </a>
         {/if}
     </div>

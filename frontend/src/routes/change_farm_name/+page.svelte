@@ -1,10 +1,26 @@
 <script lang="ts">
     import {goto} from "$app/navigation";
+    import { onMount } from 'svelte';
 
-    let farm_key = "";
-    function register_fk(){
-      if (farm_key===""){
-        alert("Please enter farm key");
+    let farm_name = null;
+    let farm_id;
+    let initial_name = null;
+
+    onMount(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      farm_name = urlParams.get('farm_name');
+      farm_id = urlParams.get('farm_id');
+    });
+
+    $: {
+        if (farm_name && initial_name == null) {
+          initial_name = farm_name;
+        }
+    }
+
+    function change_name(){
+      if (/^ *$/.test(farm_name)){
+        alert("Farm name cannot be empty or solely spaces");
       }
 
       const myHeaders = new Headers();
@@ -12,9 +28,9 @@
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
       fetch(
-          `http://127.0.0.1:8000/add?farm_key=${farm_key}`,
+          `http://127.0.0.1:8000/farm/${farm_id}?name=${farm_name}`,
           {
-            method: 'POST',
+            method: 'PUT',
             headers: myHeaders,
             redirect: 'follow'
           })
@@ -26,7 +42,8 @@
         if (!response.successful) {
           alert(response.message);
         } else if (response.successful) {
-          goto('/');
+            alert('Name has been changed successfully!');
+            goto(`${farm_id}/settings`);
         };
     }
 </script>
@@ -35,18 +52,18 @@
       <div class="card-body">
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Enter The Key of the farm</span>
+            <span class="label-text">Enter farm name</span>
           </label>
-          <input type="text" class="input input-bordered" bind:value={farm_key}/>
+          <input type="text" class="input input-bordered" bind:value={farm_name}/>
         </div>
         <div class="form-control mt-5">
           <button class="btn btn-secondary white"
-                  on:click={register_fk}
-                  disabled={farm_key.length == 0}
+                  on:click={change_name}
+                  disabled={farm_name == initial_name || /^ *$/.test(farm_name)}
           >Enter</button>
         </div>
         <div class="form-control mt-5">
-            <a href="/" class="btn btn-primary white">Cancel</a>
+            <a href="{farm_id}/settings" class="btn btn-primary white">Cancel</a>
         </div>
       </div>
   </div>

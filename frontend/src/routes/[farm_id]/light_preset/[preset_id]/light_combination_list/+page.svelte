@@ -1,12 +1,23 @@
 <script lang="ts">
-    import type { PageData } from './$types';
+    import type { PageData } from '../../../../../../.svelte-kit/types/src/routes';
     import StatPreview from "$lib/StatPreview.svelte";
     import StatPreviewLarge from "$lib/StatPreviewLarge.svelte";
-    import {FarmSettings} from "$lib/SettingStores.js"
     import {goto} from "$app/navigation";
     import { page } from '$app/stores';
     import Icon from '@iconify/svelte';
+    import {onMount} from "svelte";
+    import {dialogs} from "svelte-dialogs";
 
+    let preset_name = null;
+    let farm_id;
+    let preset_id;
+
+    onMount(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      preset_name = urlParams.get('preset_name');
+      farm_id = urlParams.get('farm_id');
+      preset_id = urlParams.get('preset_id');
+    });
     interface FarmData {
         name: string,
         temp: number,
@@ -21,6 +32,7 @@
 
     export let data: PageData
     let farm_stats: FarmData;
+    let light_combinations;
 
     const myHeaders = new Headers();
     myHeaders.append("Origin", "");
@@ -55,7 +67,7 @@
   }
 
   fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/list`,
+            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/preset/${$page.params.preset_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -66,37 +78,41 @@
 
     function light_response_handler(response) {
         if (!response.successful) {
-            goto(`/${$page.params.farm_id}/settings`);
-        } else if (response.successful) {
-            $FarmSettings.light_list = response.data;
-        };
+            goto(`/${$page.params.farm_id}/light_preset`);
+        } else {
+            light_combinations = response.data;
+        }
     }
 
-  function create_preset(){
-      fetch(
-              `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/preset/create_from_current?is_current_setting=true`,
+   async function remove(){
+    if (await dialogs.confirm("Are You sure you want to delete this automation?")){
+        fetch(
+            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/${$page.params.preset_id}`,
           {
-              method: 'POST',
-              headers: myHeaders,
-              redirect: 'follow'
+            method: 'DELETE',
+            headers: myHeaders,
+            redirect: 'follow'
           })
-      .then(async response => create_preset_handler(await response.json()))
-      .catch(error => console.log('error', error));
+        .then(async response => delete_handler(await response.json()))
+        .catch(error => console.log('error', error));
+    }
   }
 
-  function create_preset_handler(response) {
+  function delete_handler(response) {
         if (!response.successful) {
             alert(response.message);
-        } else if (response.successful) {
-            goto(`/${$page.params.farm_id}/light_preset`);
-        };
-  }
+        } else {
+          goto(`/${$page.params.farm_id}/light_preset`);
+        }
+    }
 
 </script>
-{#if farm_stats}
+{#if farm_stats && light_combinations}
    <div class=" flex grow w-screen justify-center">
-      <p class="items-center mt-5 font-bold">Light list</p>
-     <Icon icon="iconoir:light-bulb-on" class="h-5 w-5 mt-6 ml-2"/>
+      <p class="items-center mt-5 font-bold">Preset</p>
+   </div>
+  <div class=" flex grow w-screen justify-center">
+  <p class="items-center mt-3">{preset_name}</p>
    </div>
    <div class="flex w-full justify-center items-center flex-col md:flex-row md:flex-wrap">
 
@@ -128,11 +144,11 @@
           </thead>
           <tbody>
           <!-- row 1 -->
-              {#if $FarmSettings.light_list?.length}
-                 {#each $FarmSettings.light_list as ll, index}
+              {#if light_combinations?.length}
+                 {#each light_combinations as ll, index}
                   <tr >
                       <th>{index+1}</th>
-                      <a href="/{$page.params.farm_id}/light_list/edit/{$FarmSettings.light_list[index].lightId}">
+                      <a href="/{$page.params.farm_id}/light_preset/{$page.params.preset_id}/light_combination_list/edit/{ll.lightCombinationId}?preset_name={preset_name}">
                         <td class="underline text-center underline-offset-2 flex">{ll.lightName}
                           <Icon icon="icon-park-solid:setting-two" class="h-4 w-4 ml-2 mt-1"/>
                         </td>
@@ -147,17 +163,15 @@
       </table>
 
       <div class="relative flex grow justify-center items-center mt-10 flex-col">
-        <button class="btn btn-primary w-10/12 md:w-1/2 bg-black border-black text-white hover:bg-gray-500  hover:border-gray-500 hover:text-black"
-                autocomplete="off"
-                on:click={create_preset}
-        >Create preset from current setting</button>
         <button class="btn btn-primary w-10/12 md:w-1/2 mt-3"
                 autocomplete="off"
                 on:click={goto(`/${$page.params.farm_id}/light_preset`)}
         >Preset list</button>
+        <button class="btn btn-error w-10/12 md:w-1/2 mt-3 bg-red-500 border-red-500 text-white hover:bg-red-600 hover:border-red-600"
+                autocomplete="off"
+                on:click={remove}
+        >Delete this preset</button>
       </div>
-
-
   </div>
 
   </div>

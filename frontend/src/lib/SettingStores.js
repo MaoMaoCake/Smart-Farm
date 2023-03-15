@@ -8,7 +8,32 @@ export let FarmSettings = writable({
     humidity: 0,
     watering_schedule: [],
     light_preset: [],
-    ac_preset: [],
+    ac_preset: [15, 16, 17, 18, 19 ,20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
     light_list: [],
-    ac_list: []
+    ac_list: [],
+    ac_temp: 0,
+    watering_automation: true
 })
+
+export let presetMap = writable({})
+
+export let changes = writable({
+    water_automation: false,
+    ac_schedule: false,
+    light_schedule: false,
+    watering_schedule: false,
+    humidity: false,
+    co2: false
+})
+
+
+export let default_changes = writable({
+    water_automation: false,
+    ac_schedule: false,
+    light_schedule: false,
+    watering_schedule: false,
+    humidity: false,
+    co2: false
+})
+
+export let logged_in = writable(!(localStorage.getItem("token") == null || localStorage.getItem("token") === undefined))

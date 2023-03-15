@@ -2,9 +2,10 @@
   import type { PageData } from './$types';
   import StatPreview from "$lib/StatPreview.svelte";
   import StatPreviewLarge from "$lib/StatPreviewLarge.svelte";
+  import {FarmSettings, presetMap, changes} from "$lib/SettingStores.js";
   import Icon from "@iconify/svelte";
   import {beforeUpdate, onMount} from "svelte";
-  import { invalidateAll } from "$app/navigation"
+  import {goto, invalidateAll} from "$app/navigation"
   import LightSetting from "./LightSetting.svelte";
   import ACSetting from "./ACSetting.svelte";
   import CO2Setting from "./CO2Setting.svelte";
@@ -13,108 +14,306 @@
 
   // The following fetches the data for the farm denoted by the farm id in the path
   // parameter.
+   interface FarmData {
+        name: string,
+        temp: number,
+        humidity: number,
+        light: boolean,
+        ac: boolean,
+        humidifier: boolean,
+        co2_val: number,
+        co2: boolean,
+        farm_id: number
+        // ac_temp?: number
+    }
+
   export let data: PageData;
-  let light_switch, ac_switch, humidifier_switch;
-  $: light_switch = data.farm_data.light
-  $: ac_switch = data.farm_data.ac
-  $: humidifier_switch = data.farm_data.humidifier
-  let settings
-  // This makes our app respond to changes
+  let light_switching, ac_switching, humidifier_switching;
+  let light_switch = true;
+  let ac_switch = true;
+  let humidifier_switch = true;
+  let settings;
+  let farm_stats: FarmData;
+  let ac_temp_original = 25;
+
+  $: light_switching = light_switch;
+  $: ac_switching = ac_switch;
+  $: humidifier_switching = humidifier_switch;
+  let isDisabled = true;
+  let done = false;
+
+  $: {
+    const values = Object.values($changes);
+    isDisabled = values.every(val => val === false);
+  }
+
   onMount(() => {
       // get the farm's current settings:
       // let settings;
       // await fetch (something)
       // set settings = the thing we fetched
-  })
+    })
+
+  const myHeaders = new Headers();
+  myHeaders.append("Origin", "");
+  myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+  fetch(
+      `http://127.0.0.1:8000/farm/${data.farm_id}/stats`,
+      {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+      })
+    .then(async response => response_handler(await response.json()))
+    .catch(error => console.log('error', error));
+
+  fetch(
+      `http://127.0.0.1:8000/farm/${data.farm_id}`,
+      {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+      })
+    .then(async response => get_setting_response_handler(await response.json()))
+    .catch(error => console.log('error', error));
+
+  function response_handler(response) {
+        if (!response.successful) {
+          goto('/login');
+        } else if (response.successful) {
+            farm_stats = {
+                name: response.data.farmName,
+                temp: response.data.temperature,
+                humidity: response.data.humidityLevel,
+                light: response.data.lightStatus,
+                ac: response.data.ACStatus,
+                humidifier: response.data.dehumidifierStatus,
+                co2_val: response.data.CO2Level,
+                co2: response.data.CO2controllerStatus,
+                farm_id: response.data.farmId,
+                // ac_temp: response.data.ACTemperature
+            }
+
+            light_switch = farm_stats.light;
+            ac_switch = farm_stats.ac;
+            humidifier_switch = farm_stats.humidifier;
+        };
+  }
+
   beforeUpdate(() => {
     // This makes the load function run again, this will update the state on our page
     invalidateAll();
   })
-  function toggle_switch(type: string, farm_id: string, state: boolean){
-      // integration to the api to turn on and off the lights goes here
-    if (type == "light"){
-        data.farm_data.light = !state;
+
+  function control_actuators(type: string, farm_id: string, state: boolean){
+    fetch(
+          `http://127.0.0.1:8000/farm/${data.farm_id}/${type}/control?is_turn_on=${!state}&temperature=${$FarmSettings.ac_temp}`,
+          {
+            method: 'POST',
+            headers: myHeaders,
+            redirect: 'follow'
+          })
+        .then(async response => control_response_handler(await response.json(), type, state))
+        .catch(error => console.log('error', error));
+  }
+
+  function control_response_handler(response, type: string, state: boolean) {
+    if (!response.successful) {
+      alert(response.message);
+      switch (type){
+          case "light":
+              light_switch = !light_switch;
+              break;
+          case "ac":
+              ac_switch = !ac_switch;
+              break;
+          case "dehumidifier":
+              humidifier_switch = !humidifier_switch;
+              break;
+      }
+
+    } else if (response.successful) {
+      if (type == "light"){
+        farm_stats.light = !state;
+      }
+      else if (type == "ac"){
+        farm_stats.ac = !state;
+      }
+      else if ( type == "dehumidifier"){
+        farm_stats.humidifier = !state;
+      }
     }
-    else if (type == "ac"){
-        data.farm_data.ac = !state
+  }
+
+  function get_setting_response_handler(response) {
+    if (!response.successful) {
+      alert(response.message);
+    } else if (response.successful) {
+      $FarmSettings.co2 = response.data.MinCO2Level;
+      $FarmSettings.humidity = response.data.MaxHumidityLevel;
+      $FarmSettings.light_schedule = response.data.LightAutomations;
+      $FarmSettings.light_preset = response.data.FarmLightPresets;
+      $FarmSettings.ac_schedule = response.data.ACAutomations;
+      $FarmSettings.watering_schedule = response.data.WateringAutomations;
+      $FarmSettings.ac_temp = response.data.ACTemp;
+      $FarmSettings.watering_automation = response.data.isWateringAutomation;
+
+      response.data.FarmLightPresets.forEach(preset => {
+          $presetMap[preset.preset_id] = preset.name;
+      })
+
+      ac_temp_original = $FarmSettings.ac_temp;
+      done = true;
     }
-    else if ( type == "humidifier"){
-        data.farm_data.humidifier = !state
+  }
+
+  async function handleACTempChange(){
+        if ($FarmSettings.ac_temp != ac_temp_original) {
+            fetch(
+                  `http://127.0.0.1:8000/farm/${data.farm_id}/AC/temperature/change?is_turn_on=${ac_switch}&temperature=${$FarmSettings.ac_temp}`,
+                  {
+                    method: 'PATCH',
+                    headers: myHeaders,
+                    redirect: 'follow'
+                  })
+                .then(async response => change_temp_handler(await response.json()))
+                .catch(error => console.log('error', error));
+                }
     }
+
+     function change_temp_handler(response) {
+        if (!response.successful) {
+            $FarmSettings.ac_temp = ac_temp_original;
+            alert(response.message)
+            goto(`/${data.farm_id}/settings`);
+        } else {
+            ac_temp_original = $FarmSettings.ac_temp;
+        }
   }
 
   function save_settings(){
-      // check if data in settings var == FarmSettings Store
-      // if equal do nothing
-      // else write changes to DB
-  }
-</script>
+      const myHeaders = new Headers();
+      myHeaders.append("Origin", "");
+      myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+      myHeaders.append('Content-Type', 'application/json');
 
-<div class="flex w-full justify-center items-center flex-col md:flex-row">
-    <div class="flex flex-col grow md:w-1/3 md:h-5/6 items-center justify-center">
-        <div class="flex grow md:hidden">
-            <StatPreview farm_name="{data.farm_data.name}" temp="{data.farm_data.temp}" humidity={data.farm_data.humidity}
-                         light={data.farm_data.light} ac="{data.farm_data.ac}" humidifier={data.farm_data.humidifier}
-                         co2={data.farm_data.co2} co2_val={data.farm_data.co2_val}>
-            </StatPreview>
+      const input_data = {
+          MinCO2Level: $changes.co2 ? $FarmSettings.co2: null,
+          MaxHumidityLevel: $changes.humidity ? $FarmSettings.humidity: null,
+          isWateringAutomation: $FarmSettings.watering_automation,
+          ACAutomations: $FarmSettings.ac_schedule,
+          LightAutomations: $FarmSettings.light_schedule,
+          WateringAutomations: $FarmSettings.watering_schedule,
+      }
+
+      fetch(
+              `http://127.0.0.1:8000/farm/${data.farm_id}`,
+          {
+              method: 'PATCH',
+              headers: myHeaders,
+              body: JSON.stringify(input_data),
+              redirect: 'follow'
+          })
+      .then(async response => change_setting_handler(await response.json()))
+      .catch(error => console.log('error', error));
+  }
+
+  function change_setting_handler(response) {
+        if (!response.successful) {
+            alert(response.message)
+            // goto(`/${data.farm_id}/settings`);
+        } else {
+            location.reload();
+        }
+  }
+
+</script>
+{#if farm_stats && done}
+    <div class="flex w-full justify-center items-center flex-col md:flex-row">
+        <div class="flex flex-col grow md:w-1/3 md:h-5/6 items-center justify-center">
+            <div class="flex grow md:hidden">
+                <StatPreview farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
+                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
+                             co2={farm_stats.co2} co2_val={farm_stats.co2_val} farm_id={farm_stats.farm_id} type="setting">
+                </StatPreview>
+            </div>
+            <div class="hidden md:flex">
+                <StatPreviewLarge farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
+                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
+                             co2={farm_stats.co2} co2_val={farm_stats.co2_val} farm_id={farm_stats.farm_id} type="setting">
+                </StatPreviewLarge>
+            </div>
+            <div class="flex justify-evenly w-full grow">
+                <div class="flex justify-center grow items-center white ">
+                    {#if light_switching}
+                        <Icon icon="iconoir:light-bulb-on" class="h-9 w-9 bg-amber-500 p-2 mr-1 rounded-lg"/>
+                    {:else}
+                        <Icon icon="iconoir:light-bulb-off" class="h-9 w-9 bg-amber-500 p-2 mr-1 rounded-lg"/>
+                    {/if}
+                    <input type="checkbox" class="toggle toggle-success" bind:checked={light_switch} on:click={() => {control_actuators("light", data.farm_id, light_switching)}}/>
+                </div>
+                <div class="flex justify-center grow items-center white">
+                    {#if ac_switching}
+                        <Icon icon="tabler:air-conditioning" class="h-9 w-9 bg-blue-900 p-2 mr-1 rounded-lg"/>
+                    {:else}
+                        <Icon icon="tabler:air-conditioning-disabled" class="h-9 w-9 bg-blue-900 p-2 mr-1 rounded-lg"/>
+                    {/if}
+                     <select class="select select-sm bg-blue-900 rounded-lg white pr-7 mr-1 max-height-3 w-13"
+                            bind:value={$FarmSettings.ac_temp}
+                            on:change={() => handleACTempChange()}>
+                        <option disabled selected>{$FarmSettings.ac_temp}°</option>
+                        {#each $FarmSettings.ac_preset as choice}
+                            <option value={choice}>{choice}°</option>
+                        {/each}
+                    </select>
+                    <input type="checkbox" class="toggle toggle-success" bind:checked={ac_switch} on:click={() => {control_actuators("ac", data.farm_id, ac_switching)}}/>
+                </div>
+                <div class="flex justify-center grow items-center white">
+                    {#if humidifier_switching}
+                        <Icon icon="mdi:air-humidifier" class="h-9 w-9 bg-teal-900 p-2 mr-1 rounded-lg"/>
+                    {:else}
+                        <Icon icon="mdi:air-humidifier" class="h-9 w-9 bg-teal-900 p-2 mr-1 rounded-lg"/>
+                    {/if}
+                    <input type="checkbox" class="toggle toggle-success" bind:checked={humidifier_switch} on:click={() => {control_actuators("dehumidifier", data.farm_id, humidifier_switching)}}/>
+                </div>
+            </div>
         </div>
-        <div class="hidden md:flex">
-            <StatPreviewLarge farm_name="{data.farm_data.name}" temp="{data.farm_data.temp}" humidity={data.farm_data.humidity}
-                         light={data.farm_data.light} ac="{data.farm_data.ac}" humidifier={data.farm_data.humidifier}
-                         co2={data.farm_data.co2} co2_val={data.farm_data.co2_val}>
-            </StatPreviewLarge>
-        </div>
-        <div class="flex justify-evenly w-full grow">
-            <div class="flex justify-center grow items-center white ">
-                {#if light_switch}
-                    <Icon icon="iconoir:light-bulb-on" class="h-9 w-9 bg-amber-500 p-2 mr-1 rounded-lg"/>
-                {:else}
-                    <Icon icon="iconoir:light-bulb-off" class="h-9 w-9 bg-amber-500 p-2 mr-1 rounded-lg"/>
-                {/if}
-                <input type="checkbox" class="toggle toggle-success" bind:checked={light_switch} on:click={() => {toggle_switch("light", data.farm_id, light_switch)}}/>
+        <div class="flex w-full flex-col md:flex-row md:flex-wrap grow md:pl-10 md:pr-10">
+            <div class="flex flex-col grow">
+                <div class="flex">
+                    <LightSetting farm_id={data.farm_id}/>
+                </div>
+                <div class="flex">
+                    <ACSetting farm_id={data.farm_id}/>
+                </div>
+                <div class="pb-44 hidden md:block"></div> <!-- spacer for save button in desktop -->
             </div>
-            <div class="flex justify-center grow items-center white">
-                {#if ac_switch}
-                    <Icon icon="tabler:air-conditioning" class="h-9 w-9 bg-blue-900 p-2 mr-1 rounded-lg"/>
-                {:else}
-                    <Icon icon="tabler:air-conditioning-disabled" class="h-9 w-9 bg-blue-900 p-2 mr-1 rounded-lg"/>
-                {/if}
-                <input type="checkbox" class="toggle toggle-success" bind:checked={ac_switch} on:click={() => {toggle_switch("ac", data.farm_id, ac_switch)}}/>
+            <div class="flex flex-col grow">
+                <div class="flex">
+                    <CO2Setting farm_id={data.farm_id}/>
+                </div>
+                <div class="flex">
+                    <HumiditySetting farm_id={data.farm_id}/>
+                </div>
+                <div class="flex">
+                    <WateringSetting farm_id={data.farm_id}/>
+                </div>
             </div>
-            <div class="flex justify-center grow items-center white">
-                {#if humidifier_switch}
-                    <Icon icon="mdi:air-humidifier" class="h-9 w-9 bg-teal-900 p-2 mr-1 rounded-lg"/>
-                {:else}
-                    <Icon icon="mdi:air-humidifier" class="h-9 w-9 bg-teal-900 p-2 mr-1 rounded-lg"/>
-                {/if}
-                <input type="checkbox" class="toggle toggle-success" bind:checked={humidifier_switch} on:click={() => {toggle_switch("humidifier", data.farm_id, humidifier_switch)}}/>
-            </div>
+            <div class="pb-40 md:hidden"></div> <!-- spacer for bottom -->
         </div>
     </div>
-    <div class="flex w-full flex-col md:flex-row md:flex-wrap grow md:pl-10 md:pr-10">
-        <div class="flex flex-col grow">
-            <div class="flex">
-                <LightSetting farm_id={data.farm_id}/>
-            </div>
-            <div class="flex">
-                <ACSetting farm_id={data.farm_id}/>
-            </div>
-            <div class="pb-44 hidden md:block"></div> <!-- spacer for save button in desktop -->
-        </div>
-        <div class="flex flex-col grow">
-            <div class="flex">
-                <CO2Setting farm_id={data.farm_id}/>
-            </div>
-            <div class="flex">
-                <HumiditySetting farm_id={data.farm_id}/>
-            </div>
-            <div class="flex">
-                <WateringSetting farm_id={data.farm_id}/>
-            </div>
-        </div>
-        <div class="pb-40 md:hidden"></div> <!-- spacer for bottom -->
+    <div class=" flex grow w-screen justify-center fixed bottom-10">
+        <button class="btn btn-primary w-10/12 md:w-1/2"
+                on:click={save_settings}
+                disabled={isDisabled}
+                autocomplete="off"
+        >Save</button>
     </div>
-</div>
-<div class=" flex grow w-screen justify-center fixed bottom-10">
-    <button class="btn btn-primary w-10/12 md:w-1/2" on:click={save_settings}>Save</button>
-</div>
+{/if}
+
+<style>
+  .select-sm {
+  height: 2rem;
+}
+</style>

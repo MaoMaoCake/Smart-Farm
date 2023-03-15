@@ -5,6 +5,7 @@ import time as t
 from response.response_dto import get_response_status, ResponseDto
 from database.connector import get_all_lights_automation, get_all_AC_automation, get_all_watering_automation
 from response.error_codes import get_http_exception
+from .enum_list import HardwareType
 
 from .utils import run_task, validate_input
 from .models import AutomationInput, DeleteAutomationInput
@@ -35,12 +36,13 @@ async def add_task(automation_input: AutomationInput):
     tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
           f"_{automation_input.automation_id}_start"] = {"job_id": job_id}
 
-    if automation_input.end_time:
-        job_id = schedule.every().day.at(automation_input.end_time.strftime("%H:%M")).do(run_task,
-                                                                                         automation_input,
-                                                                                         False)
-        tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
-          f"_{automation_input.automation_id}_end"] = {"job_id": job_id}
+    if not automation_input.hardware_type == HardwareType.WATERING:
+        if automation_input.end_time:
+            job_id = schedule.every().day.at(automation_input.end_time.strftime("%H:%M")).do(run_task,
+                                                                                             automation_input,
+                                                                                             False)
+            tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+              f"_{automation_input.automation_id}_end"] = {"job_id": job_id}
 
     return get_response_status(message=f"Task {automation_input.ESP_id} added to run at"
                                        f" {automation_input.start_time.hour}:{automation_input.start_time.minute}"
@@ -61,14 +63,15 @@ async def update_task(automation_input: AutomationInput):
         tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
               f"_{automation_input.automation_id}_start"] = {"job_id": new_job_id}
 
-        if automation_input.end_time:
-            schedule.cancel_job(tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
-                                      f"_{automation_input.automation_id}_end"]["job_id"])
+        if not automation_input.hardware_type == HardwareType.WATERING:
+            if automation_input.end_time:
+                schedule.cancel_job(tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+                                        f"_{automation_input.automation_id}_end"]["job_id"])
 
-            new_job_id = schedule.every().day.at(automation_input.end_time.strftime("%H:%M"))\
-                .do(run_task, automation_input, False)
-            tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
-                  f"_{automation_input.automation_id}_end"] = {"job_id": new_job_id}
+                new_job_id = schedule.every().day.at(automation_input.end_time.strftime("%H:%M"))\
+                    .do(run_task, automation_input, False)
+                tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \
+                    f"_{automation_input.automation_id}_end"] = {"job_id": new_job_id}
 
         return get_response_status(message=f"Task {automation_input.ESP_id} updated to run at"
                                            f" {automation_input.start_time.hour}:{automation_input.start_time.minute}"
@@ -88,12 +91,13 @@ async def delete_task(delete_automation_input: DeleteAutomationInput):
         del tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
                   f"_{delete_automation_input.automation_id}_start"]
 
-        end_job_id = tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
-                           f"_{delete_automation_input.automation_id}_end"]["job_id"]
-        if end_job_id:
-            schedule.cancel_job(end_job_id)
-            del tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
-                      f"_{delete_automation_input.automation_id}_end"]
+        if not delete_automation_input.hardware_type == HardwareType.WATERING:
+            end_job_id = tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+                            f"_{delete_automation_input.automation_id}_end"]["job_id"]
+            if end_job_id:
+                schedule.cancel_job(end_job_id)
+                del tasks[f"{delete_automation_input.hardware_type}_{delete_automation_input.ESP_id}" \
+                        f"_{delete_automation_input.automation_id}_end"]
 
         return get_response_status(message=f"Task {delete_automation_input.ESP_id} is deleted")
     else:

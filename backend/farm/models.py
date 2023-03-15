@@ -141,6 +141,7 @@ class AC(BaseModel):
     ACId: int
     ACName: str
     ACStatus: bool
+    ACTemperature: Optional[int]
 
 
 class Dehumidifier(BaseModel):
@@ -287,7 +288,7 @@ class GetFarmSettings(BaseModel):
                 light_automations: List[LightAutomation],
                 farm_light_presets: List[FarmLightPreset],
                 ac_automations: List[FarmACAutomation],
-                watering_automations: List[WateringAutomation]
+                watering_automations: List[ WateringAutomation]
                 ):
         super().__init__(
             MinCO2Level=min_co2_level,
@@ -299,7 +300,7 @@ class GetFarmSettings(BaseModel):
         )
 
 
-class FarmLightPreset(BaseModel):
+class FarmLightPresetUpdated(BaseModel):
     presetId: int
     farmId: int
     presetName: str
