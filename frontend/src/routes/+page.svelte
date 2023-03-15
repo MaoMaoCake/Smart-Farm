@@ -1,7 +1,15 @@
 <script lang="ts">
     import StatPreview from "$lib/StatPreview.svelte";
     import AddFarm from "$lib/AddFarm.svelte";
+    import {onMount} from "svelte";
+    import {goto} from '$app/navigation'
+    import {logged_in} from "$lib/SettingStores";
 
+    onMount(() => {
+        if (!$logged_in) {
+            goto("/login")
+        }
+    })
     interface FarmData {
         name: string,
         temp: number,
@@ -14,15 +22,45 @@
         farm_id: number
     }
 
-    let data: FarmData[] = [
-        {name:"farm 1", temp: 25, humidity: 2, light: true, ac: false, humidifier: true, co2_val: 900, co2: true, farm_id: 1},
-        {name:"farm 2", temp: 24, humidity: 5, light: false, ac: true, humidifier: false, co2_val: 1000, co2: false, farm_id: 2},
-        {name:"farm 3", temp: 16, humidity: 5, light: false, ac: true, humidifier: false, co2_val: 800, co2: false, farm_id: 3},
-    ]
-    // let data = null;
+    let data: FarmData[]
+
+    const myHeaders = new Headers();
+    myHeaders.append("Origin", "");
+    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+    fetch(
+        "http://127.0.0.1:8000/list",
+        {
+          method: 'GET',
+          headers: myHeaders,
+          redirect: 'follow'
+        })
+      .then(async response => response_handler(await response.json()))
+      .catch(error => console.log('error', error));
+
+    function response_handler(response) {
+        if (response.status_code === 401) {
+          alert(response.message);
+          goto("/login")
+        } else if (response.status_code  === 200) {
+          data = response.data?.map((farm_data) => {
+            return{
+                name: farm_data.farmName,
+                temp: farm_data.temperature,
+                humidity: farm_data.humidityLevel,
+                light: farm_data.lightStatus,
+                ac: farm_data.ACStatus,
+                humidifier: farm_data.dehumidifierStatus,
+                co2_val: farm_data.CO2Level,
+                co2: farm_data.CO2controllerStatus,
+                farm_id: farm_data.farmId
+            }
+          });
+        };
+    }
 
 </script>
-{#if data}
+{#if data?.length}
     <div class="w-screen ">
         <div class="flex flex-col items-center justify-center grow md:flex-row md:flex-wrap">
 

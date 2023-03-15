@@ -24,7 +24,8 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     create_ac_automation_in_db, update_ac_automation_in_db, get_water_controller,\
     delete_watering_automation_in_db, create_watering_automation_in_db,\
     update_watering_automation_in_db, update_light_strength_to_all_light_in_preset,\
-    delete_light_automation_in_db, check_preset_in_light_automation_db, update_water_controller
+    delete_light_automation_in_db, check_preset_in_light_automation_db, update_water_controller,\
+    update_ac_temp_db
     
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
@@ -51,7 +52,7 @@ def link_farm_to_user(username: str, farm_key: str) -> ResponseDto[FarmOwner]:
 
     farm_id = check_farm_key_exist(farm_key)
     if not farm_id:
-        get_http_exception('FM404')
+        get_http_exception('FK404')
 
     if check_farm_owning(user.id, farm_id):
         get_http_exception('FO001')
@@ -374,6 +375,25 @@ def light_controlling(farm_id: int, is_turn_on: bool, username: str):
     return get_response_status(message='Successfully send requests to mqtt broker')
 
 
+def change_ac_temp(is_turn_on: bool, temperature: int, farm_id: int, username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    check_farm_exist(farm_id)
+
+    if not check_farm_owning(user.id, farm_id):
+        get_http_exception('10')
+
+    result = ac_controlling(farm_id, is_turn_on=is_turn_on, _temperature=temperature, username= username)
+
+    if result.successful:
+        update_ac_temp_db(farm_id, temperature)
+        return get_response_status(message='Successfully send requests to mqtt broker and update database')
+    else:
+        get_http_exception('03', message='MQTT connection failed')
+
+
 def ac_controlling(farm_id: int, is_turn_on: bool, _temperature: int ,username: str):
     acs = list_acs(farm_id, username).data
     ESP_mapping = get_esp_map(HardwareType.AC.value)
@@ -423,6 +443,22 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
 
     if is_turn_on:
         create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
+        for AC_automation in AC_automations:
+            if check_automation_running(AC_automation.startTime, AC_automation.endTime):
+                try:
+                    body = ACRequest(
+                        activate=is_turn_on,
+                        temperature=AC.temperature
+                    )
+                    response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
+                                                   message=json.dumps(body.__dict__))
+
+                    if response.status_code != 200:
+                        get_http_exception('03', message='MQTT connection failed')
+                except:
+                    create_ac_scheduler_task(AC_automations, mapping, ac_id, path)
+                    get_http_exception('03', message='MQTT connection failed')
+
     elif not is_turn_on:
         delete_ac_scheduler_task(AC_automations, mapping, ac_id, path)
         try:
@@ -482,7 +518,7 @@ def update_automation_to_all_acs(farm_id, is_turn_on: bool, username: str):
     acs = list_acs(farm_id, username).data
 
     for ac in acs:
-        if (bool(strtobool(ac.ACStatus)) and not is_turn_on) or (not bool(strtobool(ac.ACStatus)) and is_turn_on):
+        if (ac.ACStatus and not is_turn_on) or (not ac.ACStatus and is_turn_on):
             update_ac_automation_by_id(ac.ACId, farm_id, is_turn_on, username)
 
     return get_response_status(message='update successfully')
@@ -747,15 +783,14 @@ def are_periods_overlapping(automations: list[LightAutomation]):
 
 def are_watering_periods_overlapping(automations: list[WateringAutomation]):
     n = len(automations)
+    without_duplication = set()
+
     for i in range(n):
-        for j in range(i+1, n):
-            start1 = automations[i].wateringStartTime
-            end1 = automations[i].wateringEndTime
-            start2 = automations[j].wateringStartTime
-            end2 = automations[j].wateringEndTime
-            if not (end1 <= start2 or end2 <= start1):
-                return True
-    return False
+        without_duplication.add(automations[i].wateringStartTime)
+    if n == len(without_duplication):
+        return False
+    else:
+        return True
 
 
 def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: int, username: str):
@@ -816,7 +851,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                     update_inputs.append(automation)
                 case ChangesType.CREATE.value:
                     create_inputs.append(automation)
-                case ChangesType.NO_CHANGES.value:
+                case ChangesType.NO_CHANGES.value | None:
                     no_changes_inputs.append(automation)
 
         for delete_input in delete_inputs:
@@ -824,7 +859,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                 return get_http_exception('06', message="Cannot delete the ongoing automation")
 
         if are_periods_overlapping(update_inputs + create_inputs + no_changes_inputs):
-            return get_http_exception('06', message='Time overlapped')
+            return get_http_exception('06', message='Light Automation Time overlapped')
 
         lights = list_light(farm_id, username).data
         light_automation_map = {}
@@ -936,7 +971,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                     update_inputs.append(automation)
                 case ChangesType.CREATE.value:
                     create_inputs.append(automation)
-                case ChangesType.NO_CHANGES.value:
+                case ChangesType.NO_CHANGES.value | None:
                     no_changes_inputs.append(automation)
 
         for delete_input in delete_inputs:
@@ -944,7 +979,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                 return get_http_exception('06', message="Cannot delete the ongoing automation")
 
         if are_periods_overlapping(update_inputs + create_inputs + no_changes_inputs):
-            return get_http_exception('06', message='Time overlapped')
+            return get_http_exception('06', message='AC Automation Time overlapped')
 
         acs = list_acs(farm_id, username).data
 
@@ -959,7 +994,6 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                         )
                         r: requests.Response = requests.delete(url=path, data=json.dumps(body.__dict__))
                     except:
-                        print('here')
                         get_http_exception('03', message='Backend worker connection failed')
 
                     if r.status_code != 200:
@@ -1038,15 +1072,15 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                     update_inputs.append(automation)
                 case ChangesType.CREATE.value:
                     create_inputs.append(automation)
-                case ChangesType.NO_CHANGES.value:
+                case ChangesType.NO_CHANGES.value | None:
                     no_changes_inputs.append(automation)
 
-        for delete_input in delete_inputs:
-            if check_automation_running(delete_input.wateringStartTime, delete_input.wateringEndTime):
-                return get_http_exception('06', message="Cannot delete the ongoing automation")
+        # for delete_input in delete_inputs:
+        #     if check_automation_running(delete_input.wateringStartTime, delete_input.wateringEndTime):
+        #         return get_http_exception('06', message="Cannot delete the ongoing automation")
 
         if are_watering_periods_overlapping(update_inputs + create_inputs + no_changes_inputs):
-            return get_http_exception('06', message='Time overlapped')
+            return get_http_exception('06', message='Watering Automation Time overlapped')
 
         water_controller = get_water_controller(farm_id)
 

@@ -1,16 +1,35 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
     import ACSet from "./ACSet.svelte";
-    import {FarmSettings} from "$lib/SettingStores.js";
+    import {FarmSettings, changes} from "$lib/SettingStores.js";
 
     export let farm_id;
 
+    $: {
+        const values = Object.values($FarmSettings.ac_schedule);
+        $changes.ac_schedule = !values.every(val => val.changes_type === null || val.changes_type === "NO_CHANGES");
+    }
+
     let tooltip = false;
-    $FarmSettings.ac_schedule = [{time_start: "09:50", time_end: "12:00", temp: 25},
-        {time_start: "12:00", time_end: "14:00", temp: 26}]
+
+    function format_datetime(input_time){
+        let timeParts = input_time.split(":");
+        let hours = timeParts[0];
+        let minutes = timeParts[1];
+
+        return hours + ":" + minutes;
+    }
 
     function addTime(){
-        $FarmSettings.ac_schedule = [...$FarmSettings.ac_schedule, {time_start: "00:00", time_end: "00:00", temp: 0}]
+        $FarmSettings.ac_schedule = [...$FarmSettings.ac_schedule,
+            {
+                startTime: "00:00",
+                endTime: "00:00",
+                temperature: 25,
+                ACAutomationId: null,
+                changes_type: "CREATE"
+            }]
+        $FarmSettings.ac_schedule = $FarmSettings.ac_schedule
     }
 </script>
 <div class="flex mt-10 justify-start w-full flex-col md: flex-row">
@@ -31,14 +50,14 @@
         {/if}
         <div>
             <a href="/{farm_id}/ac_list">
-                <Icon icon="icon-park:setting-config" class="h-5 w-5 ml-2"/>
+                <Icon icon="icon-park:setting-config" class="h-6 w-6 ml-2 bg-gray-300 p-1 rounded-full"/>
             </a>
         </div>
         <div class="divider w-full ml-2"></div>
     </div>
     <div class="flex flex-col pl-5">
         {#each $FarmSettings.ac_schedule as ac, i}
-            <ACSet t_start={ac.time_start} t_end={ac.time_end} temp={ac.temp} num={i}/>
+            <ACSet t_start={format_datetime(ac.startTime)} t_end={format_datetime(ac.endTime)} temp={ac.temperature} num={i}/>
         {/each}
     </div>
     <button class="btn btn-secondary ml-10 mr-10 mt-5 text-white" on:click={addTime}>Add Time</button>
