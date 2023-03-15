@@ -4,9 +4,30 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="theme-color" content="#2F3BA2" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="apple-mobile-web-app-title" content="Svelte PWA" />
+		<link rel="apple-touch-icon" href="/favicon.png" />
+
+		<script
+		  type="module"
+		  src="https://cdn.jsdelivr.net/npm/@pwabuilder/pwainstall"
+		></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
+	<script>
+		if ("serviceWorker" in navigator && 'PushManager' in window) {
+		window.addEventListener("load", () => {
+		  navigator.serviceWorker.register("/service-worker.js").then((reg) => {
+			console.log("Service worker registered.", reg);
+		  });
+		});
+  }
+	</script>
 </html>
