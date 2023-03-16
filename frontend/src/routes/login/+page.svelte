@@ -8,7 +8,7 @@
   let showPassword = false;
 
   async function login() {
-    if (username == "" || password == "") {
+    if (username === "" || password === "") {
       alert("Username or password cannot be empty");
     }
 
