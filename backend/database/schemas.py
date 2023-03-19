@@ -121,7 +121,7 @@ class WateringAutomationDB(BaseModel):
 
 
 class LightAutomationDB(BaseModel):
-    __tablename__ = "lightpresetautomation"
+    __tablename__ = "lightPresetAutomation"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     startTime = Column(Time, nullable=False)
     endTime = Column(Time, nullable=False)
@@ -161,6 +161,7 @@ class LightCombinationDB(BaseModel):
 
 
 class LightPresetAutomationDB(BaseModel):
+    __table_args__ = {'extend_existing': True}
     __tablename__ = "lightPresetAutomation"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     farmLightPresetId = Column(Integer, ForeignKey('farmLightPreset.id'), nullable=False)
