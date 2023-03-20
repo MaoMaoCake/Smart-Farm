@@ -61,7 +61,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.backend.entrypoints=http'
-      - "traefik.http.routers.backend.rule=Host(`smartfarm.localhost`) && PathPrefix(`/api/`) || Host(`smartfarm.localhost`) && Path(`/token`)"
+      - "traefik.http.routers.backend.rule=Host(`smartfarm.localhost`) && PathPrefix(`/api/`)"
       # change the URL
 
   backend-worker:
