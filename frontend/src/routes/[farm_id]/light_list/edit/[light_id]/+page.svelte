@@ -25,7 +25,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/${$page.params.light_id}`,
+            `/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -68,8 +68,8 @@
         console.log(input_data)
         let path;
         all ?
-            path = `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/${$page.params.light_id}/update_all`
-            : path =`http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/${$page.params.light_id}`
+            path = `/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}/update_all`
+            : path =`/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}`
 
         fetch(
             path,

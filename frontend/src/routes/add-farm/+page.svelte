@@ -12,7 +12,7 @@
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
       fetch(
-          `http://127.0.0.1:8000/add?farm_key=${farm_key}`,
+          `/api/add?farm_key=${farm_key}`,
           {
             method: 'POST',
             headers: myHeaders,
