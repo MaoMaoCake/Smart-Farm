@@ -15,7 +15,7 @@ from database.enum_list import Role
 from response.response_dto import get_response_status, ResponseDto
 from response.error_codes import get_http_exception
 
-authRouter = APIRouter()
+authRouter = APIRouter(prefix="/api")
 
 
 @authRouter.post("/token", response_model=ResponseDto, tags=["Auth"])

@@ -21,7 +21,7 @@ from .models import FarmOwner, FarmStats, Light, LightCombination,\
     UpdateLightStrengthInput, GetFarmSettings, UpdateLightStrengthInputInPreset,\
     UpdateFarmSettings
 
-farmRouter = APIRouter()
+farmRouter = APIRouter(prefix="/api")
 
 
 @farmRouter.post("/add", response_model=ResponseDto[FarmOwner], tags=["Farm"])
