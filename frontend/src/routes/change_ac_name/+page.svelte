@@ -30,7 +30,7 @@
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
       fetch(
-          `http://127.0.0.1:8000/farm/${farm_id}/AC/${ac_id}?name=${ac_name}`,
+          `/api/farm/${farm_id}/AC/${ac_id}?name=${ac_name}`,
           {
             method: 'PUT',
             headers: myHeaders,

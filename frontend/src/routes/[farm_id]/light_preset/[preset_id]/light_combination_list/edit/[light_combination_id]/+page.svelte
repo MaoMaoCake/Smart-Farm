@@ -32,7 +32,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`,
+            `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -74,8 +74,8 @@
         console.log(input_data)
         let path;
         all ?
-            path = `http://127.0.0.1:8000/farm/${$page.params.farm_id}/${$page.params.preset_id}/update_all_light_combination`
-            : path = `http://127.0.0.1:8000/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`
+            path = `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/update_all_light_combination`
+            : path = `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`
 
         fetch(
             path,
