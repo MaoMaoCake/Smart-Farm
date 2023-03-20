@@ -28,7 +28,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/stats`,
+            `/api/farm/${$page.params.farm_id}/stats`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -56,7 +56,7 @@
   }
 
   fetch(
-  `http://127.0.0.1:8000/farm/${data.farm_id}`,
+  `/api/farm/${data.farm_id}`,
   {
     method: 'GET',
     headers: myHeaders,
@@ -83,7 +83,7 @@
 
   function create_preset(){
       fetch(
-              `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/preset/create_from_current?is_current_setting=false`,
+              `/api/farm/${$page.params.farm_id}/light/preset/create_from_current?is_current_setting=false`,
           {
               method: 'POST',
               headers: myHeaders,
@@ -98,7 +98,7 @@
             alert(response.message);
         } else if (response.successful) {
             location.reload();
-        };
+        }
   }
 
 </script>
