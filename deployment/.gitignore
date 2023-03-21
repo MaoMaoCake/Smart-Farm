@@ -2,3 +2,5 @@
 http-mqtt-bridge.env
 mysql.env
 backend.env
+config/mosquitto.conf
+config/password.txt
