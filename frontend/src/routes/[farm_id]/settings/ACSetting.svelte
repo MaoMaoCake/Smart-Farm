@@ -40,10 +40,13 @@
         <p class="bg-blue-900 rounded min-w-fit ml-5 pl-5 pr-5 white">AC Setting</p>
         {#if tooltip}
             <div class="absolute left-10 top-10">
-                <div class="bg-yellow-200 w-56 h-52 rounded-xl relative z-30">
+                <div class="bg-gray-300 w-56 h-52 rounded-xl relative z-30">
                     <div class="text-black">
-                        <p>This is a button</p>
-                        <p>this button is very very cool</p>
+                        <p>AC Settings</p>
+                        <br>
+                        <p>User can set the turn on and off time daily. Schedule more time can be done by clicking</p>
+                        <br>
+                        <p>User can set temperature from</p>
                     </div>
                 </div>
             </div>
