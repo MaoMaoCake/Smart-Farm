@@ -234,13 +234,13 @@
         <div class="flex flex-col grow md:w-1/3 md:h-5/6 items-center justify-center">
             <div class="flex grow md:hidden">
                 <StatPreview farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
-                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
+                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier} show_stats={true}
                              co2={farm_stats.co2} co2_val={farm_stats.co2_val} farm_id={farm_stats.farm_id} type="setting">
                 </StatPreview>
             </div>
             <div class="hidden md:flex">
                 <StatPreviewLarge farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
-                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
+                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier} show_stats={true}
                              co2={farm_stats.co2} co2_val={farm_stats.co2_val} farm_id={farm_stats.farm_id} type="setting">
                 </StatPreviewLarge>
             </div>
