@@ -58,6 +58,7 @@ services:
       - ../backend/backend.env
     links:
       - database:db
+      - mqtt-bridge:bridge
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.backend.entrypoints=http'
@@ -72,6 +73,9 @@ services:
       - 8000
     env_file:
       - ../backend/backend.env
+    links:
+      - database:db
+      - mqtt-bridge:bridge
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.worker.entrypoints=http'
