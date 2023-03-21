@@ -8,12 +8,12 @@
 
     const initial_changes_type = $FarmSettings.watering_schedule[num].changes_type;
     let s_open = false;
-    let e_open = false;
     let time_change = false;
 
     let options = {
         /* Minutes increment */
         minutesIncrement: 5,
+        hasButtons: true,
     }
 
     function formatTime(date) {
@@ -22,7 +22,7 @@
         minutes = minutes < 10 ? '0'+minutes : minutes;
         return hours + ':' + minutes;
     }
-    let startCallback = (event) => {
+    let okCallback = (event) => {
         t_start = formatTime(event.detail);
         $FarmSettings.watering_schedule[num].wateringStartTime = t_start;
         switch ($FarmSettings.watering_schedule[num].changes_type) {
@@ -32,16 +32,13 @@
                 time_change = true;
                 break
         }
+        s_open = false;
     }
 
-    function save(state){
-        if (state === 'on'){
-            s_open = false
-        }
-        else if (state === "off"){
-            e_open = false
-        }
+    let cancelCallback = () => {
+        s_open = false;
     }
+
 
     function rmTime(index: number) {
         if ($FarmSettings.watering_schedule[num].changes_type == "DELETE") {
@@ -83,8 +80,7 @@
                 </div>
                 <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                     <div class="flex flex-col justify-center">
-                        <TimePicker {options} on:change={startCallback} />
-                        <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
+                        <TimePicker {options} on:cancel={cancelCallback} on:ok={okCallback}/>
                     </div>
                 </div>
             {/if}

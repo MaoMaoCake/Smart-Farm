@@ -19,6 +19,7 @@
     let options = {
         /* Minutes increment */
         minutesIncrement: 5,
+        hasButtons: true,
     }
 
     function formatTime(date) {
@@ -27,7 +28,7 @@
         minutes = minutes < 10 ? '0'+minutes : minutes;
         return hours + ':' + minutes;
     }
-    let startCallback = (event) => {
+    let s_okCallback = (event) => {
         t_start = formatTime(event.detail)
         $FarmSettings.ac_schedule[num].startTime = t_start;
         switch ($FarmSettings.ac_schedule[num].changes_type) {
@@ -37,9 +38,14 @@
                 time_change = true;
                 break
         }
+        s_open = false;
     }
 
-    let endCallback = (event) => {
+    let s_cancelCallback = () => {
+        s_open = false;
+    }
+
+    let e_okCallback = (event) => {
         t_end = formatTime(event.detail)
         $FarmSettings.ac_schedule[num].endTime = t_end;
         switch ($FarmSettings.ac_schedule[num].changes_type) {
@@ -49,15 +55,13 @@
                 time_change = true;
                 break
         }
+        e_open = false;
     }
-    function save(state){
-        if (state === 'on'){
-            s_open = false
-        }
-        else if (state === "off"){
-            e_open = false
-        }
+
+    let e_cancelCallback = () => {
+        e_open = false;
     }
+
     function rmTime(index: number){
         if ($FarmSettings.ac_schedule[num].changes_type == "DELETE") {
             if (preset_change || time_change) {
@@ -110,8 +114,7 @@
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                         <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={startCallback} />
-                            <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
+                            <TimePicker {options} on:ok={s_okCallback} on:cancel={s_cancelCallback}/>
                         </div>
                     </div>
                 {/if}
@@ -125,8 +128,7 @@
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                         <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={endCallback} />
-                            <button class="btn btn-primary" on:click={() => {save("off")}}>Save</button>
+                            <TimePicker {options} on:change={e_okCallback} on:cancel={e_cancelCallback}/>
                         </div>
                     </div>
                 {/if}
