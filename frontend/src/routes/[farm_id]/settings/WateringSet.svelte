@@ -74,7 +74,7 @@
             <div>
                 <button on:click={() => {s_open = true}}
                         class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white"
-                        disabled={$FarmSettings.watering_schedule[num].changes_type == "DELETE"}>{t_start}</button>
+                        disabled={$FarmSettings.watering_schedule[num].changes_type === "DELETE"}>{t_start}</button>
             {#if s_open}
                 <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                 </div>
@@ -86,7 +86,7 @@
             {/if}
             </div>
             <div class="flex grow items-center pl-5">
-                {#if $FarmSettings.watering_schedule[num].changes_type != "DELETE"}
+                {#if $FarmSettings.watering_schedule[num].changes_type !== "DELETE"}
                     <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
                 {:else}
                      <button class="btn rounded-xl bg-gray-300 text-black hover:text-white" on:click={remove}>Undo</button>
