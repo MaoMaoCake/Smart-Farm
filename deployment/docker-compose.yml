@@ -92,17 +92,13 @@ services:
     container_name: db
     image: mysql:latest
     restart: unless-stopped
-    expose:
-      - 5432
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-#    env_file:
-#      - .env
+    env_file:
+      - mysql.env
 #    labels:
 #      - 'traefik.enable=true'
     volumes:
       - smart-farm-db:/var/lib/mysql
-        #  mongo:
+#  mongo:
 #    container_name: mongo_db
 #    image: mongo:latest
 volumes:
