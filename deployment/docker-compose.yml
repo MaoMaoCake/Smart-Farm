@@ -35,6 +35,9 @@ services:
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - frontend
+      - backend
 
   frontend:
     container_name: frontend
@@ -46,7 +49,8 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.frontend.entrypoints=http'
       - "traefik.http.routers.frontend.rule=Host(`smartfarm.localhost`)"
-      # change the URL
+    depends_on:
+      - backend
 
   backend:
     container_name: backend
@@ -55,7 +59,7 @@ services:
     expose:
       - 8000
     env_file:
-      - ../backend/backend.env
+      - backend.env
     links:
       - database:db
       - mqtt-bridge:bridge
@@ -63,7 +67,9 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.backend.entrypoints=http'
       - "traefik.http.routers.backend.rule=Host(`smartfarm.localhost`) && PathPrefix(`/api/`)"
-      # change the URL
+    depends_on:
+      - backend-worker
+      - database
 
   backend-worker:
     container_name: worker
@@ -79,8 +85,11 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.worker.entrypoints=http'
-#
-#  mqtt2db:
+    depends_on:
+      - mqtt-bridge
+      - database
+  #
+  #  mqtt2db:
 #    container_name: mqtt2db
 #    image: registry.gitlab.com/maomaocake/smart-farm/mqtt2db:latest
 #    restart: unless-stopped
