@@ -1,4 +1,9 @@
 import os
+import pymongo
+from datetime import datetime, date, time, timedelta
+import json
+from dateutil.relativedelta import relativedelta
+
 
 from typing import Optional
 
@@ -14,7 +19,8 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     ACAutomation, WateringAutomation, UpdateLightStrengthInputInPreset, UpdateLightCombination,\
     FarmACAutomation, FarmLightPreset, Dehumidifier, CreateLightAutomationInput,\
     UpdateLightAutomationInput, CreateACAutomationInput, UpdateACAutomationInput, WaterController,\
-    CreateWateringAutomationInput, UpdateWateringAutomationInput, FarmLightPresetUpdated
+    CreateWateringAutomationInput, UpdateWateringAutomationInput, FarmLightPresetUpdated,\
+    GraphOutput
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
@@ -30,6 +36,9 @@ engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.
 Session = sessionmaker(bind=engine)
 session = Session()
 
+client = pymongo.MongoClient(os.getenv('MONGO_PATH'))
+db = client[os.getenv('MONGO_DB')]
+collection = db[os.getenv('MONGO_COLLECTION')]
 
 def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str, verification_code: str) -> User:
     new_user = UserDb(username=username,
@@ -841,3 +850,124 @@ def change_password_from_changeCode(code: str, new_password: str) -> bool:
         "password": pwd_context.hash(new_password)
     })
 
+
+def get_stats_from_mongo(farm_id: int):
+    yesterday = datetime.now() - timedelta(hours=24)
+    week_ago = datetime.now() - timedelta(days=7)
+    last_month = datetime.now() - relativedelta(months=1)
+
+    pipeline_day = [
+        {
+            "$match": {
+                "farmId": farm_id,
+                "createAt": {"$gte": yesterday}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$createAt",
+                "Temperature": {"$avg": "$Temperature"},
+                "Humidity": {"$avg": "$Humidity"},
+                "CO2": {"$avg": "$CO2"}
+            }
+        }
+    ]
+
+    pipeline_week = [
+        {
+            "$match": {
+                "farmId": farm_id,
+                "createAt": {"$gte": week_ago}
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "$dateToString": {
+                        "format": "%Y-%m-%d",
+                        "date": "$createAt",
+                        "timezone": "+00:00"
+                    }
+                },
+                "Temperature": {"$avg": "$Temperature"},
+                "Humidity": {"$avg": "$Humidity"},
+                "CO2": {"$avg": "$CO2"}
+            }
+        }
+    ]
+
+    last_month = datetime.now() - relativedelta(months=1)
+
+    pipeline_month = [
+        {
+            "$match": {
+                "farmId": farm_id,
+                "createAt": {"$gte": last_month}
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "$dateToString": {
+                        "format": "%Y-%m-%d",
+                        "date": "$createAt",
+                        "timezone": "+00:00"
+                    }
+                },
+                "Temperature": {"$avg": "$Temperature"},
+                "Humidity": {"$avg": "$Humidity"},
+                "CO2": {"$avg": "$CO2"}
+            }
+        }
+    ]
+
+    result_day = collection.aggregate(pipeline_day)
+    result_week = collection.aggregate(pipeline_week)
+    result_month = collection.aggregate(pipeline_month)
+
+    output_day = []
+    output_week = []
+    output_month = []
+
+    for record in result_day:
+        datetime_str = record["_id"].strftime('%Y-%m-%d %H:%M:%S')
+        datetime_obj = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+
+        output_day.append(json.loads(
+            f'{{"group": "Temperature", "date": "{datetime_obj}", "value": "{record["Temperature"]}"}}'
+        ))
+        output_day.append(json.loads(
+            f'{{"group": "Humidity", "date": "{datetime_obj}", "value": "{record["Humidity"]}"}}'
+        ))
+        output_day.append(json.loads(
+            f'{{"group": "CO2", "date": "{datetime_obj}", "value": "{record["CO2"]}"}}'
+        ))
+
+    for record in result_week:
+        output_week.append(json.loads(
+            f'{{"group": "Temperature", "date": "{record["_id"]}", "value": "{record["Temperature"]}"}}'
+        ))
+        output_week.append(json.loads(
+            f'{{"group": "Humidity", "date": "{record["_id"]}", "value": "{record["Humidity"]}"}}'
+        ))
+        output_week.append(json.loads(
+            f'{{"group": "CO2", "date": "{record["_id"]}", "value": "{record["CO2"]}"}}'
+        ))
+
+    for record in result_month:
+        output_month.append(json.loads(
+            f'{{"group": "Temperature", "date": "{record["_id"]}", "value": "{record["Temperature"]}"}}'
+        ))
+        output_month.append(json.loads(
+            f'{{"group": "Humidity", "date": "{record["_id"]}", "value": "{record["Humidity"]}"}}'
+        ))
+        output_month.append(json.loads(
+            f'{{"group": "CO2", "date": "{record["_id"]}", "value": "{record["CO2"]}"}}'
+        ))
+
+    output = GraphOutput(
+        day=output_day,
+        week=output_week,
+        month=output_month
+    )
+    return output
