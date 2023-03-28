@@ -17,7 +17,7 @@
 </script>
 <div class="h-16"> <!-- This is to make the navbar spacing -->
 </div>
-<div class="navbar bg-primary h-16 fixed top-0 left-0 right-0">
+<div class="navbar bg-primary h-16 fixed top-0 left-0 right-0"  style="z-index: 999;">
     <div class="flex-1">
         <a class="m-5 font-bold white" href="/">AUTO FARM</a>
     </div>
