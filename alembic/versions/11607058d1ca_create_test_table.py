@@ -27,7 +27,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('username', sa.VARCHAR(45), nullable=False, unique=True),
         sa.Column('password', sa.VARCHAR(255), nullable=False),
@@ -44,7 +44,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('name', sa.VARCHAR(45), nullable=False),
         sa.Column('maxHumidity', sa.Integer, nullable=False),
@@ -63,7 +63,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('userId', sa.Integer, sa.ForeignKey('user.id'), nullable=False)
@@ -78,7 +78,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('temperature', sa.Integer, nullable=False)
@@ -93,7 +93,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('name', sa.VARCHAR(255), nullable=False),
@@ -113,7 +113,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('temperature', sa.Integer, nullable=False),
@@ -130,7 +130,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('humidity', sa.Integer, nullable=False)
@@ -145,7 +145,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('status', sa.Boolean, nullable=False),
@@ -162,7 +162,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('CO2', sa.Integer, nullable=False)
@@ -178,7 +178,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('status', sa.Boolean, nullable=False),
@@ -194,7 +194,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('startTime', sa.Time, nullable=False),
@@ -210,7 +210,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('name', sa.VARCHAR(45), nullable=False),
@@ -231,7 +231,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('name', sa.VARCHAR(255), nullable=False)
@@ -247,7 +247,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('startTime', sa.Time, nullable=False),
@@ -265,7 +265,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('lightId', sa.Integer, sa.ForeignKey('light.id'), nullable=False),
         sa.Column('farmLightPresetId', sa.Integer, sa.ForeignKey('farmLightPreset.id'), nullable=False),
@@ -285,7 +285,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('hardwareType', sa.Enum('LIGHT','AC','CO2_SENSOR','CO2_CONTROLLER','DEHUMIDIFIER','HUMIDITY_SENSOR',
                                           'TEMPERATURE_SENSOR','WATERING'), nullable=False),
@@ -305,7 +305,7 @@ def upgrade():
         sa.Column('deleteAt', sa.DateTime, nullable=True),
         sa.Column('createBy', sa.VARCHAR(45), nullable=False),
         sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
-        sa.Column('delete', sa.VARCHAR(45), nullable=True),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
         sa.Column('automation', sa.Boolean, nullable=False),
