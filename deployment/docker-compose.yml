@@ -78,7 +78,7 @@ services:
     expose:
       - 8000
     env_file:
-      - ../backend/backend.env
+      - backend.env
     links:
       - database:db
       - mqtt-bridge:bridge
