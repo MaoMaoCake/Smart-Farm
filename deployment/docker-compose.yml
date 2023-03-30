@@ -1,5 +1,4 @@
 version: "3"
-# todo update container image names
 services:
   mqtt-broker:
     image: eclipse-mosquitto:2
@@ -48,7 +47,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.frontend.entrypoints=http'
-      - "traefik.http.routers.frontend.rule=Host(`smartfarm.localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`smart-farm.jirapongpansak.com`)"
     depends_on:
       - backend
 
@@ -66,7 +65,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.backend.entrypoints=http'
-      - "traefik.http.routers.backend.rule=Host(`smartfarm.localhost`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.rule=Host(`smart-farm.jirapongpansak.com`) && PathPrefix(`/api/`)"
     depends_on:
       - backend-worker
       - database
