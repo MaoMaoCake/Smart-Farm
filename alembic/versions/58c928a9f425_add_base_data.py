@@ -307,8 +307,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.execute("DELETE FROM user")
-    op.execute("DELETE FROM farm")
+    op.execute("DELETE FROM MQTTMap")
     op.execute("DELETE FROM AC")
     op.execute("DELETE FROM CO2Controller")
     op.execute("DELETE FROM CO2Sensor")
@@ -317,4 +316,7 @@ def downgrade() -> None:
     op.execute("DELETE FROM light")
     op.execute("DELETE FROM temperatureSensor")
     op.execute("DELETE FROM waterController")
-    op.execute("DELETE FROM MQTTMap")
+    op.execute("DELETE FROM user")
+    op.execute("DELETE FROM farm")
+
+
