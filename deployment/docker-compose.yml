@@ -104,6 +104,8 @@ services:
       - mysql.env
 #    labels:
 #      - 'traefik.enable=true'
+    ports:
+      - "3306:3306"
     volumes:
       - smart-farm-db:/var/lib/mysql
 #  mongo:
