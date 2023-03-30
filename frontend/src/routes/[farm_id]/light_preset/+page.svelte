@@ -1,5 +1,6 @@
 <script lang="ts">
     import StatPreview from "$lib/StatPreview.svelte";
+    import StatPreviewLarge from "$lib/StatPreviewLarge.svelte";
     import type {PageData} from "./$types";
     import {FarmSettings} from "$lib/SettingStores";
     import {page} from "$app/stores";
@@ -109,23 +110,31 @@
      <Icon icon="iconoir:light-bulb-on" class="h-5 w-5 mt-6 ml-2"/>
    </div>
     <div class="flex w-full justify-center items-center flex-col md:flex-row">
-        <div>
-            <StatPreview farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
-                         light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
-                         co2={farm_stats.co2} co2_val={farm_stats.co2_val}>
-            </StatPreview>
-        </div>
-        <div class="flex grow flex-col items-center w-full pb-5">
-            <div class="flex justify-evenly w-full">
-                <button class="btn bg-black text-white"
-                        on:click={goto(`/${$page.params.farm_id}/settings`)}>Farm setting
-                <Icon icon="icon-park-solid:setting-two" class="h-4 w-4 ml-2"/></button>
-                <button class="btn bg-gray-300 text-black"
-                        on:click={goto(`/${$page.params.farm_id}/light_list`)}>Light setting
-                <Icon icon="iconoir:light-bulb-on" class="h-5 w-5 ml-2"/></button>
+        <div class="flex flex-col grow md:w-1/3 md:h-5/6 items-center justify-center">
+            <div class="flex grow md:hidden">
+                <StatPreview farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
+                             light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
+                             co2={farm_stats.co2} co2_val={farm_stats.co2_val}>
+                </StatPreview>
+            </div>
+            <div class="hidden md:flex">
+              <StatPreviewLarge farm_name="{farm_stats.name}" temp="{farm_stats.temp}" humidity={farm_stats.humidity}
+                           light={farm_stats.light} ac="{farm_stats.ac}" humidifier={farm_stats.humidifier}
+                           co2={farm_stats.co2} co2_val={farm_stats.co2_val} farm_id={farm_stats.farm_id} type="setting">
+              </StatPreviewLarge>
+            </div>
+            <div class="flex grow flex-col items-center w-full pb-5">
+                <div class="flex justify-evenly w-full">
+                    <button class="btn bg-black text-white"
+                            on:click={goto(`/${$page.params.farm_id}/settings`)}>Farm setting
+                    <Icon icon="icon-park-solid:setting-two" class="h-4 w-4 ml-2"/></button>
+                    <button class="btn bg-gray-300 text-black"
+                            on:click={goto(`/${$page.params.farm_id}/light_list`)}>Light setting
+                    <Icon icon="iconoir:light-bulb-on" class="h-5 w-5 ml-2"/></button>
+                </div>
             </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="fixed-box overflow-x-auto">
             <table class="table w-full">
                 <!-- head -->
                 <thead>
@@ -179,3 +188,20 @@
       </div>
     </div>
 {/if}
+
+<style>
+  .fixed-box {
+    height: 40vh;
+    overflow-y: scroll;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 0.5rem;
+    text-align: center;
+  }
+</style>

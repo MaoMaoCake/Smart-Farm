@@ -20,6 +20,7 @@
     let options = {
         /* Minutes increment */
         minutesIncrement: 5,
+        hasButtons: true,
     }
 
     function formatTime(date) {
@@ -28,7 +29,7 @@
         minutes = minutes < 10 ? '0'+minutes : minutes;
         return hours + ':' + minutes;
     }
-    let startCallback = (event) => {
+    let s_okCallback = (event) => {
         t_start = formatTime(event.detail);
         $FarmSettings.light_schedule[num].startTime = t_start;
         switch ($FarmSettings.light_schedule[num].changes_type) {
@@ -38,9 +39,10 @@
                 time_change = true;
                 break
         }
+        s_open = false;
     }
 
-    let endCallback = (event) => {
+    let e_okCallback = (event) => {
         t_end = formatTime(event.detail);
         $FarmSettings.light_schedule[num].endTime = t_end;
         switch ($FarmSettings.light_schedule[num].changes_type) {
@@ -50,14 +52,15 @@
                 time_change = true;
                 break
         }
+        e_open = false;
     }
-    function save(state){
-        if (state === 'on'){
-            s_open = false
-        }
-        else if (state === "off"){
-            e_open = false
-        }
+
+    let s_cancelCallback = () => {
+        s_open = false;
+    }
+
+    let e_cancelCallback = () => {
+        e_open = false;
     }
     function rmTime(index: number){
         if ($FarmSettings.light_schedule[num].changes_type == "DELETE") {
@@ -105,14 +108,13 @@
             <div class="flex items-center">
                 <p class="ml-2 pr-0.5">On</p>
                 <button on:click={() => {s_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white"
-                        disabled={$FarmSettings.light_schedule[num].changes_type == "DELETE"}>{t_start}</button>
+                        disabled={$FarmSettings.light_schedule[num].changes_type === "DELETE"}>{t_start}</button>
                 {#if s_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                         <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={startCallback} />
-                            <button class="btn btn-primary" on:click={() => {save("on")}}>Save</button>
+                            <TimePicker {options} on:ok={s_okCallback} on:cancel={s_cancelCallback} />
                         </div>
                     </div>
                 {/if}
@@ -120,14 +122,13 @@
             <div class="flex items-center">
                 <p class="pl-2">Off</p>
                 <button on:click={() => {e_open = true}} class="btn bg-gray-300 rounded-lg ml-2 w-24 text-black hover:text-white"
-                        disabled={$FarmSettings.light_schedule[num].changes_type == "DELETE"}>{t_end}</button>
+                        disabled={$FarmSettings.light_schedule[num].changes_type === "DELETE"}>{t_end}</button>
                 {#if e_open}
                     <div class="bg-gray-300 blur w-screen h-screen fixed top-0 left-0 z-30">
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                         <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={endCallback}/>
-                            <button class="btn btn-primary" on:click={() => {save("off")}}>Save</button>
+                            <TimePicker {options} on:ok={e_okCallback} on:cancel={e_cancelCallback}/>
                         </div>
                     </div>
                 {/if}
@@ -138,7 +139,7 @@
                 <label class="label input-group input-group-vertical">
                     <span class="label-text bg-base-100 ">Preset</span>
                     <select class="select bg-amber-500 rounded-lg white"
-                            disabled={$FarmSettings.light_schedule[num].changes_type == "DELETE"}
+                            disabled={$FarmSettings.light_schedule[num].changes_type === "DELETE"}
                             bind:value={$FarmSettings.light_schedule[num].farmLightPresetId}
                             on:change={() => handleOptionChange()}>
                         {#if preset.preset_id === "" }
@@ -154,7 +155,7 @@
             </div>
         </div>
         <div class="flex grow items-center pl-5">
-             {#if $FarmSettings.light_schedule[num].changes_type != "DELETE"}
+             {#if $FarmSettings.light_schedule[num].changes_type !== "DELETE"}
                 <button class="btn btn-error rounded-xl" on:click={remove}>X</button>
              {:else}
                  <button class="btn rounded-xl bg-gray-300 text-black hover:text-white" on:click={remove}>Undo</button>

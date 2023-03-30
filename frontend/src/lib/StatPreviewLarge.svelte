@@ -10,6 +10,7 @@
 
     export let farm_id;
     export let type;
+    export let show_stats = false;
 
     import Icon from '@iconify/svelte';
 
@@ -17,7 +18,7 @@
 
 <div class="hidden md:flex justify-center">
     <div class="grid grid-cols-4 grid-rows-8 bg-gray-300 m-5 rounded-lg w-96">
-        <div class="col-start-1 col-span-4 row-start-1 flex justify-center bg-primary rounded-t-lg white items-center h-14 pl-3">
+        <div class="col-start-1 col-span-4 row-start-1 flex justify-center bg-primary rounded-t-lg white items-center h-14 pl-3 static">
             {farm_name}
             {#if !type}
                 <a href="{farm_id}/settings">
@@ -28,6 +29,11 @@
                     <Icon icon="mdi:pen" class="h-4 w-4 ml-2 "/>
                 </a>
             {/if}
+            <div class="relative right-0">
+            {#if show_stats}
+                <a class="btn btn-secondary btn-xs ml-2 text-white" href="/{farm_id}/stats">Stats</a>
+            {/if}
+        </div>
         </div>
         <div class="col-start-1 col-span-4 row-start-2 row-span-4 bg-blue-900 aspect-square flex items-center justify-evenly flex-col white rounded-xl m-2">
             <div class="flex justify-evenly items-center">
