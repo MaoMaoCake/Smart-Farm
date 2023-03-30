@@ -39,7 +39,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/stats`,
+            `/api/farm/${$page.params.farm_id}/stats`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -67,7 +67,7 @@
   }
 
   fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/light/preset/${$page.params.preset_id}`,
+            `/api/farm/${$page.params.farm_id}/light/preset/${$page.params.preset_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -87,7 +87,7 @@
    async function remove(){
     if (await dialogs.confirm("Are You sure you want to delete this automation?")){
         fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/${$page.params.preset_id}`,
+            `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}`,
           {
             method: 'DELETE',
             headers: myHeaders,

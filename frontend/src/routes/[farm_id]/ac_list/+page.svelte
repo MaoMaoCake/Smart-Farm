@@ -31,7 +31,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/stats`,
+            `/api/farm/${$page.params.farm_id}/stats`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -59,7 +59,7 @@
   }
 
   fetch(
-            `http://127.0.0.1:8000/farm/${$page.params.farm_id}/AC/list/`,
+            `/api/farm/${$page.params.farm_id}/AC/list/`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -95,7 +95,7 @@
 
     function update_ac_status(ac_id: number, ac_status: boolean){
       fetch(
-              `http://127.0.0.1:8000/farm/${$page.params.farm_id}/AC/${ac_id}/automation?is_turn_on=${ac_status}`,
+              `/api/farm/${$page.params.farm_id}/AC/${ac_id}/automation?is_turn_on=${ac_status}`,
           {
               method: 'PATCH',
               headers: myHeaders,
@@ -116,7 +116,7 @@
 
     function update_all_ac_status(ac_status: boolean){
       fetch(
-              `http://127.0.0.1:8000/farm/${$page.params.farm_id}/AC/automation?is_turn_on=${ac_status}`,
+              `/api/farm/${$page.params.farm_id}/AC/automation?is_turn_on=${ac_status}`,
           {
               method: 'PATCH',
               headers: myHeaders,

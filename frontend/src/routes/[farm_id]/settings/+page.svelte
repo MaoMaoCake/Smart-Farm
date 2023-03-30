@@ -59,7 +59,7 @@
   myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
   fetch(
-      `http://127.0.0.1:8000/farm/${data.farm_id}/stats`,
+      `/api/farm/${data.farm_id}/stats`,
       {
         method: 'GET',
         headers: myHeaders,
@@ -69,7 +69,7 @@
     .catch(error => console.log('error', error));
 
   fetch(
-      `http://127.0.0.1:8000/farm/${data.farm_id}`,
+      `/api/farm/${data.farm_id}`,
       {
         method: 'GET',
         headers: myHeaders,
@@ -108,7 +108,7 @@
 
   function control_actuators(type: string, farm_id: string, state: boolean){
     fetch(
-          `http://127.0.0.1:8000/farm/${data.farm_id}/${type}/control?is_turn_on=${!state}&temperature=${$FarmSettings.ac_temp}`,
+          `/api/farm/${data.farm_id}/${type}/control?is_turn_on=${!state}&temperature=${$FarmSettings.ac_temp}`,
           {
             method: 'POST',
             headers: myHeaders,
@@ -171,7 +171,7 @@
   async function handleACTempChange(){
         if ($FarmSettings.ac_temp != ac_temp_original) {
             fetch(
-                  `http://127.0.0.1:8000/farm/${data.farm_id}/AC/temperature/change?is_turn_on=${ac_switch}&temperature=${$FarmSettings.ac_temp}`,
+                  `/api/farm/${data.farm_id}/AC/temperature/change?is_turn_on=${ac_switch}&temperature=${$FarmSettings.ac_temp}`,
                   {
                     method: 'PATCH',
                     headers: myHeaders,
@@ -208,7 +208,7 @@
       }
 
       fetch(
-              `http://127.0.0.1:8000/farm/${data.farm_id}`,
+              `/api/farm/${data.farm_id}`,
           {
               method: 'PATCH',
               headers: myHeaders,
