@@ -5,8 +5,6 @@ from sqlalchemy.orm import relationship
 from .utils import current_datetime
 from .enum_list import Role
 
-from farm.enum_list import HardwareType, ESPType
-
 Base = declarative_base()
 
 
@@ -34,7 +32,7 @@ class FarmDb(BaseModel):
     __tablename__ = "farm"
     name = Column(String, nullable=False)
     maxHumidity = Column(Integer, nullable=False)
-    minCO2 = Column(Integer, nullable=False)
+    minCO2 = Column(String, nullable=False)
     lightStatus = Column(Boolean, nullable=False)
     ACTemp =Column(Integer, nullable=False)
     farmKey = Column(String, nullable=False, unique=True)
@@ -173,10 +171,12 @@ class LightPresetAutomationDB(BaseModel):
 
 class MQTTMapDB(BaseModel):
     __tablename__ = "MQTTMap"
-    hardwareType = Column(Enum(HardwareType), nullable=False)
+    hardwareType = Column(Enum('LIGHT','AC','CO2_SENSOR','CO2_CONTROLLER','DEHUMIDIFIER','HUMIDITY_SENSOR',
+                                          'TEMPERATURE_SENSOR','WATERING'), nullable=False)
     hardwareId = Column(Integer, nullable=False)
     ESPId = Column(Integer, nullable=False)
-    ESPType = Column(Enum(ESPType), nullable=False)
+    ESPType = Column(Enum('SENSOR','CO2_CONTROLLER','LIGHT_CONTROLLER','AC_CONTROLLER',
+                                     'DEHUMIDIFIER_CONTROLLER','WATERING_SYSTEM'), nullable=False)
 
 
 class WaterControllerDB(BaseModel):
