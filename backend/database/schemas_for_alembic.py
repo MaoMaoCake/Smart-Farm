@@ -26,6 +26,8 @@ class UserDb(BaseModel):
     password = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     role = Column(Enum(Role), nullable=False)
+    verified = Column(Boolean, nullable=False, default=False)
+    verificationCode = Column(String, nullable=True)
 
 
 class FarmDb(BaseModel):

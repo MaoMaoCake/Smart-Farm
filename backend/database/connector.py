@@ -28,11 +28,12 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str) -> User:
+def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str, verification_code: str) -> User:
     new_user = UserDb(username=username,
                       password=password_hashed,
                       email=email,
                       role=role,
+                      verificationCode=verification_code,
                       createBy=create_by,
                       updateBy=create_by
                       )
@@ -43,10 +44,10 @@ def create_user(username: str, password_hashed: str, email: str, role: str, crea
 
 
 def get_user_from_db(username: str) -> User | None:
-    user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password).filter(
+    user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password, UserDb.verified).filter(
         UserDb.username == username).first()
 
-    return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value)) if user else None
+    return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value), verified=user.verified) if user else None
 
 
 def get_dup_email(email: str) -> User | None:
@@ -785,3 +786,18 @@ def update_ac_temp_db(farm_id: int, temperature: int) -> None:
                     "ACTemp": temperature
                   })
     session.commit()
+
+
+def verify_user_from_verification_code(verification_code: str) -> bool:
+    if not session.query(UserDb).filter(UserDb.verificationCode == verification_code):
+        return False
+
+    session.query(UserDb
+                  ).filter(UserDb.verificationCode == verification_code
+                  ).update({
+        "verified": True
+    })
+
+    session.commit()
+
+    return  True

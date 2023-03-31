@@ -1,11 +1,12 @@
 <script lang="js">
   import {goto} from '$app/navigation'
-  import {logged_in} from "$lib/SettingStores";
+  import {is_register, logged_in} from "$lib/SettingStores";
   import { FaEye, FaEyeSlash } from "svelte-icons/fa";
 
   let username = "";
   let password = "";
   let showPassword = false;
+  is_register.set(true);
 
   async function login() {
     if (username === "" || password === "") {
@@ -37,7 +38,8 @@
       alert(response.message);
     } else if (response.status_code  === 200) {
       localStorage.setItem('token', response.data.access_token);
-      logged_in.set(true)
+      logged_in.set(true);
+      is_register.set(false);
       goto('/');
     }
   }
@@ -59,7 +61,9 @@
 <svelte:window on:keydown={handleKeydown}/>
 <div class="flex align-center justify-center">
   <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+    <img src="logo.png" alt="Logo" class="w-24 h-24 mt-10">
       <div class="card-body">
+        <p class="font-bold text-center text-3xl">Login</p>
         <div class="form-control">
           <label class="label">
             <span class="label-text">Username</span>
@@ -102,6 +106,10 @@
         <div class="form-control mt-6">
           <button class="btn btn-primary" on:click={login}>Login</button>
         </div>
+         <div class="mt-4 text-center">
+          <span>Don't have an account?</span>
+          <a href="/register" class="link ml-2">Register</a>
+        </div>
       </div>
 </div>
 </div>
@@ -119,4 +127,9 @@
     top: 50%;
     transform: translateY(-50%);
   }
+
+   img {
+  margin-left: auto;
+  margin-right: auto;
+}
 </style>

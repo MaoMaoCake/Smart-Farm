@@ -37,3 +37,5 @@ export let default_changes = writable({
 })
 
 export let logged_in = writable(!(localStorage.getItem("token") == null || localStorage.getItem("token") === undefined))
+export let is_register = writable(true)
+export let is_verify = writable(false)
