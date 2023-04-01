@@ -3,7 +3,7 @@ from datetime import datetime, time
 from pydantic import BaseModel
 from typing import Optional
 from datetime import time
-from typing import List
+from typing import List, Dict, Any
 
 from .enum_list import ChangesType
 
@@ -365,3 +365,9 @@ class UpdateWateringAutomationInput(BaseModel):
     startTime: time
     endTime: time
     username: str
+
+
+class GraphOutput(BaseModel):
+    day: List[Dict[str, Any]]
+    week: List[Dict[str, Any]]
+    month: List[Dict[str, Any]]
