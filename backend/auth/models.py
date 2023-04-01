@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
+from fastapi.param_functions import Form
+
+from database.enum_list import Role
 
 class Token(BaseModel):
     access_token: str
@@ -15,7 +18,48 @@ class User(BaseModel):
     username: str
     password: Optional[str]
     role: str  # Admin User Guest
+    verified: Optional[bool]
 
     class Config:
         orm_mode = True
 
+
+class RegisterInput():
+    username: str
+    password: str
+    email: str
+    role: Role
+
+    def __init__(
+        self,
+        username: str = Form(),
+        password: str = Form(),
+        email: str = Form(),
+        role: Role = Form()
+    ):
+        self.username=username
+        self.password=password
+        self.email=email
+        self.role=role
+
+class ForgetPasswordInput():
+    email: str
+
+    def __init__(
+        self,
+        email: str = Form(),
+    ):
+        self.email=email
+
+
+class PasswordChangingInput():
+    code: str
+    new_password: str
+
+    def __init__(
+        self,
+        code: str = Form(),
+        new_password: str = Form(),
+    ):
+        self.code=code
+        self.new_password=new_password

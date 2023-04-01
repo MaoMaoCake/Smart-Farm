@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 # OAuth Libraries
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
-from .utils import create_access_token, get_current_active_user, create_new_user
+from .utils import create_access_token, get_current_active_user, validate_verification_url, verify_user, forget_password
 
-from .models import Token, User
-from .utils import authenticate_user, create_new_user
+from .models import Token, User, RegisterInput, ForgetPasswordInput, PasswordChangingInput
+from .utils import authenticate_user, create_new_user, is_password_change, reset_password
 
 from database.enum_list import Role
 from response.response_dto import get_response_status, ResponseDto
@@ -61,12 +61,32 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
     """
     return get_response_status(data=current_user)
 
-@authRouter.post("/users/create", response_model=User)
-async def create_user(
-        username: str,
-        password: str,
-        email: str,
-        role: Role,
-        current_user: User = Depends(get_current_active_user)):
+@authRouter.post("/users/create", response_model=ResponseDto)
+async def create_user(form_data: RegisterInput = Depends()):
+    return get_response_status(data=create_new_user(form_data.username, form_data.password, form_data.email, form_data.role))
 
-    return create_new_user(username, password, email, role, current_user.username)
+
+@authRouter.post("/users/verify/{verification_code}", response_model=ResponseDto)
+async def verify_email(verification_code: str):
+    if validate_verification_url(verification_code):
+        return verify_user(verification_code)
+
+    return get_http_exception('10','Verification url timeout')
+
+
+@authRouter.post("/users/forget-password/", response_model=ResponseDto)
+async def forget_email_request(inputs: ForgetPasswordInput = Depends()):
+    forget_password(inputs.email)
+
+    return get_response_status('Success')
+
+
+@authRouter.get("/users/password-changing/{code}", response_model=ResponseDto)
+async def get_is_password_changing(code: str):
+    return get_response_status(data=is_password_change(code))
+
+
+@authRouter.patch("/users/change-password/", response_model=ResponseDto)
+async def change_password(inputs: PasswordChangingInput = Depends()):
+    reset_password(inputs.code, inputs.new_password)
+    return get_response_status('Success')

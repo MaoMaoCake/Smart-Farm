@@ -5,6 +5,7 @@ from typing import Optional
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+from passlib.context import CryptContext
 
 from auth.models import User
 from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
@@ -21,6 +22,8 @@ from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
                        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
 
@@ -28,11 +31,12 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str) -> User:
+def create_user(username: str, password_hashed: str, email: str, role: str, create_by: str, verification_code: str) -> User:
     new_user = UserDb(username=username,
                       password=password_hashed,
                       email=email,
                       role=role,
+                      verificationCode=verification_code,
                       createBy=create_by,
                       updateBy=create_by
                       )
@@ -43,10 +47,10 @@ def create_user(username: str, password_hashed: str, email: str, role: str, crea
 
 
 def get_user_from_db(username: str) -> User | None:
-    user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password).filter(
+    user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password, UserDb.verified).filter(
         UserDb.username == username).first()
 
-    return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value)) if user else None
+    return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value), verified=user.verified) if user else None
 
 
 def get_dup_email(email: str) -> User | None:
@@ -785,3 +789,55 @@ def update_ac_temp_db(farm_id: int, temperature: int) -> None:
                     "ACTemp": temperature
                   })
     session.commit()
+
+
+def verify_user_from_verification_code(verification_code: str) -> bool:
+    if not session.query(UserDb).filter(UserDb.verificationCode == verification_code):
+        return False
+
+    session.query(UserDb
+                  ).filter(UserDb.verificationCode == verification_code
+                  ).update({
+        "verified": True
+    })
+
+    session.commit()
+
+    return  True
+
+
+def update_forget_email_code(email: str, change_code: str) -> bool:
+    if not session.query(UserDb).filter(UserDb.email == email).first():
+        return False
+
+    session.query(UserDb
+                  ).filter(UserDb.email == email
+                  ).update({
+        "passwordChanging": True,
+        "changeCode": change_code
+    })
+
+    session.commit()
+
+    return  True
+
+
+def get_is_password_changing(code: str) -> bool:
+    changeCode = session.query(UserDb).filter(UserDb.changeCode == code).first()
+    if not changeCode:
+        return False
+
+    if changeCode.passwordChanging:
+        return True
+
+    return False
+
+
+def change_password_from_changeCode(code: str, new_password: str) -> bool:
+    session.query(UserDb
+                  ).filter(UserDb.changeCode == code
+                  ).update({
+        "passwordChanging": False,
+        "password": pwd_context.hash(new_password)
+    })
+

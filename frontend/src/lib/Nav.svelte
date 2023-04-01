@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte'
-    import {logged_in} from "./SettingStores";
+    import {logged_in, is_register, is_verify} from "./SettingStores";
     import { themeChange } from 'theme-change'
     import {goto} from '$app/navigation'
     let checked = localStorage.getItem("theme") === 'sf_light'
@@ -19,7 +19,11 @@
 </div>
 <div class="navbar bg-primary h-16 fixed top-0 left-0 right-0"  style="z-index: 999;">
     <div class="flex-1">
+      {#if !$is_verify}
         <a class="m-5 font-bold white" href="/">AUTO FARM</a>
+        {:else }
+        <a class="m-5 font-bold white" >AUTO FARM</a>
+        {/if}
     </div>
     <div class="flex-none" >
          <ul class="menu menu-horizontal px-1">
@@ -38,11 +42,17 @@
                 </label>
              </li>
              <li>
-                 {#if $logged_in}
-                    <a class="btn btn-secondary sm:m-2 text-white" on:click={logout}>Logout</a>
-                {:else}
-                    <a class="btn btn-secondary sm:m-2 text-white" href="/login">Login</a>
-                {/if}
+               {#if !$is_verify}
+                 {#if $is_register}
+                      <a class="btn btn-secondary sm:m-2 text-white bg-black border-black" href="/register">Register</a>
+                   {:else}
+                     {#if $logged_in}
+                        <a class="btn btn-secondary sm:m-2 text-white" on:click={logout}>Logout</a>
+                    {:else}
+                        <a class="btn btn-secondary sm:m-2 text-white" href="/login">Login</a>
+                    {/if}
+                 {/if}
+               {/if}
              </li>
          </ul>
     </div>
