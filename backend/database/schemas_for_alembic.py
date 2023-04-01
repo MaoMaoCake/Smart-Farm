@@ -28,6 +28,8 @@ class UserDb(BaseModel):
     role = Column(Enum(Role), nullable=False)
     verified = Column(Boolean, nullable=False, default=False)
     verificationCode = Column(String, nullable=True)
+    passwordChanging = Column(Boolean, nullable=False, default=False)
+    changeCode = Column(String, nullable=True)
 
 
 class FarmDb(BaseModel):

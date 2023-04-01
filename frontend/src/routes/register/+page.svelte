@@ -98,7 +98,7 @@
           <label class="label">
             <span class="label-text">Username</span>
           </label>
-          <input type="text" placeholder="username" class="input input-bordered" bind:value={username}/>
+          <input type="text" placeholder="username" class="input input-bordered" bind:value={username} autofocus/>
           {#if errors.username}
             <p class="text-red-500 text-xs italic">{errors.username}</p>
           {/if}
@@ -118,9 +118,9 @@
           </label>
           <div class="relative">
             {#if showPassword}
-              <input type="text" name="password" class="input input-bordered w-full py-2 px-3 pr-10" bind:value={password} placeholder="Password" autofocus>
+              <input type="text" name="password" class="input input-bordered w-full py-2 px-3 pr-10" bind:value={password} placeholder="Password">
             {:else}
-              <input type="password" name="password" class="input input-bordered w-full py-2 px-3 pr-10" bind:value={password} placeholder="Password" autofocus>
+              <input type="password" name="password" class="input input-bordered w-full py-2 px-3 pr-10" bind:value={password} placeholder="Password">
             {/if}
               <button class="absolute inset-y-1 right-0 pr-3 flex items-center h-10 w-10" on:click={() => showPassword = !showPassword}>
                 {#if showPassword}

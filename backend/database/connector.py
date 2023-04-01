@@ -5,6 +5,7 @@ from typing import Optional
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+from passlib.context import CryptContext
 
 from auth.models import User
 from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
@@ -20,6 +21,8 @@ from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB, WaterControllerDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
                        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
@@ -801,3 +804,40 @@ def verify_user_from_verification_code(verification_code: str) -> bool:
     session.commit()
 
     return  True
+
+
+def update_forget_email_code(email: str, change_code: str) -> bool:
+    if not session.query(UserDb).filter(UserDb.email == email).first():
+        return False
+
+    session.query(UserDb
+                  ).filter(UserDb.email == email
+                  ).update({
+        "passwordChanging": True,
+        "changeCode": change_code
+    })
+
+    session.commit()
+
+    return  True
+
+
+def get_is_password_changing(code: str) -> bool:
+    changeCode = session.query(UserDb).filter(UserDb.changeCode == code).first()
+    if not changeCode:
+        return False
+
+    if changeCode.passwordChanging:
+        return True
+
+    return False
+
+
+def change_password_from_changeCode(code: str, new_password: str) -> bool:
+    session.query(UserDb
+                  ).filter(UserDb.changeCode == code
+                  ).update({
+        "passwordChanging": False,
+        "password": pwd_context.hash(new_password)
+    })
+

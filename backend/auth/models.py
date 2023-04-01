@@ -42,3 +42,24 @@ class RegisterInput():
         self.email=email
         self.role=role
 
+class ForgetPasswordInput():
+    email: str
+
+    def __init__(
+        self,
+        email: str = Form(),
+    ):
+        self.email=email
+
+
+class PasswordChangingInput():
+    code: str
+    new_password: str
+
+    def __init__(
+        self,
+        code: str = Form(),
+        new_password: str = Form(),
+    ):
+        self.code=code
+        self.new_password=new_password

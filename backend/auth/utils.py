@@ -21,7 +21,9 @@ from fastapi import Depends, HTTPException, status
 # import env variable tools
 import os
 
-from database.connector import get_user_from_db, create_user, get_dup_email, verify_user_from_verification_code
+from database.connector import get_user_from_db, create_user,\
+    get_dup_email, verify_user_from_verification_code, update_forget_email_code, get_is_password_changing,\
+    change_password_from_changeCode
 
 from response.error_codes import get_http_exception
 from response.response_dto import get_response_status
@@ -124,6 +126,12 @@ def generate_verification_url(email):
     return f"http://{os.environ['APP_BASE_URL']}/verify/{verification_code}", verification_code
 
 
+def generate_forget_password_url(email):
+    serializer = URLSafeTimedSerializer(os.environ['EMAIL_PASSWORD'])
+    verification_code = serializer.dumps(email)
+    return f"http://{os.environ['APP_BASE_URL']}/change_password/{verification_code}", verification_code
+
+
 def validate_verification_url(token):
     serializer = URLSafeTimedSerializer(os.environ['EMAIL_PASSWORD'])
     try:
@@ -180,7 +188,7 @@ def send_verification_email(to_email, verification_url):
                     .logo {{
                         display: block;
                         margin: 0 auto;
-                        width: 200px;
+                        width: 100px;
                         height: auto;
                     }}
                     .button {{
@@ -236,3 +244,99 @@ def verify_user(verification_code: str):
         return get_response_status('Verification success')
     else:
         get_http_exception('10', 'Invalid verification key')
+
+
+def forget_password(email: str):
+    forget_password_url, forget_password_code = generate_forget_password_url(email)
+    if not update_forget_email_code(email, forget_password_code):
+        get_http_exception('10', 'This email is not registered!')
+
+    send_forget_password_email(email, forget_password_url)
+
+    return True
+
+
+def send_forget_password_email(to_email, verification_url):
+    email = os.getenv('EMAIL')
+    password = os.getenv('EMAIL_PASSWORD')
+
+    # Email content
+    message = MIMEMultipart('alternative')
+    message['From'] = email
+    message['To'] = to_email
+    message['Subject'] = 'Password change request'
+
+    html = f"""\
+        <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                    }}
+                    .container {{
+                        width: 600px;
+                        margin: 0 auto;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        padding: 20px;
+                    }}
+                    .logo {{
+                        display: block;
+                        margin: 0 auto;
+                        width: 100px;
+                        height: auto;
+                    }}
+                    .button {{
+                        display: block;
+                        margin: 0 auto;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: #fff;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        text-align: center;
+                    }}
+                    .content {{
+                        height: 500px;
+                        overflow: auto;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <img class="logo" src="https://cdn.discordapp.com/attachments/802176047096922175/1091638749827444736/logo.png">
+                    <h1>You requested a password change</h1>
+                    <p>Please follow the below link to proceed the password change</p>
+                    <p><a class="button" href="{verification_url}">Chnage password</a></p>
+                </div>
+            </body>
+        </html>
+        """
+    body = MIMEText(html, 'html')
+    message.attach(body)
+
+    # Email server configuration
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    context = ssl.create_default_context()
+
+    # Start TLS connection with Gmail server
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.ehlo()  # Can be omitted
+    server.starttls(context=context)
+    server.ehlo()
+
+    # Login to Gmail account
+    server.login(email, password)
+
+    # Send email and close connection
+    server.sendmail(email, to_email, message.as_string())
+    server.quit()
+
+
+def is_password_change(code: str):
+    return get_is_password_changing(code)
+
+
+def reset_password(code: str, new_password: str):
+    change_password_from_changeCode(code, new_password)

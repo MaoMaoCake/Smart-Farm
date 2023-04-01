@@ -34,7 +34,9 @@ def upgrade():
         sa.Column('email', sa.VARCHAR(45), nullable=False, unique=True),
         sa.Column('role', sa.Enum('ADMIN', 'USER', 'VIEWER'), nullable=False),
         sa.Column('verified', sa.Boolean, nullable=False, server_default=False),
-        sa.Column('verificationCode', sa.VARCHAR(255), nullable=True)
+        sa.Column('verificationCode', sa.VARCHAR(255), nullable=True),
+        sa.Column('passwordChanging', sa.Boolean, nullable=False, server_default=False),
+        sa.Column('changeCode', sa.VARCHAR(255), nullable=True),
     )
     op.create_table(
         'farm',
