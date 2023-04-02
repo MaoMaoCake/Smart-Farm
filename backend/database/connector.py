@@ -20,7 +20,7 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmACAutomation, FarmLightPreset, Dehumidifier, CreateLightAutomationInput,\
     UpdateLightAutomationInput, CreateACAutomationInput, UpdateACAutomationInput, WaterController,\
     CreateWateringAutomationInput, UpdateWateringAutomationInput, FarmLightPresetUpdated,\
-    GraphOutput
+    GraphOutput, FarmInfo
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
@@ -981,3 +981,13 @@ def get_all_user_from_db():
     for user in users:
         user_list.append(User(id=user.id, username=user.username, verified=user.verified, createAt=user.createAt, role=user.role.value, email=user.email))
     return user_list
+
+
+def get_all_farm_from_db():
+    farms = session.query(FarmDb.id, FarmDb.name, FarmDb.farmKey, FarmDb.createAt).all()
+
+    farm_list = []
+
+    for farm in farms:
+        farm_list.append(FarmInfo(id=farm.id, name=farm.name, farmKey=farm.farmKey, createAt=farm.createAt))
+    return farm_list

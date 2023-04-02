@@ -371,3 +371,10 @@ class GraphOutput(BaseModel):
     day: List[Dict[str, Any]]
     week: List[Dict[str, Any]]
     month: List[Dict[str, Any]]
+
+
+class FarmInfo(BaseModel):
+    id: int
+    name: str
+    farmKey: str
+    createAt: datetime

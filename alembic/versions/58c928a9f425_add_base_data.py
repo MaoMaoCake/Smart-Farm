@@ -18,8 +18,18 @@ depends_on = None
 
 def upgrade() -> None:
     user_data = [
-        {'username': 'Pond1', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6', 'email': 'Pond1@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'ADMIN', 'verified': True},
-        {'username': 'Pond2', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6', 'email': 'Pond2@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'ADMIN', 'verified': True}
+        {'username': 'Pond1', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6', 'email': 'Pond1@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'USER', 'verified': True},
+        {'username': 'Pond2', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6', 'email': 'Pond2@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'USER', 'verified': True},
+        {'username': 'Pond3', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6',
+         'email': 'Pond3@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'USER', 'verified': True},
+        {'username': 'Pond4', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6',
+         'email': 'Pond4@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'USER', 'verified': True},
+        {'username': 'Pond5', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6',
+         'email': 'Pond5@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'USER', 'verified': True},
+        {'username': 'Pond6', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6',
+         'email': 'Pond6@example.com', 'role': 'USER', 'createBy': 'ADMIN', 'updateBy': 'USER', 'verified': True},
+        {'username': 'gunn', 'password': '$2a$12$6dhdabhOcPo2MjX3uNjPeeYzDfnvNLIdmeqYPaUK0/ICo.e/Doyc6',
+         'email': 'gunn123456@gmail.com', 'role': 'ADMIN', 'createBy': 'ADMIN', 'updateBy': 'ADMIN', 'verified': True},
     ]
     table = sa.Table('user', sa.MetaData(), autoload_with=op.get_bind())
     op.bulk_insert(table, user_data)
