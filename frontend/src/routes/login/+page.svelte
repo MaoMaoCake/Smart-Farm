@@ -27,7 +27,7 @@
       redirect: 'follow',
     };
 
-    fetch("/api/token", requestOptions)
+    fetch("http://127.0.0.1:8000/api/token", requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }
@@ -40,7 +40,11 @@
       localStorage.setItem('token', response.data.access_token);
       logged_in.set(true);
       is_register.set(false);
-      goto('/');
+      if (response.data.role === "USER" || response.data.role === "VIEWER"){
+          goto('/');
+      } else {
+          goto('/admin-portal/user-list');
+      }
     }
   }
 

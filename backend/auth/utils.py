@@ -105,9 +105,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, os.getenv("OAUTH_SECRET_KEY"), algorithms=[os.getenv("OAUTH_ALGORITHM")])
         username: str = payload.get("sub")
+        role: str = payload.get("role")
         if username is None:
             get_http_exception('10', "Could not validate credentials")
-        token_data = TokenData(username=username)
+        token_data = TokenData(username=username, role=role)
     except JWTError:
         get_http_exception('10', "Could not validate credentials")
     user = get_user(username=token_data.username)

@@ -971,3 +971,13 @@ def get_stats_from_mongo(farm_id: int):
         month=output_month
     )
     return output
+
+
+def get_all_user_from_db():
+    users = session.query(UserDb.id, UserDb.username, UserDb.createAt, UserDb.verified, UserDb.role, UserDb.email).all()
+
+    user_list = []
+
+    for user in users:
+        user_list.append(User(id=user.id, username=user.username, verified=user.verified, createAt=user.createAt, role=user.role.value, email=user.email))
+    return user_list

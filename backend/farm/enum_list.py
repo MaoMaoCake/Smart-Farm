@@ -26,3 +26,8 @@ class ChangesType(str, Enum):
     UPDATE = "UPDATE"
     CREATE = "CREATE"
     DELETE = "DELETE"
+
+class Role(Enum):
+    ADMIN = "ADMIN"
+    USER = "USER"
+    VIEWER = 'VIEWER'

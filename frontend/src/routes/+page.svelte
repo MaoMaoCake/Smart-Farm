@@ -4,6 +4,9 @@
     import {onMount} from "svelte";
     import {goto} from '$app/navigation'
     import {logged_in} from "$lib/SettingStores";
+    import {is_register} from "../lib/SettingStores";
+
+    is_register.set(false);
 
     onMount(() => {
         if (!$logged_in) {
@@ -29,7 +32,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-        "/api/list",
+        "http://127.0.0.1:8000/api/list",
         {
           method: 'GET',
           headers: myHeaders,

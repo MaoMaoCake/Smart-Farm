@@ -31,9 +31,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     access_token_expires = timedelta(minutes=float(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES')))
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username, "role": user.role}, expires_delta=access_token_expires
     )
-    return get_response_status(data=Token(access_token=access_token, token_type="bearer"))
+    return get_response_status(data=Token(access_token=access_token, token_type="bearer", role=user.role))
 
 @authRouter.post("/token_swagger", response_model=Token, tags=["Auth"])
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
