@@ -179,7 +179,7 @@ class MQTTMapDB(BaseModel):
     __tablename__ = "MQTTMap"
     hardwareType = Column(Enum(HardwareType), nullable=False)
     hardwareId = Column(Integer, nullable=False)
-    ESPId = Column(Integer, nullable=False)
+    ESPId = Column(Integer, ForeignKey('ESP.id'), nullable=False)
     ESPType = Column(Enum(ESPType), nullable=False)
 
 
@@ -188,3 +188,10 @@ class WaterControllerDB(BaseModel):
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     automation = Column(Boolean, nullable=False)
     isAvailable = Column(Boolean, nullable=False)
+
+
+class ESPsDB(BaseModel):
+    __tablename__ = "ESP"
+    isUsed = Column(Boolean, nullable=False)
+    isAvailable = Column(Boolean, nullable=False)
+

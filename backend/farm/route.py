@@ -15,7 +15,7 @@ from .utils import link_farm_to_user, list_farms,\
     update_light_strength, update_light_combination_strength,update_farm_name_to_db,\
     update_preset_name_to_db, update_light_name_to_db, update_AC_name_to_db,\
     dehumidifier_controlling, update_farm_setting_to_db, change_ac_temp, get_stats_graph,\
-    list_users, list_farms_by_admin
+    list_users, list_farms_by_admin, list_ESPs_by_admin
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
     FarmLightPreset, AC, LightStrength, CreateLightInput, \
@@ -259,3 +259,11 @@ async def get_all_farms(current_user: User = Depends(get_current_active_user)):
         get_http_exception('10')
 
     return list_farms_by_admin(current_user.username)
+
+
+@farmRouter.get("/admin/list/ESPs", response_model=ResponseDto, tags=["Admin"])
+async def get_all_ESPs(current_user: User = Depends(get_current_active_user)):
+    if current_user.role != Role.ADMIN.value:
+        get_http_exception('10')
+
+    return list_ESPs_by_admin(current_user.username)

@@ -66,7 +66,7 @@
       <Icon icon="material-symbols:person"/>User List</a>
     <a class="tab tab-bordered  tab-active">
       <Icon icon="mdi:farm-home"/>Farm list</a>
-    <a class="tab tab-bordered">
+    <a class="tab tab-bordered" href="/admin-portal/esp-list">
       <Icon icon="material-symbols:motion-sensor-active-sharp"/>ESP list</a>
   </div>
   <h1 class="text-3xl font-bold mb-4 mt-10 flex items-center">Farm List<Icon icon="mdi:farm-home"/></h1>

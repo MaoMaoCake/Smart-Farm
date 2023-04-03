@@ -20,11 +20,11 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmACAutomation, FarmLightPreset, Dehumidifier, CreateLightAutomationInput,\
     UpdateLightAutomationInput, CreateACAutomationInput, UpdateACAutomationInput, WaterController,\
     CreateWateringAutomationInput, UpdateWateringAutomationInput, FarmLightPresetUpdated,\
-    GraphOutput, FarmInfo
+    GraphOutput, FarmInfo, ESPInfo
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
-    ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB, WaterControllerDB
+    ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB, WaterControllerDB, ESPsDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
 
@@ -991,3 +991,13 @@ def get_all_farm_from_db():
     for farm in farms:
         farm_list.append(FarmInfo(id=farm.id, name=farm.name, farmKey=farm.farmKey, createAt=farm.createAt))
     return farm_list
+
+
+def get_all_esp_from_db():
+    esps = session.query(ESPsDB.id, ESPsDB.isUsed, ESPsDB.isAvailable, ESPsDB.createAt).all()
+
+    esp_list = []
+
+    for esp in esps:
+        esp_list.append(ESPInfo(id=esp.id, isUsed=esp.isUsed, isAvailable=esp.isAvailable, createAt=esp.createAt))
+    return esp_list

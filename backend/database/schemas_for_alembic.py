@@ -178,7 +178,7 @@ class MQTTMapDB(BaseModel):
     hardwareType = Column(Enum('LIGHT','AC','CO2_SENSOR','CO2_CONTROLLER','DEHUMIDIFIER','HUMIDITY_SENSOR',
                                           'TEMPERATURE_SENSOR','WATERING'), nullable=False)
     hardwareId = Column(Integer, nullable=False)
-    ESPId = Column(Integer, nullable=False)
+    ESPId = Column(Integer, ForeignKey('ESP.id'), nullable=False)
     ESPType = Column(Enum('SENSOR','CO2_CONTROLLER','LIGHT_CONTROLLER','AC_CONTROLLER',
                                      'DEHUMIDIFIER_CONTROLLER','WATERING_SYSTEM'), nullable=False)
 
@@ -187,4 +187,10 @@ class WaterControllerDB(BaseModel):
     __tablename__ = "waterController"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     automation = Column(Boolean, nullable=False)
+    isAvailable = Column(Boolean, nullable=False)
+
+
+class ESPsDB(BaseModel):
+    __tablename__ = "ESP"
+    isUsed = Column(Boolean, nullable=False)
     isAvailable = Column(Boolean, nullable=False)

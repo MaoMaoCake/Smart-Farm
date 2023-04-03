@@ -57,10 +57,10 @@
       <Icon icon="material-symbols:person"/>User List</a>
     <a class="tab tab-bordered" href="/admin-portal/farm-list">
       <Icon icon="mdi:farm-home"/>Farm list</a>
-    <a class="tab tab-bordered">
+    <a class="tab tab-bordered" href="/admin-portal/esp-list">
       <Icon icon="material-symbols:motion-sensor-active-sharp"/>ESP list</a>
   </div>
-  <h1 class="text-3xl font-bold mb-4 mt-10 flex items-center">User List  <Icon icon="material-symbols:person"/></h1>
+  <h1 class="text-3xl font-bold mb-4 mt-10 flex items-center">User List <Icon icon="material-symbols:person"/></h1>
   <div class="search-wrapper mb-4 flex items-center rounded-lg border border-gray-300 px-3 py-2">
   <Icon icon="bi:search" class="mr-2 text-gray-400"/>
   <input type="text" placeholder="Search Users..." on:input={handleSearch} class="w-full bg-transparent focus:outline-none "/>
@@ -83,7 +83,11 @@
             <td>{user.username}</td>
             <td>{user.email}</td>
             <td>{user.role}</td>
-            <td>{user.verified}</td>
+            {#if user.verified}
+              <td><p class="bg-green-900 rounded pl-6 pr-5 white w-20">{user.verified}</p></td>
+            {:else }
+              <td><p class="bg-red-900 rounded pl-6 pr-5 white w-20">{user.verified}</p></td>
+            {/if}
             <td>{user.createAt}</td>
             <td class="text-right">
               <a href={`users/${user.id}`} class="btn btn-primary">View Details</a>

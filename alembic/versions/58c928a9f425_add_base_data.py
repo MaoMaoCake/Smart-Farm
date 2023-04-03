@@ -315,9 +315,75 @@ def upgrade() -> None:
     table = sa.Table('MQTTMap', sa.MetaData(), autoload_with=op.get_bind())
     op.bulk_insert(table, MQTT_map_data)
 
+    ESP_data = [
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+    ]
+    table = sa.Table('ESP', sa.MetaData(), autoload_with=op.get_bind())
+    op.bulk_insert(table, ESP_data)
+
 
 def downgrade() -> None:
     op.execute("DELETE FROM MQTTMap")
+    op.execute("DELETE FROM ESP")
     op.execute("DELETE FROM AC")
     op.execute("DELETE FROM CO2Controller")
     op.execute("DELETE FROM CO2Sensor")

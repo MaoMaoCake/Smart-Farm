@@ -378,3 +378,10 @@ class FarmInfo(BaseModel):
     name: str
     farmKey: str
     createAt: datetime
+
+
+class ESPInfo(BaseModel):
+    id: int
+    isUsed: bool
+    isAvailable: bool
+    createAt: datetime
