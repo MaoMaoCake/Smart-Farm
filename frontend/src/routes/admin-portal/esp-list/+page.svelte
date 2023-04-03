@@ -12,6 +12,7 @@
     let pageSize = 5;
     let searchText = "";
     let filter = "all";
+    let sort = 'desc';
 
      $: filteredESPs = ESPs.filter((esp) => {
         if (!searchText) return true;
@@ -22,7 +23,13 @@
         if (filter === "all") return true;
         if (filter === "InUse") return esp.isUsed == true;
         if (filter === "NotInUse") return esp.isUsed == false;
-      });
+      }).sort((a, b) => {
+        if (sort === 'asc') {
+            return new Date(a.createAt) - new Date(b.createAt);
+        } else {
+            return new Date(b.createAt) - new Date(a.createAt);
+        }
+    });
 
     $: paginatedUsers = paginate({ items: filteredESPs, pageSize, currentPage });
     $: theme = localStorage.getItem("theme") === 'sf_light';
@@ -58,14 +65,37 @@
     filter = "all"
     }
 
-function showInUse() {
-  filter = "InUse"
-}
+    function showInUse() {
+      filter = "InUse"
+    }
 
-function showNotInUse() {
-  filter = "NotInUse"
-}
+    function showNotInUse() {
+      filter = "NotInUse"
+    }
 
+    function toggleSort() {
+      sort = sort === 'asc' ? 'desc' : 'asc';
+    }
+
+    function create_new_esp() {
+         fetch(
+            `http://127.0.0.1:8000/api/admin/create/esp`,
+          {
+            method: 'POST',
+            headers: myHeaders,
+            redirect: 'follow'
+          })
+        .then(async response => response_handler(await response.json()))
+        .catch(error => console.log('error', error));
+
+    function response_handler(response) {
+        if (!response.successful) {
+            alert(response.message);
+        } else if (response.successful) {
+            location.reload();
+        };
+    }
+    }
 
 </script>
 <h1 class="text-1xl font-bold mb-4 mt-10 flex justify-center">Admin Portal</h1>
@@ -78,7 +108,13 @@ function showNotInUse() {
     <a class="tab tab-bordered tab-active">
       <Icon icon="material-symbols:motion-sensor-active-sharp"/>ESP list</a>
   </div>
-  <h1 class="text-3xl font-bold mb-4 mt-10 flex items-center">ESP List <Icon icon="material-symbols:motion-sensor-active-sharp"/></h1>
+  <div class="mt-5  text-right">
+    <button on:click ={create_new_esp} class="btn btn-primary">
+      <Icon icon="material-symbols:motion-sensor-active-sharp"/>
+      Add New ESP
+    </button>
+  </div>
+  <h1 class="text-3xl font-bold mb-4 mt-5 flex items-center">ESP List <Icon icon="material-symbols:motion-sensor-active-sharp"/></h1>
   <div class="search-wrapper mb-4 flex items-center rounded-lg border border-gray-300 px-3 py-2">
   <Icon icon="bi:search" class="mr-2 text-gray-400"/>
   <input type="text" placeholder="Search ESPs..." on:input={handleSearch} class="w-full bg-transparent focus:outline-none "/>
@@ -89,13 +125,39 @@ function showNotInUse() {
       {:else if filter === "NotInUse"}
       <button class="bg-red-600 text-white font-bold py-2 px-4 rounded" style="white-space: nowrap;">Not In Use</button>
      {/if}
+
+    <button class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded ml-2" style="white-space: nowrap;">
+   {#if sort === 'asc'}
+     <span class="flex items-center">
+       Sort: Old to New
+       <Icon icon="material-symbols:arrow-circle-up-outline" class="w-5 h-5"/>
+     </span>
+    {:else }
+     <span class="flex items-center">
+       Sort: New to Old
+       <Icon icon="material-symbols:arrow-circle-down-outline" class="w-5 h-5"/>
+     </span>
+    {/if}
+</button>
 </div>
 
   <button on:click={showAll} class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded mr-4">All</button>
 <button on:click={showInUse} class="bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">In Use</button>
 <button on:click={showNotInUse} class="bg-red-600 text-white font-bold py-2 px-4 rounded mr-4">Not In Use</button>
-
-  <table class="table table-auto w-full">
+<button on:click={toggleSort} class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded mr-4">
+   {#if sort === 'asc'}
+     <span class="flex items-center">
+       Sort: Old to New
+       <Icon icon="material-symbols:arrow-circle-up-outline" class="w-5 h-5"/>
+     </span>
+    {:else }
+     <span class="flex items-center">
+       Sort: New to Old
+       <Icon icon="material-symbols:arrow-circle-down-outline" class="w-5 h-5"/>
+     </span>
+    {/if}
+</button>
+  <table class="table table-auto w-full  mt-5">
     <thead>
       <tr>
         <th>ESP ID</th>
@@ -123,7 +185,7 @@ function showNotInUse() {
           {/each}
       </tbody>
     </table>
-  {#if !ESPs?.length}
+  {#if !filteredESPs?.length}
     <div class="flex flex-col justify-center items-center p-10">
       <Icon icon="tabler:tools-off" class="w-52 h-52"/>
       <p class="mt-10 mb-10">No ESP found!</p>

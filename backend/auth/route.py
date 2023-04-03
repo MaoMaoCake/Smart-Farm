@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from .utils import create_access_token, get_current_active_user, validate_verification_url, verify_user, forget_password
 
 from .models import Token, User, RegisterInput, ForgetPasswordInput, PasswordChangingInput
-from .utils import authenticate_user, create_new_user, is_password_change, reset_password
+from .utils import authenticate_user, create_new_user, is_password_change, reset_password, create_admin, update_admin
 
 from database.enum_list import Role
 from response.response_dto import get_response_status, ResponseDto
@@ -90,3 +90,15 @@ async def get_is_password_changing(code: str):
 async def change_password(inputs: PasswordChangingInput = Depends()):
     reset_password(inputs.code, inputs.new_password)
     return get_response_status('Success')
+
+
+@authRouter.post("/admin/create/admin", response_model=ResponseDto, tags=["Admin"])
+async def create_admin_user(inputs: ForgetPasswordInput = Depends()):
+
+    return get_response_status(data=create_admin(inputs.email))
+
+
+@authRouter.post("/admin/update/admin", response_model=ResponseDto, tags=["Admin"])
+async def update_admin_user(form_data: RegisterInput = Depends()):
+
+    return get_response_status(data=update_admin(form_data.username, form_data.password, form_data.email))

@@ -1,7 +1,8 @@
 import requests
 import os
 import json
-from distutils.util import strtobool
+import random
+import string
 from datetime import time, datetime
 
 
@@ -25,7 +26,8 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     delete_watering_automation_in_db, create_watering_automation_in_db,\
     update_watering_automation_in_db, update_light_strength_to_all_light_in_preset,\
     delete_light_automation_in_db, check_preset_in_light_automation_db, update_water_controller,\
-    update_ac_temp_db, get_stats_from_mongo, get_all_user_from_db, get_all_farm_from_db, get_all_esp_from_db
+    update_ac_temp_db, get_stats_from_mongo, get_all_user_from_db, get_all_farm_from_db, get_all_esp_from_db, \
+    create_farm_to_db, create_esp_to_db
     
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
@@ -1207,3 +1209,27 @@ def list_ESPs_by_admin(username: str):
         get_http_exception('US404')
 
     return get_response_status(data=get_all_esp_from_db())
+
+def generate_random_key(length=10):
+    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+
+    return ''.join(random.choice(chars) for _ in range(length))
+
+def create_farm(username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    farm_amount = len(get_all_farm_from_db())+1
+
+    random_key = generate_random_key(20)
+
+    return get_response_status(data=create_farm_to_db(farm_amount, random_key))
+
+
+def create_esp(username: str):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_esp_to_db())

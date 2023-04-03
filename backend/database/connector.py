@@ -801,7 +801,8 @@ def update_ac_temp_db(farm_id: int, temperature: int) -> None:
 
 
 def verify_user_from_verification_code(verification_code: str) -> bool:
-    if not session.query(UserDb).filter(UserDb.verificationCode == verification_code):
+    user = session.query(UserDb).filter(UserDb.verificationCode == verification_code).first()
+    if not user:
         return False
 
     session.query(UserDb
@@ -812,7 +813,7 @@ def verify_user_from_verification_code(verification_code: str) -> bool:
 
     session.commit()
 
-    return  True
+    return user
 
 
 def update_forget_email_code(email: str, change_code: str) -> bool:
@@ -1001,3 +1002,50 @@ def get_all_esp_from_db():
     for esp in esps:
         esp_list.append(ESPInfo(id=esp.id, isUsed=esp.isUsed, isAvailable=esp.isAvailable, createAt=esp.createAt))
     return esp_list
+
+
+def create_farm_to_db(farm_amount: int, random_key: str):
+    new_farm = FarmDb(name=f"Farm {farm_amount}",
+                       maxHumidity=5,
+                       minCO2=1000,
+                       lightStatus=False,
+                       ACTemp=25,
+                       farmKey=random_key,
+                       createBy='ADMIN',
+                       updateBy='ADMIN'
+                       )
+    session.add(new_farm)
+    session.commit()
+
+    return 'Success'
+
+
+def create_esp_to_db():
+    new_esp = ESPsDB(isUsed=False,
+                       isAvailable=True,
+                       createBy='ADMIN',
+                       updateBy='ADMIN'
+                       )
+    session.add(new_esp)
+    session.commit()
+
+    return 'Success'
+
+
+def update_admin_info(
+        username: str,
+        password: str,
+        email: str,
+        verification_code: str):
+
+    session.query(UserDb
+                  ).filter(UserDb.email == email
+                           ).update({
+        "username": username,
+        "password": password,
+        "verificationCode": verification_code,
+        "updateBy": username
+    })
+    session.commit()
+
+    return get_user_from_db(username)
