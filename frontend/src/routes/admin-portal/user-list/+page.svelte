@@ -163,7 +163,7 @@
             <td>{user.createAt}</td>
             {#if user.role != 'ADMIN'}
              <td class="text-right">
-              <a href={`users/${user.id}`} class="btn btn-primary">View Details</a>
+              <a href={`/admin-portal/user/${user.id}?username=${user.username}`} class="btn btn-primary">View Details</a>
             </td>
             {/if}
           </tr>

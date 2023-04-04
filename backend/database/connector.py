@@ -1049,3 +1049,16 @@ def update_admin_info(
     session.commit()
 
     return get_user_from_db(username)
+
+
+def get_all_farm_from_user_id_from_db(user_id: int):
+    farm_owning = session.query(FarmOwnerDB.farmId).filter(FarmOwnerDB.userId == user_id).all()
+    farm_ids = [farm[0] for farm in farm_owning]
+
+    farms = session.query(FarmDb.id, FarmDb.name, FarmDb.farmKey, FarmDb.createAt).filter(FarmDb.id.in_(farm_ids)).all()
+
+    farm_list = []
+
+    for farm in farms:
+        farm_list.append(FarmInfo(id=farm.id, name=farm.name, farmKey=farm.farmKey, createAt=farm.createAt))
+    return farm_list
