@@ -27,7 +27,7 @@
       redirect: 'follow',
     };
 
-    fetch("http://127.0.0.1:8000/api/token", requestOptions)
+    fetch("/api/token", requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }

@@ -25,7 +25,7 @@
        bodyFormData.append('email', email);
 
            fetch(
-              `http://127.0.0.1:8000/api/admin/create/admin`,
+              `/api/admin/create/admin`,
             {
               method: 'POST',
               headers: myHeaders,

@@ -39,7 +39,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/api/admin/list/users`,
+            `/api/admin/list/users`,
           {
             method: 'GET',
             headers: myHeaders,

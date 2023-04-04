@@ -54,7 +54,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/api/admin/farm/${$page.params.farm_id}`,
+            `/api/admin/farm/${$page.params.farm_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -72,7 +72,7 @@
     }
 
     fetch(
-            `http://127.0.0.1:8000/api/admin/list/ESPs`,
+            `/api/admin/list/ESPs`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -105,7 +105,7 @@
       }
 
       fetch(
-              `http://127.0.0.1:8000/api/farm/${$page.params.farm_id}/light/create`,
+              `/api/farm/${$page.params.farm_id}/light/create`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -118,7 +118,7 @@
 
     function createAC() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/ac/${$page.params.farm_id}`,
+              `/api/admin/create/ac/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -138,7 +138,7 @@
 
     function createWatering() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/watering/${$page.params.farm_id}`,
+              `api/admin/create/watering/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -150,7 +150,7 @@
 
     function createCO2Controller() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/co2_controller/${$page.params.farm_id}`,
+              `/api/admin/create/co2_controller/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -162,7 +162,7 @@
 
     function createDehumidifier() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/dehumidifier/${$page.params.farm_id}`,
+              `/api/admin/create/dehumidifier/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -174,7 +174,7 @@
 
     function createTemperatureSensor() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/temperature_sensor/${$page.params.farm_id}`,
+              `/api/admin/create/temperature_sensor/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -186,7 +186,7 @@
 
     function createHumiditySensor() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/humidity_sensor/${$page.params.farm_id}`,
+              `/api/admin/create/humidity_sensor/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -198,7 +198,7 @@
 
     function createCO2Sensor() {
       fetch(
-              `http://127.0.0.1:8000/api/admin/create/co2_sensor/${$page.params.farm_id}`,
+              `/api/admin/create/co2_sensor/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -215,7 +215,7 @@
     function handleESPChange(original, selected, sensorType, sensorId) {
         if (original === 'Unselected'){
             fetch(
-              `http://127.0.0.1:8000/api/admin/create/ESPMap/${selected}/${sensorType}/${sensorId}`,
+              `/api/admin/create/ESPMap/${selected}/${sensorType}/${sensorId}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -225,7 +225,7 @@
           .catch(error => console.log('error', error));
         } else {
              fetch(
-              `http://127.0.0.1:8000/api/admin/update/ESPMap/${selected}/${sensorType}/${sensorId}`,
+              `/api/admin/update/ESPMap/${selected}/${sensorType}/${sensorId}`,
             {
               method: 'PATCH',
               headers: myHeaders,

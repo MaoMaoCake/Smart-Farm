@@ -39,7 +39,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/api/admin/list/ESPs`,
+            `/api/admin/list/ESPs`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -79,7 +79,7 @@
 
     function create_new_esp() {
          fetch(
-            `http://127.0.0.1:8000/api/admin/create/esp`,
+            `/api/admin/create/esp`,
           {
             method: 'POST',
             headers: myHeaders,

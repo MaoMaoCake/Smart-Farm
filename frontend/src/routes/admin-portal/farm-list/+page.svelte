@@ -39,7 +39,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `http://127.0.0.1:8000/api/admin/list/farms`,
+            `/api/admin/list/farms`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -73,7 +73,7 @@
 
     function create_new_farm() {
          fetch(
-            `http://127.0.0.1:8000/api/admin/create/farm`,
+            `/api/admin/create/farm`,
           {
             method: 'POST',
             headers: myHeaders,

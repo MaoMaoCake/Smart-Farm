@@ -18,7 +18,7 @@
   const myHeaders = new Headers();
       myHeaders.append("Origin", "");
 
-  fetch(`http://127.0.0.1:8000/api/users/verify/${$page.params.verification_code}`, {
+  fetch(`/api/users/verify/${$page.params.verification_code}`, {
             method: 'POST',
             headers: myHeaders,
             redirect: 'follow'
@@ -88,7 +88,7 @@
       redirect: 'follow',
     };
 
-    fetch("http://127.0.0.1:8000/api/admin/update/admin", requestOptions)
+    fetch("/api/admin/update/admin", requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }
