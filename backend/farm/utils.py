@@ -27,7 +27,10 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     update_watering_automation_in_db, update_light_strength_to_all_light_in_preset,\
     delete_light_automation_in_db, check_preset_in_light_automation_db, update_water_controller,\
     update_ac_temp_db, get_stats_from_mongo, get_all_user_from_db, get_all_farm_from_db, get_all_esp_from_db, \
-    create_farm_to_db, create_esp_to_db, get_all_farm_from_user_id_from_db
+    create_farm_to_db, create_esp_to_db, get_all_farm_from_user_id_from_db, get_all_sensors_from_farm_id_from_db,\
+    create_default_ac_to_db, create_default_watering_to_db, create_default_co2_controller_to_db,\
+    create_default_dehumidifier_to_db, create_default_co2_sensor_to_db, create_default_humidity_sensor_to_db,\
+    create_default_temperature_sensor_to_db, create_esp_map_to_db, update_esp_map_to_db
     
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
@@ -93,9 +96,6 @@ def create_new_light(farm_id: int, create_light_input: CreateLightInput, usernam
         get_http_exception('US404')
 
     check_farm_exist(farm_id)
-
-    if not check_farm_owning(user.id, farm_id):
-        get_http_exception('10')
 
     return get_response_status(data=create_light(farm_id, create_light_input, username))
 
@@ -842,6 +842,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
 
     if update_farm_input.LightAutomations:
         delete_inputs = []
+        delete_inputs = []
         update_inputs = []
         create_inputs = []
         no_changes_inputs = []
@@ -1242,3 +1243,82 @@ def list_farms_from_user_id_by_admin(username: str, user_id: int):
 
     return get_response_status(data=get_all_farm_from_user_id_from_db(user_id))
 
+
+def list_sensors_from_farm_id_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=get_all_sensors_from_farm_id_from_db(farm_id))
+
+
+def create_new_ac_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_ac_to_db(farm_id, username))
+
+
+def create_new_watering_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_watering_to_db(farm_id, username))
+
+
+def create_new_co2_controller_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_co2_controller_to_db(farm_id, username))
+
+
+def create_new_dehumidifier_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_dehumidifier_to_db(farm_id, username))
+
+
+def create_new_temperature_sensor_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_temperature_sensor_to_db(farm_id, username))
+
+
+def create_new_humidity_sensor_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_humidity_sensor_to_db(farm_id, username))
+
+
+def create_new_co2_sensor_by_admin(username: str, farm_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_default_co2_sensor_to_db(farm_id, username))
+
+
+def create_new_esp_map_by_admin(username: str, esp_id: int, sensor_type: str, sensor_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=create_esp_map_to_db(esp_id, sensor_type, sensor_id, username))
+
+
+def update_esp_map_by_admin(username: str, esp_id: int, sensor_type: str, sensor_id: int):
+    user = get_user_from_db(username)
+    if not user:
+        get_http_exception('US404')
+
+    return get_response_status(data=update_esp_map_to_db(esp_id, sensor_type, sensor_id, username))

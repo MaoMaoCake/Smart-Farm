@@ -171,7 +171,7 @@
             </td>
             <td>{farm.createAt}</td>
             <td class="text-right">
-              <a href={`users/${farm.id}`} class="btn btn-primary">View Details</a>
+              <a href={`/admin-portal/farm/${farm.id}?farm_name=${farm.name}`} class="btn btn-primary">View Details</a>
             </td>
           </tr>
           {/each}

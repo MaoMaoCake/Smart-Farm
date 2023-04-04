@@ -149,7 +149,6 @@ class Dehumidifier(BaseModel):
     DehumidifierIsAvailable: str
 
 
-
 class CreateLightInput(BaseModel):
     name: Optional[str]
     automation: Optional[bool]
@@ -385,3 +384,14 @@ class ESPInfo(BaseModel):
     isUsed: bool
     isAvailable: bool
     createAt: datetime
+
+
+class CO2Controller(BaseModel):
+    CO2ControllerId: int
+    CO2ControllerIsAvailable: bool
+
+
+class SensorInfo(BaseModel):
+    sensorType: str
+    sensorId: int
+    espId: int | str
