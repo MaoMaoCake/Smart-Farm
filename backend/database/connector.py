@@ -20,13 +20,15 @@ from farm.models import FarmOwner, FarmStats, Light, LightCombination, \
     FarmACAutomation, FarmLightPreset, Dehumidifier, CreateLightAutomationInput,\
     UpdateLightAutomationInput, CreateACAutomationInput, UpdateACAutomationInput, WaterController,\
     CreateWateringAutomationInput, UpdateWateringAutomationInput, FarmLightPresetUpdated,\
-    GraphOutput
+    GraphOutput, FarmInfo, ESPInfo, CO2Controller, SensorInfo
 from .schemas import UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
     CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, \
-    ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB, WaterControllerDB
+    ACAutomationDB, WateringAutomationDB, LightAutomationDB, MQTTMapDB, WaterControllerDB, ESPsDB
 from response.error_codes import get_http_exception
 from response.response_dto import ResponseDto, get_response_status
+
+from .enum_list import HardwareType
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -649,6 +651,12 @@ def list_humidity_sensors_id(farm_id: int) -> list[int]:
     return [humidity_sensor.id for humidity_sensor in humidity_sensors]
 
 
+def list_temperature_sensors_id(farm_id: int) -> list[int]:
+    temperature_sensors = session.query(TemperatureSensorDB).filter(TemperatureSensorDB.farmId == farm_id).all()
+
+    return [temperature_sensor.id for temperature_sensor in temperature_sensors]
+
+
 def delete_light_automation_in_db(automation_id: int) -> None:
     try:
         session.query(LightAutomationDB).filter(
@@ -735,6 +743,9 @@ def update_ac_automation_in_db(update_automation_input: UpdateACAutomationInput)
 def get_water_controller(farm_id: int) -> WaterController:
     water_controller = session.query(WaterControllerDB).filter(WaterControllerDB.farmId == farm_id).first()
 
+    if not(water_controller):
+        return None
+
     return WaterController(
         waterControllerId=water_controller.id,
         automation=water_controller.automation
@@ -801,7 +812,8 @@ def update_ac_temp_db(farm_id: int, temperature: int) -> None:
 
 
 def verify_user_from_verification_code(verification_code: str) -> bool:
-    if not session.query(UserDb).filter(UserDb.verificationCode == verification_code):
+    user = session.query(UserDb).filter(UserDb.verificationCode == verification_code).first()
+    if not user:
         return False
 
     session.query(UserDb
@@ -812,7 +824,7 @@ def verify_user_from_verification_code(verification_code: str) -> bool:
 
     session.commit()
 
-    return  True
+    return user
 
 
 def update_forget_email_code(email: str, change_code: str) -> bool:
@@ -971,3 +983,347 @@ def get_stats_from_mongo(farm_id: int):
         month=output_month
     )
     return output
+
+
+def get_all_user_from_db():
+    users = session.query(UserDb.id, UserDb.username, UserDb.createAt, UserDb.verified, UserDb.role, UserDb.email).all()
+
+    user_list = []
+
+    for user in users:
+        user_list.append(User(id=user.id, username=user.username, verified=user.verified, createAt=user.createAt, role=user.role.value, email=user.email))
+    return user_list
+
+
+def get_all_farm_from_db():
+    farms = session.query(FarmDb.id, FarmDb.name, FarmDb.farmKey, FarmDb.createAt).all()
+
+    farm_list = []
+
+    for farm in farms:
+        farm_list.append(FarmInfo(id=farm.id, name=farm.name, farmKey=farm.farmKey, createAt=farm.createAt))
+    return farm_list
+
+
+def get_all_esp_from_db():
+    esps = session.query(ESPsDB.id, ESPsDB.isUsed, ESPsDB.isAvailable, ESPsDB.createAt).all()
+
+    esp_list = []
+
+    for esp in esps:
+        esp_list.append(ESPInfo(id=esp.id, isUsed=esp.isUsed, isAvailable=esp.isAvailable, createAt=esp.createAt))
+    return esp_list
+
+
+def create_farm_to_db(farm_amount: int, random_key: str):
+    new_farm = FarmDb(name=f"Farm {farm_amount}",
+                       maxHumidity=5,
+                       minCO2=1000,
+                       lightStatus=False,
+                       ACTemp=25,
+                       farmKey=random_key,
+                       createBy='ADMIN',
+                       updateBy='ADMIN'
+                       )
+    session.add(new_farm)
+    session.commit()
+
+    return 'Success'
+
+
+def create_esp_to_db():
+    new_esp = ESPsDB(isUsed=False,
+                       isAvailable=True,
+                       createBy='ADMIN',
+                       updateBy='ADMIN'
+                       )
+    session.add(new_esp)
+    session.commit()
+
+    return 'Success'
+
+
+def update_admin_info(
+        username: str,
+        password: str,
+        email: str,
+        verification_code: str):
+
+    session.query(UserDb
+                  ).filter(UserDb.email == email
+                           ).update({
+        "username": username,
+        "password": password,
+        "verificationCode": verification_code,
+        "updateBy": username
+    })
+    session.commit()
+
+    return get_user_from_db(username)
+
+
+def get_all_farm_from_user_id_from_db(user_id: int):
+    farm_owning = session.query(FarmOwnerDB.farmId).filter(FarmOwnerDB.userId == user_id).all()
+    farm_ids = [farm[0] for farm in farm_owning]
+
+    farms = session.query(FarmDb.id, FarmDb.name, FarmDb.farmKey, FarmDb.createAt).filter(FarmDb.id.in_(farm_ids)).all()
+
+    farm_list = []
+
+    for farm in farms:
+        farm_list.append(FarmInfo(id=farm.id, name=farm.name, farmKey=farm.farmKey, createAt=farm.createAt))
+    return farm_list
+
+
+def get_co2_controller_from_db(farm_id: int) :
+    co2Controllers = session.query(CO2ControllerDB).filter(CO2ControllerDB.farmId == farm_id).all()
+
+    return [CO2Controller(
+        CO2ControllerId=co2Controller.id,
+        CO2ControllerIsAvailable=co2Controller.isAvailable
+    ) for co2Controller in co2Controllers]
+
+
+def create_default_ac_to_db(farm_id: int, username: str) :
+    acs = get_acs_from_db(farm_id)
+    ac_amount = len(acs)
+    try:
+        new_ac = ACDB(farmId=farm_id,
+                            name=f'AC {ac_amount+1}',
+                            status=False,
+                            isAvailable=True,
+                            automation=True,
+                            temperature=acs[0].ACTemperature  if (ac_amount > 0) else 25,
+                            fanLevel=5,
+                            createBy=username,
+                            updateBy=username
+                            )
+        session.add(new_ac)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_default_watering_to_db(farm_id: int, username: str) :
+    water_controller = get_water_controller(farm_id)
+    if (water_controller):
+        get_http_exception(error_code='06', message='Water controller is at maximum amount')
+    try:
+        new_ac = WaterControllerDB(farmId=farm_id,
+                            isAvailable=True,
+                            automation=True,
+                            createBy=username,
+                            updateBy=username
+                            )
+        session.add(new_ac)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_default_co2_controller_to_db(farm_id: int, username: str) :
+    co2_controller = get_co2_controller_from_db(farm_id)
+    if (co2_controller):
+        get_http_exception(error_code='06', message='CO2 controller is at maximum amount')
+    try:
+        new_co2_controller = CO2ControllerDB(farmId=farm_id,
+                            isAvailable=True,
+                            status=False,
+                            createBy=username,
+                            updateBy=username
+                            )
+        session.add(new_co2_controller)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_default_dehumidifier_to_db(farm_id: int, username: str):
+    try:
+        new_dehumidifier = DehumidifierDB(farmId=farm_id,
+                                             isAvailable=True,
+                                             status=False,
+                                             createBy=username,
+                                             updateBy=username
+                                             )
+        session.add(new_dehumidifier)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_default_temperature_sensor_to_db(farm_id: int, username: str):
+    try:
+        new_temperature_sensor = TemperatureSensorDB(farmId=farm_id,
+                                         temperature=0,
+                                         createBy=username,
+                                         updateBy=username
+                                         )
+        session.add(new_temperature_sensor)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_default_humidity_sensor_to_db(farm_id: int, username: str):
+    try:
+        new_humidity_sensor = HumiditySensorDB(farmId=farm_id,
+                                         humidity=0,
+                                         createBy=username,
+                                         updateBy=username
+                                         )
+        session.add(new_humidity_sensor)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_default_co2_sensor_to_db(farm_id: int, username: str):
+    try:
+        new_co2_sensor = CO2SensorDB(farmId=farm_id,
+                                         CO2=1000,
+                                         createBy=username,
+                                         updateBy=username
+                                         )
+        session.add(new_co2_sensor)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def create_esp_map_to_db(esp_id: int, sensor_type: str, sensor_id: int, username: str):
+    hardwareType = ""
+    match sensor_type:
+        case "CO2_SENSOR" | "HUMIDITY_SENSOR" | "TEMPERATURE_SENSOR":
+            hardwareType = "SENSOR"
+        case "WATERING":
+            hardwareType = "WATERING_SYSTEM"
+        case "LIGHT":
+            hardwareType = "LIGHT_CONTROLLER"
+        case "AC":
+            hardwareType = "AC_CONTROLLER"
+        case "CO2_CONTROLLER":
+            hardwareType = "CO2_CONTROLLER"
+        case "DEHUMIDIFIER":
+            hardwareType = "DEHUMIDIFIER_CONTROLLER"
+
+    try:
+        new_mqtt_map = MQTTMapDB(hardwareType=sensor_type,
+                                    hardwareId=sensor_id,
+                                    ESPId=esp_id,
+                                    ESPType=hardwareType,
+                                    createBy=username,
+                                    updateBy=username
+                                     )
+        session.add(new_mqtt_map)
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        get_http_exception(error_code='03', message=f'Database error: {e}')
+
+
+def update_esp_map_to_db(esp_id: int, sensor_type: str, sensor_id: int, username: str):
+    session.query(MQTTMapDB
+                  ).filter(MQTTMapDB.hardwareId == sensor_id and
+                           MQTTMapDB.hardwareType == sensor_type
+                  ).update({
+        "ESPId": esp_id,
+        "updateBy": username
+    })
+    session.commit()
+
+
+def get_all_sensors_from_farm_id_from_db(farm_id: int):
+    ESP_mapping = get_esp_map()
+
+    lights = get_lights_from_db(farm_id)
+    acs = get_acs_from_db(farm_id)
+    water_controller = get_water_controller(farm_id)
+    humidity_sensor_ids = list_humidity_sensors_id(farm_id)
+    co2_sensor_ids = list_co2_sensors_id(farm_id)
+    temperature_sensor_ids = list_temperature_sensors_id(farm_id)
+    dehumidifiers = get_dehumidifier_from_db(farm_id)
+    co2_controllers = get_co2_controller_from_db(farm_id)
+
+    esp_list = []
+
+    for light in lights:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.LIGHT.value, sensorId=light.lightId,
+                                       espId=ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]))
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.LIGHT.value, sensorId=light.lightId,
+                                       espId="Unselected"))
+
+    for ac in acs:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.AC.value, sensorId=ac.ACId,
+                                       espId=ESP_mapping[f"{HardwareType.AC.value}{ac.ACId}"]))
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.AC.value, sensorId=ac.ACId,
+                                       espId="Unselected"))
+
+    if water_controller:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.WATERING.value, sensorId=water_controller.waterControllerId,
+                                       espId=ESP_mapping[
+                                           f"{HardwareType.WATERING.value}{water_controller.waterControllerId}"]))
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.WATERING.value, sensorId=water_controller.waterControllerId,
+                                       espId="Unselected"))
+
+    for humidity_sensor_id in humidity_sensor_ids:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.HUMIDITY_SENSOR.value, sensorId=humidity_sensor_id,
+                                       espId=ESP_mapping[f"{HardwareType.HUMIDITY_SENSOR.value}{humidity_sensor_id}"]))
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.HUMIDITY_SENSOR.value, sensorId=humidity_sensor_id,
+                                       espId="Unselected"))
+
+    for co2_sensor_id in co2_sensor_ids:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.CO2_SENSOR.value, sensorId=co2_sensor_id,
+                                       espId=ESP_mapping[f"{HardwareType.CO2_SENSOR.value}{co2_sensor_id}"]))
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.CO2_SENSOR.value, sensorId=co2_sensor_id,
+                                       espId="Unselected"))
+
+    for temperature_sensor_id in temperature_sensor_ids:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.TEMPERATURE_SENSOR.value, sensorId=temperature_sensor_id,
+                                       espId=ESP_mapping[
+                                           f"{HardwareType.TEMPERATURE_SENSOR.value}{temperature_sensor_id}"]))
+
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.TEMPERATURE_SENSOR.value, sensorId=temperature_sensor_id,
+                                       espId="Unselected"))
+
+    for co2_controller in co2_controllers:
+        try:
+            esp_list.append(
+                SensorInfo(sensorType=HardwareType.CO2_CONTROLLER.value, sensorId=co2_controller.CO2ControllerId,
+                           espId=ESP_mapping[f"{HardwareType.CO2_CONTROLLER.value}{co2_controller.CO2ControllerId}"]))
+        except KeyError:
+            esp_list.append(
+                SensorInfo(sensorType=HardwareType.CO2_CONTROLLER.value, sensorId=co2_controller.CO2ControllerId,
+                           espId="Unselected"))
+
+
+    for dehumidifier in dehumidifiers:
+        try:
+            esp_list.append(SensorInfo(sensorType=HardwareType.DEHUMIDIFIER.value, sensorId=dehumidifier.DehumidifierId,
+                                       espId=ESP_mapping[
+                                           f"{HardwareType.DEHUMIDIFIER.value}{dehumidifier.DehumidifierId}"]))
+
+        except KeyError:
+            esp_list.append(SensorInfo(sensorType=HardwareType.DEHUMIDIFIER.value, sensorId=dehumidifier.DehumidifierId,
+                                       espId="Unselected"))
+
+    return esp_list

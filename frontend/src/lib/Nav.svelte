@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte'
-    import {logged_in, is_register, is_verify} from "./SettingStores";
+    import {logged_in, is_register, is_verify, is_admin} from "./SettingStores";
     import { themeChange } from 'theme-change'
     import {goto} from '$app/navigation'
     let checked = localStorage.getItem("theme") === 'sf_light'
@@ -19,7 +19,7 @@
 </div>
 <div class="navbar bg-primary h-16 fixed top-0 left-0 right-0"  style="z-index: 999;">
     <div class="flex-1">
-      {#if !$is_verify}
+      {#if !$is_verify && !$is_admin}
         <a class="m-5 font-bold white" href="/">AUTO FARM</a>
         {:else }
         <a class="m-5 font-bold white" >AUTO FARM</a>

@@ -1,16 +1,19 @@
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.param_functions import Form
+from datetime import datetime
 
 from database.enum_list import Role
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: Optional[str]
 
 
 class TokenData(BaseModel):
     username: str | None = None
+    role: str | None = None
 
 
 class User(BaseModel):
@@ -19,6 +22,8 @@ class User(BaseModel):
     password: Optional[str]
     role: str  # Admin User Guest
     verified: Optional[bool]
+    createAt: Optional[datetime]
+    email: Optional[str]
 
     class Config:
         orm_mode = True

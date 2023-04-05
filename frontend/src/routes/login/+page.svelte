@@ -40,7 +40,11 @@
       localStorage.setItem('token', response.data.access_token);
       logged_in.set(true);
       is_register.set(false);
-      goto('/');
+      if (response.data.role === "USER" || response.data.role === "VIEWER"){
+          goto('/');
+      } else {
+          goto('/admin-portal/user-list');
+      }
     }
   }
 

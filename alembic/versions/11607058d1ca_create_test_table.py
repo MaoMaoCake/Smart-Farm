@@ -280,6 +280,21 @@ def upgrade():
 
     )
     op.create_table(
+        'ESP',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('customData', sa.JSON, nullable=True),
+        sa.Column('createAt', sa.DateTime, nullable=False, server_default=sa.func.now()),
+        sa.Column('updateAt', sa.DateTime, nullable=False, server_default=sa.func.now(),
+                  server_onupdate=sa.func.now()),
+        sa.Column('deleteAt', sa.DateTime, nullable=True),
+        sa.Column('createBy', sa.VARCHAR(45), nullable=False),
+        sa.Column('updateBy', sa.VARCHAR(45), nullable=False),
+        sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
+
+        sa.Column('isUsed', sa.Boolean, nullable=False),
+        sa.Column('isAvailable', sa.Boolean, nullable=False)
+    )
+    op.create_table(
         'MQTTMap',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('customData', sa.JSON, nullable=True),
@@ -294,7 +309,7 @@ def upgrade():
         sa.Column('hardwareType', sa.Enum('LIGHT','AC','CO2_SENSOR','CO2_CONTROLLER','DEHUMIDIFIER','HUMIDITY_SENSOR',
                                           'TEMPERATURE_SENSOR','WATERING'), nullable=False),
         sa.Column('hardwareId', sa.Integer, nullable=False),
-        sa.Column('ESPId', sa.Integer, nullable=False),
+        sa.Column('ESPId', sa.Integer, sa.ForeignKey('ESP.id'), nullable=False),
         sa.Column('ESPType', sa.Enum('SENSOR','CO2_CONTROLLER','LIGHT_CONTROLLER','AC_CONTROLLER',
                                      'DEHUMIDIFIER_CONTROLLER','WATERING_SYSTEM'), nullable=False)
 
@@ -320,6 +335,7 @@ def upgrade():
 def downgrade():
     op.drop_table('waterController')
     op.drop_table('MQTTMap')
+    op.drop_table('ESP')
     op.drop_table('lightPresetAutomation')
     op.drop_table('lightCombination')
     op.drop_table('farmLightPreset')
