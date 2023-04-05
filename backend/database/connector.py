@@ -59,7 +59,7 @@ def create_user(username: str, password_hashed: str, email: str, role: str, crea
 
 def get_user_from_db(username: str) -> User | None:
     user = session.query(UserDb.id, UserDb.username, UserDb.role, UserDb.password, UserDb.verified).filter(
-        UserDb.username == username).first()
+        UserDb.username == username or UserDb.email == username).first()
 
     return User(id=user.id, username=user.username, password=user.password, role=str(user.role.value), verified=user.verified) if user else None
 
