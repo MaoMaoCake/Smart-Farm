@@ -70,7 +70,7 @@
         <p class="font-bold text-center text-3xl">Login</p>
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Username</span>
+            <span class="label-text">Username or Email</span>
           </label>
           <input type="text" placeholder="username" class="input input-bordered" bind:value={username}/>
         </div>
