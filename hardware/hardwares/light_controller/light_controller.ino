@@ -8,12 +8,12 @@ DynamicJsonDocument doc(1024);
 // Update these with values suitable for your network.
 const char* ssid = "PD_LAPTOP";
 const char* password = "012345679";
-const char* mqtt_server = "192.168.137.1";
+const char* mqtt_server = "10.100.7.206";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
 #define MQTT_SERIAL_PUBLISH_CH "python/mqtt"
-#define MQTT_SERIAL_RECEIVER_CH "5"
+#define MQTT_SERIAL_RECEIVER_CH "8"
 
 WiFiClient wifiClient;
 

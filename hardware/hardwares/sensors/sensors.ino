@@ -54,14 +54,14 @@ int send_time_interval = 10;
 // Update these with values suitable for your network.
 const char* ssid = "PD_LAPTOP";
 const char* password = "012345679";
-const char* mqtt_server = "10.100.12.85";
+const char* mqtt_server = "10.100.7.206";
 int minCO2 = 0;
 int maxHumidity = 0;
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
 #define MQTT_SERIAL_PUBLISH_CH "python/mqtt"
-#define MQTT_SERIAL_RECEIVER_CH "1"
+#define MQTT_SERIAL_RECEIVER_CH "2"
 
 WiFiClient wifiClient;
 
@@ -174,22 +174,22 @@ int  MGGetPercentage(float volts, float *pcurve)
 
 void turnOnCo2(){
   String co2Request = F("{\"action\": \"turn_on/co2\"}");
-  publishSerialData(co2Request)
+  publishSerialData(co2Request);
 }
 
 void turnOffCo2(){
   String co2Request = F("{\"action\": \"turn_off/co2\"}");
-  publishSerialData(co2Request)
+  publishSerialData(co2Request);
 }
 
 void turnOnDehumidifier(){
-  String co2Request = F("{\"action\": \"turn_on/dehumidifier\"}");
-  publishSerialData(co2Request)
+  String dehumidifierRequest = F("{\"action\": \"turn_on/dehumidifier\"}");
+  publishSerialData(dehumidifierRequest);
 }
 
 void turnOffDehumidifier(){
-  String co2Request = F("{\"action\": \"turn_off/dehumidifier\"}");
-  publishSerialData(co2Request)
+  String dehumidifierRequest = F("{\"action\": \"turn_off/dehumidifier\"}");
+  publishSerialData(dehumidifierRequest);
 }
 
 String collectAllSensorData() {
@@ -231,14 +231,20 @@ String collectAllSensorData() {
   if (minCO2 > 0){
     if (int(percentage) > minCO2){
       Serial.print("CO2 is over limit");
+      turnOnCo2();
       Serial.println(minCO2);
+    } else {
+      turnOffCo2();
     }
   }
 
   if (maxHumidity > 0){
     if (int(humidity) > maxHumidity){
-      Serial.print("CO2 is over limit");
+      Serial.print("Humidity is over limit");
+      turnOnDehumidifier();
       Serial.println(maxHumidity);
+    } else {
+      turnOffDehumidifier();
     }
   }
     
