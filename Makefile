@@ -25,7 +25,10 @@ build-backend-no-cache:
 build-backend-worker-no-cache:
 	docker build --no-cache --network=host -t registry.gitlab.com/maomaocake/smart-farm/backend-worker $(mkfile_dir)/backend-worker
 
-build-docker:build-frontend-no-cache build-backend-no-cache build-backend-worker-no-cache
+build-mqtt-bridge:
+	docker build --no-cache --network=host -t registry.gitlab.com/maomaocake/smart-farm/mqtt-bridge $(mkfile_dir)/mqtt-bridge
+
+build-docker:build-frontend-no-cache build-backend-no-cache build-backend-worker-no-cache build-mqtt-bridge
 
 
 # Docker Commands
@@ -33,6 +36,7 @@ push-dockers:
 	docker push registry.gitlab.com/maomaocake/smart-farm/frontend:latest
 	docker push registry.gitlab.com/maomaocake/smart-farm/backend:latest
 	docker push registry.gitlab.com/maomaocake/smart-farm/backend-worker:latest
+	docker push registry.gitlab.com/maomaocake/smart-farm/mqtt-bridge:latest
 
 
 run-frontend:
