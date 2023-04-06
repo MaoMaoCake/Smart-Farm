@@ -11,7 +11,7 @@ services:
       - 9001:9001
 
   mqtt-bridge:
-    image: rsteckler/docker-http-mqtt-bridge:v1
+    image: registry.gitlab.com/maomaocake/smart-farm/mqtt-bridge:latest
     ports:
       - 5000:5000
     env_file:
@@ -87,15 +87,17 @@ services:
     depends_on:
       - mqtt-bridge
       - database
-  #
-  #  mqtt2db:
-#    container_name: mqtt2db
-#    image: registry.gitlab.com/maomaocake/smart-farm/mqtt2db:latest
-#    restart: unless-stopped
+
+  mqtt2db:
+    container_name: mqtt2db
+    image: registry.gitlab.com/maomaocake/smart-farm/mqtt2db:latest
+    restart: unless-stopped
+    env_file:
+      - backend.env
 #    labels:
 #      - 'traefik.enable=true'
 #      - 'traefik.http.routers.backend.entrypoints=http'
-  cartdb:
+  mongodb:
     image: mongo:4.4 # need to specify the version to prevent code corruption
     environment: # variable of the server or OS
       MONGO_INITDB_ROOT_USERNAME: touch
@@ -115,8 +117,5 @@ services:
       - "3306:3306"
     volumes:
       - smart-farm-db:/var/lib/mysql
-#  mongo:
-#    container_name: mongo_db
-#    image: mongo:latest
 volumes:
   smart-farm-db:
