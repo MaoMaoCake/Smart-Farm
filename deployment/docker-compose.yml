@@ -95,6 +95,13 @@ services:
 #    labels:
 #      - 'traefik.enable=true'
 #      - 'traefik.http.routers.backend.entrypoints=http'
+  cartdb:
+    image: mongo:4.4 # need to specify the version to prevent code corruption
+    environment: # variable of the server or OS
+      MONGO_INITDB_ROOT_USERNAME: touch
+      MONGO_INITDB_ROOT_PASSWORD: touchja
+    ports:
+      - "27017:27017"
 
   database:
     container_name: db
