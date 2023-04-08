@@ -37,6 +37,9 @@ services:
     depends_on:
       - frontend
       - backend
+    links:
+      - database:db
+      - mqtt-bridge:bridge
 
   frontend:
     container_name: frontend
@@ -93,12 +96,13 @@ services:
     image: registry.gitlab.com/maomaocake/smart-farm/mqtt2db:latest
     restart: unless-stopped
     env_file:
-      - backend.env
-#    labels:
-#      - 'traefik.enable=true'
-#      - 'traefik.http.routers.backend.entrypoints=http'
+      - mqtt2db.env
+    depends_on:
+      - mqtt-broker
+      - mongodb
+
   mongodb:
-    image: mongo:4.4 # need to specify the version to prevent code corruption
+    image: mongo:4.2.1 # need to specify the version to prevent code corruption
     environment: # variable of the server or OS
       MONGO_INITDB_ROOT_USERNAME: touch
       MONGO_INITDB_ROOT_PASSWORD: touchja
