@@ -34,7 +34,7 @@
   myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
    fetch(
-          `api/farm/${$page.params.farm_id}/stats`,
+          `/api/farm/${$page.params.farm_id}/stats`,
         {
           method: 'GET',
           headers: myHeaders,
