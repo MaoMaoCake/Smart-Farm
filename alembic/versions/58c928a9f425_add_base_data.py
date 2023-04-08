@@ -35,7 +35,8 @@ def upgrade() -> None:
     op.bulk_insert(table, user_data)
 
     farm_data = [
-        {'name': 'Pond1\'s Farm',
+        {'id': 1,
+         'name': 'Pond1\'s Farm',
          'maxHumidity': 3,
          'minCO2': 1000,
          'lightStatus': False,
@@ -184,6 +185,71 @@ def upgrade() -> None:
     table = sa.Table('waterController', sa.MetaData(), autoload_with=op.get_bind())
     op.bulk_insert(table, water_controller_data)
 
+    ESP_data = [
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'isUsed': True,
+         'isAvailable': True,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+    ]
+    table = sa.Table('ESP', sa.MetaData(), autoload_with=op.get_bind())
+    op.bulk_insert(table, ESP_data)
+
     MQTT_map_data = [
         {'hardwareType': 'HUMIDITY_SENSOR',
          'hardwareId': 1,
@@ -315,71 +381,6 @@ def upgrade() -> None:
     table = sa.Table('MQTTMap', sa.MetaData(), autoload_with=op.get_bind())
     op.bulk_insert(table, MQTT_map_data)
 
-    ESP_data = [
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-        {'isUsed': True,
-         'isAvailable': True,
-         'createBy': 'ADMIN',
-         'updateBy': 'ADMIN'},
-    ]
-    table = sa.Table('ESP', sa.MetaData(), autoload_with=op.get_bind())
-    op.bulk_insert(table, ESP_data)
-
 
 def downgrade() -> None:
     op.execute("DELETE FROM MQTTMap")
@@ -394,5 +395,4 @@ def downgrade() -> None:
     op.execute("DELETE FROM waterController")
     op.execute("DELETE FROM user")
     op.execute("DELETE FROM farm")
-
 
