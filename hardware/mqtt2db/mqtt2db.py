@@ -1,4 +1,5 @@
 
+import os
 import random
 
 from models import UpdateLightStrengthInput,UpdateAllSensorInput
@@ -18,16 +19,16 @@ from database.enum_list import System
 from dotenv import load_dotenv
 load_dotenv('mqtt2db.env')
 
-broker = '10.100.12.85'
-port = 1883
-topic = "python/mqtt"
+broker = f"{os.getenv('MQTT_SERVER')}"
+port = int(os.getenv('MQTT_PORT'))
+topic = f"{os.getenv('MQTT_TOPIC')}"
 client_id = f'python-mqtt-{random.randint(0, 100)}'
-username = 'admin'
-password = 'password'
-myclient = pymongo.MongoClient('mongodb://touch:touchja@localhost:27017/?authMechanism=DEFAULT') 
+username = f"{os.getenv('MQTT_USERNAME')}"
+password = f"{os.getenv('MQTT_PASSWORD')}"
+myclient = pymongo.MongoClient("mongodb://"f"{os.getenv('MONGO_USERNAME')}"":"f"{os.getenv('MONGO_PASSWORD')}""@"f"{os.getenv('MONGO_SERVER')}"":"f"{os.getenv('MONGO_PORT')}""/?authMechanism=DEFAULT") 
 
-mydb = myclient["dev"]
-mycol = mydb["sensor_data"]
+mydb = myclient[f"{os.getenv('MONGO_DB')}"]
+mycol = mydb[f"{os.getenv('MONGO_COLLECTION')}"]
 
 def connect_mqtt() -> mqtt_client:
     def on_connect(client, userdata, flags, rc):
