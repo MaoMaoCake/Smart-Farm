@@ -65,6 +65,7 @@ services:
     links:
       - database:db
       - mqtt-bridge:bridge
+      - backend-worker:worker
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.backend.entrypoints=http'
@@ -102,12 +103,15 @@ services:
       - mongodb
 
   mongodb:
+    container_name: mongodb
     image: mongo:4.2.1 # need to specify the version to prevent code corruption
     environment: # variable of the server or OS
       MONGO_INITDB_ROOT_USERNAME: touch
       MONGO_INITDB_ROOT_PASSWORD: touchja
     ports:
       - "27017:27017"
+    volumes:
+      - smart-farm-mongodb:/data/db
 
   database:
     container_name: db
@@ -123,3 +127,4 @@ services:
       - smart-farm-db:/var/lib/mysql
 volumes:
   smart-farm-db:
+  smart-farm-mongodb:
