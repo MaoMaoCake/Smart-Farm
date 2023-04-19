@@ -8,12 +8,14 @@ DynamicJsonDocument doc(1024);
 // Update these with values suitable for your network.
 const char* ssid = "PD_LAPTOP";
 const char* password = "012345679";
-const char* mqtt_server = "10.100.7.206";
+const char* mqtt_server = "192.168.1.158";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
 #define MQTT_SERIAL_PUBLISH_CH "python/mqtt"
-#define MQTT_SERIAL_RECEIVER_CH "8"
+#define MQTT_SERIAL_RECEIVER_CH "7"
+
+const int esp_status_pin = 2;
 
 WiFiClient wifiClient;
 
@@ -44,6 +46,8 @@ struct Result{
 
 void setup() {
   Serial.begin(9600);
+  pinMode(esp_status_pin, OUTPUT);
+  digitalWrite(esp_status_pin, HIGH);
   UVs.attach(UVPin);
   IRs.attach(IRPin);
   NLs.attach(NLPin);
@@ -60,6 +64,10 @@ void setup() {
 
 void loop() {
   client.loop();
+  digitalWrite(esp_status_pin, HIGH);
+  delay(100);
+  digitalWrite(esp_status_pin, LOW);
+  delay(100);
 }
 
 
