@@ -982,6 +982,8 @@ def get_stats_from_mongo(farm_id: int):
         week=output_week,
         month=output_month
     )
+
+    print(output)
     return output
 
 
