@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
   // import "@carbon/styles/css/styles.css";
+  import './style.css';
   import "@carbon/charts/styles.css";
   import { LineChart } from "@carbon/charts-svelte";
   import StatPreview from "$lib/StatPreview.svelte";
