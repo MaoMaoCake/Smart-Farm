@@ -19,13 +19,13 @@ int send_time_interval = 10;
 // Update these with values suitable for your network.
 const char* ssid = "PD_LAPTOP";
 const char* password = "012345679";
-const char* mqtt_server = " 192.168.137.250";
+const char* mqtt_server = "192.168.137.250";
 int maxHumidity = 0;
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
 #define MQTT_SERIAL_PUBLISH_CH "python/mqtt"
-#define MQTT_SERIAL_RECEIVER_CH "1"
+#define MQTT_SERIAL_RECEIVER_CH "3"
 
 WiFiClient wifiClient;
 

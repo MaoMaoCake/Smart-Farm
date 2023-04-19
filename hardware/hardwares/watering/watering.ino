@@ -23,7 +23,7 @@ bool activate = false;
 const int watering_pin = 2;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(112500);
 
   pinMode(watering_pin, OUTPUT);      // set the LED pin mode
   Serial.setTimeout(500);// Set time out for

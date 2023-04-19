@@ -7,7 +7,7 @@ DynamicJsonDocument doc(1024);
 // Update these with values suitable for your network.
 const char* ssid = "PD_LAPTOP";
 const char* password = "012345679";
-const char* mqtt_server = "10.100.7.206";
+const char* mqtt_server = "192.168.137.250";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
@@ -26,6 +26,7 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(dehumidifier_pin, OUTPUT);      // set the LED pin mode
+  digitalWrite(dehumidifier_pin,HIGH);
   Serial.setTimeout(500);// Set time out for
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
@@ -99,6 +100,8 @@ void turnOnDehumidifier(){
   updateData += F("{\"action\": \"update/dehumidifier\"");
   updateData += F(",\"activate\":");
   updateData += String(activate);
+  updateData += F(",\"espId\":");
+  updateData += String(MQTT_SERIAL_RECEIVER_CH);
   updateData += F("}");
   publishSerialData(updateData);
 }
@@ -109,6 +112,8 @@ void turnOffDehumidifier(){
   updateData += F("{\"action\": \"update/dehumidifier\"");
   updateData += F(",\"activate\":");
   updateData += String(activate);
+  updateData += F(",\"espId\":");
+  updateData += String(MQTT_SERIAL_RECEIVER_CH);
   updateData += F("}");
   publishSerialData(updateData);
 }
