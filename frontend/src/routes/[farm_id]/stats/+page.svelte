@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  import "@carbon/styles/css/styles.css";
+  // import "@carbon/styles/css/styles.css";
   import "@carbon/charts/styles.css";
   import { LineChart } from "@carbon/charts-svelte";
   import StatPreview from "$lib/StatPreview.svelte";
@@ -64,7 +64,7 @@
   }
 
   fetch(
-          `api/farm/${$page.params.farm_id}/statsGraph`,
+          `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/statsGraph`,
         {
           method: 'GET',
           headers: myHeaders,
@@ -123,7 +123,7 @@
                         on:click={()=>{table = "month"}}> Last month</button>
             </div>
       {#if table === 'day'}
-        <div class="flex grow mt-2 mb-2">
+        <div class="flex grow mt-2 mb-2 bg-white rounded pt-2 pl-2 pr-2 pb-2">
             <LineChart
                     data={chart_data_day}
                     options={{
@@ -147,7 +147,7 @@
         </div>
         {/if}
 {#if table === 'week'}
-        <div class="flex grow mt-2 mb-2">
+        <div class="flex grow mt-2 mb-2 bg-white rounded pt-2 pl-2 pr-2 pb-2">
             <LineChart
                     data={chart_data_week}
                     options={{
@@ -170,7 +170,7 @@
         </div>
         {/if}
       {#if table === 'month'}
-        <div class="flex grow mt-2 mb-2">
+        <div class="flex grow mt-2 mb-2 bg-white rounded pt-2 pl-2 pr-2 pb-2">
             <LineChart
                     data={chart_data_month}
                     options={{
