@@ -246,7 +246,7 @@ async def update_ac_temp(is_turn_on: bool, temperature: int, farm_id: int, curre
 async def get_status_graph(farm_id: int, current_user: User = Depends(get_current_active_user)):
     if current_user.role != Role.USER.value:
         get_http_exception('10')
-    return get_stats_graph(farm_id, current_user.username)@farmRouter.get("/farm/{farm_id}/statsGraph", response_model=ResponseDto, tags=["Farm"])
+    return get_stats_graph(farm_id, current_user.username)
 
 
 @farmRouter.get("/admin/list/users", response_model=ResponseDto, tags=["Admin"])
