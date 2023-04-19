@@ -77,11 +77,18 @@
         }
     }
 
+    const confirm_ops = {
+        confirmButtonClass: "confirm-btn",
+        cancelButtonClass: "cancel-btn",
+        text: "Are You sure you want to delete this automation?",
+        title: null
+    }
+
     async function remove(){
         if ($FarmSettings.ac_schedule[num].changes_type == "DELETE") {
             rmTime(num)
         } else {
-            if (await dialogs.confirm("Are You sure you want to delete this automation?")){
+            if (await dialogs.confirm(confirm_ops)){
                 rmTime(num)
             }
         }
@@ -163,3 +170,9 @@
         </div>
     </div>
 </div>
+
+<style>
+    .confirm-btn{
+        background: red;
+    }
+</style>
