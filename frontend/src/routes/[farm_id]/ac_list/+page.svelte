@@ -7,6 +7,8 @@
     import {goto} from "$app/navigation";
     import { page } from '$app/stores';
     import Icon from '@iconify/svelte';
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     interface FarmData {
         name: string,
@@ -31,7 +33,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/farm/${$page.params.farm_id}/stats`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/stats`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -59,7 +61,7 @@
   }
 
   fetch(
-            `/api/farm/${$page.params.farm_id}/AC/list/`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/AC/list/`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -95,7 +97,7 @@
 
     function update_ac_status(ac_id: number, ac_status: boolean){
       fetch(
-              `/api/farm/${$page.params.farm_id}/AC/${ac_id}/automation?is_turn_on=${ac_status}`,
+              `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/AC/${ac_id}/automation?is_turn_on=${ac_status}`,
           {
               method: 'PATCH',
               headers: myHeaders,
@@ -116,7 +118,7 @@
 
     function update_all_ac_status(ac_status: boolean){
       fetch(
-              `/api/farm/${$page.params.farm_id}/AC/automation?is_turn_on=${ac_status}`,
+              `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/AC/automation?is_turn_on=${ac_status}`,
           {
               method: 'PATCH',
               headers: myHeaders,

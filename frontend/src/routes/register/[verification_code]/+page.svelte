@@ -3,6 +3,8 @@
   import {is_register, logged_in} from "$lib/SettingStores";
   import { FaEye, FaEyeSlash } from "svelte-icons/fa";
   import {page} from "$app/stores";
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   let username = "";
   let password = "";
@@ -18,7 +20,7 @@
   const myHeaders = new Headers();
       myHeaders.append("Origin", "");
 
-  fetch(`/api/users/verify/${$page.params.verification_code}`, {
+  fetch(`${PUBLIC_URL_PREFIX}/api/users/verify/${$page.params.verification_code}`, {
             method: 'POST',
             headers: myHeaders,
             redirect: 'follow'
@@ -88,7 +90,7 @@
       redirect: 'follow',
     };
 
-    fetch("/api/admin/update/admin", requestOptions)
+    fetch(`${PUBLIC_URL_PREFIX}/api/admin/update/admin`, requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }

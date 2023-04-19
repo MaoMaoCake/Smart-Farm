@@ -6,6 +6,9 @@
     import {goto} from "$app/navigation";
      import Icon from '@iconify/svelte';
     import {onMount} from "svelte";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
+
     export let data: PageData;
     let natural;
     let uv;
@@ -32,7 +35,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -74,8 +77,8 @@
         console.log(input_data)
         let path;
         all ?
-            path = `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/update_all_light_combination`
-            : path = `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`
+            path = `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/update_all_light_combination`
+            : path = `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/${$page.params.preset_id}/${$page.params.light_combination_id}`
 
         fetch(
             path,

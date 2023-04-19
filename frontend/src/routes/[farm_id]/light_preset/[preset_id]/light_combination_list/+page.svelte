@@ -7,6 +7,8 @@
     import Icon from '@iconify/svelte';
     import {onMount} from "svelte";
     import {dialogs} from "svelte-dialogs";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     let preset_name = null;
     let farm_id;
@@ -39,7 +41,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/farm/${$page.params.farm_id}/stats`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/stats`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -67,7 +69,7 @@
   }
 
   fetch(
-            `/api/farm/${$page.params.farm_id}/light/preset/${$page.params.preset_id}`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/light/preset/${$page.params.preset_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -87,7 +89,7 @@
    async function remove(){
     if (await dialogs.confirm("Are You sure you want to delete this automation?")){
         fetch(
-            `/api/farm/${$page.params.farm_id}/${$page.params.preset_id}`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/${$page.params.preset_id}`,
           {
             method: 'DELETE',
             headers: myHeaders,

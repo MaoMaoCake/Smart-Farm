@@ -1,5 +1,7 @@
 <script lang="ts">
     import {goto} from "$app/navigation";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     let farm_key = "";
     function register_fk(){
@@ -12,7 +14,7 @@
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
       fetch(
-          `/api/add?farm_key=${farm_key}`,
+          `${PUBLIC_URL_PREFIX}/api/add?farm_key=${farm_key}`,
           {
             method: 'POST',
             headers: myHeaders,

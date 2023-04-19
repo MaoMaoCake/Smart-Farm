@@ -6,6 +6,8 @@
     import {page} from "$app/stores";
     import {goto} from "$app/navigation";
     import Icon from '@iconify/svelte';
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     export let data: PageData;
 
@@ -29,7 +31,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/farm/${$page.params.farm_id}/stats`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/stats`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -57,7 +59,7 @@
   }
 
   fetch(
-  `/api/farm/${data.farm_id}`,
+  `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}`,
   {
     method: 'GET',
     headers: myHeaders,
@@ -84,7 +86,7 @@
 
   function create_preset(){
       fetch(
-              `/api/farm/${$page.params.farm_id}/light/preset/create_from_current?is_current_setting=false`,
+              `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/light/preset/create_from_current?is_current_setting=false`,
           {
               method: 'POST',
               headers: myHeaders,

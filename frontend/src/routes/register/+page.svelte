@@ -2,6 +2,8 @@
   import {goto} from '$app/navigation'
   import {is_register, logged_in} from "$lib/SettingStores";
   import { FaEye, FaEyeSlash } from "svelte-icons/fa";
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   let username = "";
   let password = "";
@@ -66,7 +68,7 @@
       redirect: 'follow',
     };
 
-    fetch("/api/users/create", requestOptions)
+    fetch(`${PUBLIC_URL_PREFIX}/api/users/create`, requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }
