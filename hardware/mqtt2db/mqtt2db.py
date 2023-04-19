@@ -131,7 +131,7 @@ def turn_on_dehumidifier(esp_id: int):
         for i in esp_ids:
             dehumidifier_command = {}
             dehumidifier_command['activate'] = True
-            ret = publish_data(client,str(esp_id),json.dumps(dehumidifier_command))
+            ret = publish_data(client,str(i),json.dumps(dehumidifier_command))
     except:
         print("[turn_on_dehumidifier] cannot turn on the dehumidifier with espId:", esp_id)
 
@@ -141,7 +141,7 @@ def turn_off_dehumidifier(esp_id: int):
         for i in esp_ids:
             dehumidifier_command = {}
             dehumidifier_command['activate'] = False
-            ret = publish_data(client,str(esp_id),json.dumps(dehumidifier_command))
+            ret = publish_data(client,str(i),json.dumps(dehumidifier_command))
     except:
         print("[turn_off_dehumidifier] cannot turn off the dehumidifier with espId:", esp_id)
 
@@ -152,7 +152,7 @@ def turn_on_ac(esp_id: int):
             ac_command = {}
             ac_command['activate'] = True
             ac_command['temperature'] = 14
-            ret = publish_data(client,str(esp_id),json.dumps(ac_command))    
+            ret = publish_data(client,str(i),json.dumps(ac_command))    
     except:
         print("[turn_on_ac]: cannot turn on the ac with espId:", esp_id)
 
@@ -162,7 +162,7 @@ def turn_off_ac(esp_id: int):
         for i in esp_ids:
             ac_command = {}
             ac_command['activate'] = False
-            ret = publish_data(client,str(esp_id),json.dumps(ac_command))    
+            ret = publish_data(client,str(i),json.dumps(ac_command))    
     except:
         print("[turn_off_ac]: cannot turn off the ac with espId:", esp_id)
 
@@ -172,7 +172,7 @@ def turn_on_co2(esp_id: int):
         for i in esp_ids:
             co2_command = {}
             co2_command['activate'] = False
-            ret = publish_data(client,str(esp_id),json.dumps(co2_command))  
+            ret = publish_data(client,str(i),json.dumps(co2_command))  
     except:
         print("[turn_on_co2] cannot turn on the co2 controller with espId:", esp_id)
 
@@ -182,7 +182,7 @@ def turn_off_co2(esp_id: int):
         for i in esp_ids:
             co2_command = {}
             co2_command['activate'] = False
-            ret = publish_data(client,str(esp_id),json.dumps(co2_command))
+            ret = publish_data(client,str(i),json.dumps(co2_command))
     except:
         print("[turn_off_co2] cannot turn off the co2 controller with espId:", esp_id)
 

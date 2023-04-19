@@ -25,7 +25,6 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 def update_light_strength_to_all_light(update_light_strength_input: UpdateLightStrengthInput,farm_id: int,username: str):
-    print('asdf',update_light_strength_input)
     session.query(LightDB
         ).filter(LightDB.farmId == farm_id
             ).update({'UVLightDensity': update_light_strength_input.UVLightDensity,
@@ -137,9 +136,9 @@ def get_ac_status_by_farm_id(farm_id: int):
     return ac_status
 
 def get_dehumidifier_esp_id_by_esp_id(esp_id: int) -> list[int]:
-    espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.HUMIDITY_SENSOR.value).one()
+    espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.HUMIDITY_SENSOR.value).first()
 
-    humiditySensor = session.query(HumiditySensorDB).filter(HumiditySensorDB.id == espMap.hardwareId).one()
+    humiditySensor = session.query(HumiditySensorDB).filter(HumiditySensorDB.id == espMap.hardwareId).first()
 
     dehumidifiers = session.query(DehumidifierDB).filter(DehumidifierDB.farmId == humiditySensor.farmId).all()
 
@@ -150,9 +149,9 @@ def get_dehumidifier_esp_id_by_esp_id(esp_id: int) -> list[int]:
     return [esp.ESPId for esp in esps]
 
 def get_ac_esp_id_by_esp_id(esp_id: int) -> list[int]:
-    espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.TEMPERATURE_SENSOR.value).one()
+    espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.TEMPERATURE_SENSOR.value).first()
 
-    temperatureSensor = session.query(TemperatureSensorDB).filter(HumiditySensorDB.id == espMap.hardwareId).one()
+    temperatureSensor = session.query(TemperatureSensorDB).filter(HumiditySensorDB.id == espMap.hardwareId).first()
 
     acs = session.query(ACDB).filter(ACDB.farmId == temperatureSensor.farmId).all()
 
@@ -163,9 +162,9 @@ def get_ac_esp_id_by_esp_id(esp_id: int) -> list[int]:
     return [esp.ESPId for esp in esps]
 
 def get_co2_controller_esp_id_by_esp_id(esp_id: int) -> list[int]:
-    espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.CO2_SENSOR.value).one()
+    espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.CO2_SENSOR.value).first()
 
-    co2Sensor = session.query(CO2SensorDB).filter(CO2SensorDB.id == espMap.hardwareId).one()
+    co2Sensor = session.query(CO2SensorDB).filter(CO2SensorDB.id == espMap.hardwareId).first()
 
     co2s = session.query(CO2ControllerDB).filter(CO2ControllerDB.farmId == co2Sensor.farmId).all()
 
