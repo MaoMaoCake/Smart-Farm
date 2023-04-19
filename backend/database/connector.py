@@ -878,9 +878,9 @@ def get_stats_from_mongo(farm_id: int):
         {
             "$group": {
                 "_id": "$createAt",
-                "Temperature": {"$avg": "$Temperature"},
-                "Humidity": {"$avg": "$Humidity"},
-                "CO2": {"$avg": "$CO2"}
+                "Temperature": {"$avg": "$temperature"},
+                "Humidity": {"$avg": "$humidity"},
+                "CO2": {"$avg": "$co2"}
             }
         }
     ]
@@ -901,9 +901,13 @@ def get_stats_from_mongo(farm_id: int):
                         "timezone": "+00:00"
                     }
                 },
-                "Temperature": {"$avg": "$Temperature"},
-                "Humidity": {"$avg": "$Humidity"},
-                "CO2": {"$avg": "$CO2"}
+                "Temperature": {"$avg": "$temperature"},
+                "Humidity": {"$avg": "$humidity"},
+                "CO2": {
+                "$avg": {
+                    "$ifNull": [ "$co2", 0 ]
+                }
+            }
             }
         }
     ]
@@ -926,9 +930,13 @@ def get_stats_from_mongo(farm_id: int):
                         "timezone": "+00:00"
                     }
                 },
-                "Temperature": {"$avg": "$Temperature"},
-                "Humidity": {"$avg": "$Humidity"},
-                "CO2": {"$avg": "$CO2"}
+                "Temperature": {"$avg": "$temperature"},
+                "Humidity": {"$avg": "$humidity"},
+                "CO2": {
+                "$avg": {
+                    "$ifNull": [ "$co2", 0 ]
+                }
+            }
             }
         }
     ]
@@ -945,37 +953,46 @@ def get_stats_from_mongo(farm_id: int):
         datetime_str = record["_id"].strftime('%Y-%m-%d %H:%M:%S')
         datetime_obj = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
 
-        output_day.append(json.loads(
-            f'{{"group": "Temperature", "date": "{datetime_obj}", "value": "{record["Temperature"]}"}}'
-        ))
-        output_day.append(json.loads(
-            f'{{"group": "Humidity", "date": "{datetime_obj}", "value": "{record["Humidity"]}"}}'
-        ))
-        output_day.append(json.loads(
-            f'{{"group": "CO2", "date": "{datetime_obj}", "value": "{record["CO2"]}"}}'
-        ))
+        if record["Temperature"] is not None:
+            output_day.append(json.loads(
+                f'{{"group": "Temperature", "date": "{datetime_obj}", "value": "{record["Temperature"]}"}}'
+            ))
+        if record["Humidity"] is not None:
+            output_day.append(json.loads(
+                f'{{"group": "Humidity", "date": "{datetime_obj}", "value": "{record["Humidity"]}"}}'
+            ))
+        if record["CO2"] is not None:
+            output_day.append(json.loads(
+                f'{{"group": "CO2", "date": "{datetime_obj}", "value": "{record["CO2"]}"}}'
+            ))
 
     for record in result_week:
-        output_week.append(json.loads(
-            f'{{"group": "Temperature", "date": "{record["_id"]}", "value": "{record["Temperature"]}"}}'
-        ))
-        output_week.append(json.loads(
-            f'{{"group": "Humidity", "date": "{record["_id"]}", "value": "{record["Humidity"]}"}}'
-        ))
-        output_week.append(json.loads(
-            f'{{"group": "CO2", "date": "{record["_id"]}", "value": "{record["CO2"]}"}}'
-        ))
+        if record["Temperature"] is not None:
+            output_week.append(json.loads(
+                f'{{"group": "Temperature", "date": "{record["_id"]}", "value": "{record["Temperature"]}"}}'
+            ))
+        if record["Humidity"] is not None:
+            output_week.append(json.loads(
+                f'{{"group": "Humidity", "date": "{record["_id"]}", "value": "{record["Humidity"]}"}}'
+            ))
+        if record["CO2"] is not None:
+            output_week.append(json.loads(
+                f'{{"group": "CO2", "date": "{record["_id"]}", "value": "{record["CO2"]}"}}'
+            ))
 
     for record in result_month:
-        output_month.append(json.loads(
-            f'{{"group": "Temperature", "date": "{record["_id"]}", "value": "{record["Temperature"]}"}}'
-        ))
-        output_month.append(json.loads(
-            f'{{"group": "Humidity", "date": "{record["_id"]}", "value": "{record["Humidity"]}"}}'
-        ))
-        output_month.append(json.loads(
-            f'{{"group": "CO2", "date": "{record["_id"]}", "value": "{record["CO2"]}"}}'
-        ))
+        if record["Temperature"] is not None:
+            output_month.append(json.loads(
+                f'{{"group": "Temperature", "date": "{record["_id"]}", "value": "{record["Temperature"]}"}}'
+            ))
+        if record["Humidity"] is not None:
+            output_month.append(json.loads(
+                f'{{"group": "Humidity", "date": "{record["_id"]}", "value": "{record["Humidity"]}"}}'
+            ))
+        if record["CO2"] is not None:
+            output_month.append(json.loads(
+                f'{{"group": "CO2", "date": "{record["_id"]}", "value": "{record["CO2"]}"}}'
+            ))
 
     output = GraphOutput(
         day=output_day,
