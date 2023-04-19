@@ -1,6 +1,8 @@
 <script lang="js">
   import {is_verify} from "$lib/SettingStores";
   import {goto} from '$app/navigation'
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   is_verify.set(true);
   let verification_code;
@@ -35,7 +37,7 @@
       redirect: 'follow',
     };
 
-    fetch("/api/users/forget-password", requestOptions)
+    fetch(`${PUBLIC_URL_PREFIX}/api/users/forget-password`, requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }

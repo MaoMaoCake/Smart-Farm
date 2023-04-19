@@ -5,6 +5,8 @@
     import Icon from '@iconify/svelte';
     import {writable} from "svelte/store";
     import {page} from "$app/stores";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     const queryParams = new URLSearchParams(window.location.search);
     const username = queryParams.get('username');
@@ -43,7 +45,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/admin/user/${$page.params.user_id}/list/farm`,
+            `${PUBLIC_URL_PREFIX}/api/admin/user/${$page.params.user_id}/list/farm`,
           {
             method: 'GET',
             headers: myHeaders,

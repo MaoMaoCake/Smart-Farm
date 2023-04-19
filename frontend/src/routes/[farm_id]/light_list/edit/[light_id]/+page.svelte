@@ -4,7 +4,9 @@
     import LightValueLarge from "./LightValueLarge.svelte";
     import {page} from "$app/stores";
     import {goto} from "$app/navigation";
-     import Icon from '@iconify/svelte';
+    import Icon from '@iconify/svelte';
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
     export let data: PageData;
     let natural;
     let uv;
@@ -25,7 +27,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}`,
+            `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -68,8 +70,8 @@
         console.log(input_data)
         let path;
         all ?
-            path = `/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}/update_all`
-            : path =`/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}`
+            path = `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}/update_all`
+            : path =`${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/light/${$page.params.light_id}`
 
         fetch(
             path,

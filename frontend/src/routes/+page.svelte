@@ -5,6 +5,7 @@
     import {goto} from '$app/navigation'
     import {logged_in} from "$lib/SettingStores";
     import {is_register} from "../lib/SettingStores";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
 
     is_register.set(false);
 
@@ -32,7 +33,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-        "/api/list",
+        `${PUBLIC_URL_PREFIX}/api/list`,
         {
           method: 'GET',
           headers: myHeaders,

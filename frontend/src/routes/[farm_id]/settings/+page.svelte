@@ -11,6 +11,8 @@
   import CO2Setting from "./CO2Setting.svelte";
   import HumiditySetting from "./HumiditySetting.svelte";
   import WateringSetting from "./WateringSetting.svelte";
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   // The following fetches the data for the farm denoted by the farm id in the path
   // parameter.
@@ -59,7 +61,7 @@
   myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
   fetch(
-      `/api/farm/${data.farm_id}/stats`,
+      `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}/stats`,
       {
         method: 'GET',
         headers: myHeaders,
@@ -69,7 +71,7 @@
     .catch(error => console.log('error', error));
 
   fetch(
-      `/api/farm/${data.farm_id}`,
+      `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}`,
       {
         method: 'GET',
         headers: myHeaders,
@@ -108,7 +110,7 @@
 
   function control_actuators(type: string, farm_id: string, state: boolean){
     fetch(
-          `/api/farm/${data.farm_id}/${type}/control?is_turn_on=${!state}&temperature=${$FarmSettings.ac_temp}`,
+          `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}/${type}/control?is_turn_on=${!state}&temperature=${$FarmSettings.ac_temp}`,
           {
             method: 'POST',
             headers: myHeaders,
@@ -171,7 +173,7 @@
   async function handleACTempChange(){
         if ($FarmSettings.ac_temp != ac_temp_original) {
             fetch(
-                  `/api/farm/${data.farm_id}/AC/temperature/change?is_turn_on=${ac_switch}&temperature=${$FarmSettings.ac_temp}`,
+                  `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}/AC/temperature/change?is_turn_on=${ac_switch}&temperature=${$FarmSettings.ac_temp}`,
                   {
                     method: 'PATCH',
                     headers: myHeaders,
@@ -208,7 +210,7 @@
       }
 
       fetch(
-              `/api/farm/${data.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}`,
           {
               method: 'PATCH',
               headers: myHeaders,

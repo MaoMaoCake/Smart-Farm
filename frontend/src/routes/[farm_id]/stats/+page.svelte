@@ -8,6 +8,8 @@
   import {page} from "$app/stores";
   import {goto} from "$app/navigation";
   import Icon from '@iconify/svelte';
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   interface FarmData {
         name: string,
@@ -34,7 +36,7 @@
   myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
    fetch(
-          `/api/farm/${$page.params.farm_id}/stats`,
+          `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/stats`,
         {
           method: 'GET',
           headers: myHeaders,

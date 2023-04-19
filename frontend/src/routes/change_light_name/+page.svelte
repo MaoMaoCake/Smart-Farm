@@ -1,6 +1,8 @@
 <script lang="ts">
     import {goto} from "$app/navigation";
     import { onMount } from 'svelte';
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     let light_name = null;
     let farm_id;
@@ -30,7 +32,7 @@
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
       fetch(
-          `/api/farm/${farm_id}/light/${light_id}?name=${light_name}`,
+          `${PUBLIC_URL_PREFIX}/api/farm/${farm_id}/light/${light_id}?name=${light_name}`,
           {
             method: 'PUT',
             headers: myHeaders,

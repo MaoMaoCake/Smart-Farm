@@ -2,6 +2,8 @@
   import {is_verify} from "$lib/SettingStores";
   import {onMount} from "svelte";
   import {page} from "$app/stores";
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   is_verify.set(true);
   let verification_code;
@@ -15,7 +17,7 @@
   const myHeaders = new Headers();
       myHeaders.append("Origin", "");
 
-   fetch(`/api/users/verify/${$page.params.verification_code}`, {
+   fetch(`${PUBLIC_URL_PREFIX}/api/users/verify/${$page.params.verification_code}`, {
             method: 'POST',
             headers: myHeaders,
             redirect: 'follow'

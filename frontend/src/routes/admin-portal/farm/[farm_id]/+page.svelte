@@ -5,6 +5,8 @@
     import Icon from '@iconify/svelte';
     import {writable} from "svelte/store";
     import {page} from "$app/stores";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     const queryParams = new URLSearchParams(window.location.search);
     const farm_name = queryParams.get('farm_name');
@@ -54,7 +56,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/admin/farm/${$page.params.farm_id}`,
+            `${PUBLIC_URL_PREFIX}/api/admin/farm/${$page.params.farm_id}`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -72,7 +74,7 @@
     }
 
     fetch(
-            `/api/admin/list/ESPs`,
+            `${PUBLIC_URL_PREFIX}/api/admin/list/ESPs`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -105,7 +107,7 @@
       }
 
       fetch(
-              `/api/farm/${$page.params.farm_id}/light/create`,
+              `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/light/create`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -118,7 +120,7 @@
 
     function createAC() {
       fetch(
-              `/api/admin/create/ac/${$page.params.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/ac/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -150,7 +152,7 @@
 
     function createCO2Controller() {
       fetch(
-              `/api/admin/create/co2_controller/${$page.params.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/co2_controller/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -162,7 +164,7 @@
 
     function createDehumidifier() {
       fetch(
-              `/api/admin/create/dehumidifier/${$page.params.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/dehumidifier/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -174,7 +176,7 @@
 
     function createTemperatureSensor() {
       fetch(
-              `/api/admin/create/temperature_sensor/${$page.params.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/temperature_sensor/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -186,7 +188,7 @@
 
     function createHumiditySensor() {
       fetch(
-              `/api/admin/create/humidity_sensor/${$page.params.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/humidity_sensor/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -198,7 +200,7 @@
 
     function createCO2Sensor() {
       fetch(
-              `/api/admin/create/co2_sensor/${$page.params.farm_id}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/co2_sensor/${$page.params.farm_id}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -215,7 +217,7 @@
     function handleESPChange(original, selected, sensorType, sensorId) {
         if (original === 'Unselected'){
             fetch(
-              `/api/admin/create/ESPMap/${selected}/${sensorType}/${sensorId}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/ESPMap/${selected}/${sensorType}/${sensorId}`,
             {
               method: 'POST',
               headers: myHeaders,
@@ -225,7 +227,7 @@
           .catch(error => console.log('error', error));
         } else {
              fetch(
-              `/api/admin/update/ESPMap/${selected}/${sensorType}/${sensorId}`,
+              `${PUBLIC_URL_PREFIX}/api/admin/update/ESPMap/${selected}/${sensorType}/${sensorId}`,
             {
               method: 'PATCH',
               headers: myHeaders,

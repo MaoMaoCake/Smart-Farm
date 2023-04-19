@@ -3,6 +3,8 @@
   import { FaEye, FaEyeSlash } from "svelte-icons/fa";
   import {page} from "$app/stores";
   import {goto} from "$app/navigation";
+  import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
   is_verify.set(true);
   let verification_code;
@@ -25,7 +27,7 @@
       redirect: 'follow',
     };
 
-  fetch(`/api/users/password-changing/${$page.params.verification_code}`, requestOptions)
+  fetch(`${PUBLIC_URL_PREFIX}/api/users/password-changing/${$page.params.verification_code}`, requestOptions)
       .then(async response => changing_response_handler(await response.json()))
       .catch(error => console.log('error', error));
 
@@ -73,7 +75,7 @@
       redirect: 'follow',
     };
 
-    fetch("/api/users/change-password", requestOptions)
+    fetch(`${PUBLIC_URL_PREFIX}/api/users/change-password`, requestOptions)
     .then(async response => response_handler(await response.json()))
     .catch(error => console.log('error', error));
   }

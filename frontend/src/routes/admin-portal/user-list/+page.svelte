@@ -3,6 +3,8 @@
     import {is_admin, is_register} from "../../../lib/SettingStores";
     import { paginate, DarkPaginationNav, LightPaginationNav } from 'svelte-paginate'
     import Icon from '@iconify/svelte';
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     is_admin.set(true);
     is_register.set(false);
@@ -39,7 +41,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/admin/list/users`,
+            `${PUBLIC_URL_PREFIX}/api/admin/list/users`,
           {
             method: 'GET',
             headers: myHeaders,

@@ -4,6 +4,8 @@
     import { paginate, DarkPaginationNav, LightPaginationNav } from 'svelte-paginate'
     import Icon from '@iconify/svelte';
     import {writable} from "svelte/store";
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     is_admin.set(true);
     is_register.set(false);
@@ -39,7 +41,7 @@
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     fetch(
-            `/api/admin/list/farms`,
+            `${PUBLIC_URL_PREFIX}/api/admin/list/farms`,
           {
             method: 'GET',
             headers: myHeaders,
@@ -73,7 +75,7 @@
 
     function create_new_farm() {
          fetch(
-            `/api/admin/create/farm`,
+            `${PUBLIC_URL_PREFIX}/api/admin/create/farm`,
           {
             method: 'POST',
             headers: myHeaders,

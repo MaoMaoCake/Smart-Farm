@@ -1,6 +1,7 @@
 <script lang="ts">
     import {goto} from "$app/navigation";
-    import { onMount } from 'svelte';
+    import { PUBLIC_URL_PREFIX } from '$env/static/public'
+
 
     let email = "";
     let errors = "";
@@ -25,7 +26,7 @@
        bodyFormData.append('email', email);
 
            fetch(
-              `/api/admin/create/admin`,
+              `${PUBLIC_URL_PREFIX}/api/admin/create/admin`,
             {
               method: 'POST',
               headers: myHeaders,
