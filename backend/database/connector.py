@@ -953,6 +953,7 @@ def get_stats_from_mongo(farm_id: int):
     for record in result_day:
         datetime_str = record["_id"].strftime('%Y-%m-%d %H:%M:%S')
         datetime_obj = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+        datetime_obj = datetime_obj + timedelta(hours=7)
 
         if record["Temperature"] is not None:
             output_day.append(json.loads(
