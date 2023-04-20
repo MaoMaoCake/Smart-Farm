@@ -925,10 +925,13 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                         r: requests.Response = requests.post(url=path, data=json.dumps(body.__dict__))
                     except Exception as e:
                         print(e)
+                        delete_light_automation_in_db(new_automation.lightAutomationId)
                         get_http_exception('03', message='Backend worker connection failed')
 
                     if r.status_code != 200:
                         response_message = json.loads(r.content)
+                        delete_light_automation_in_db(new_automation.lightAutomationId)
+                        print(str(response_message["message"]))
                         get_http_exception('03', message=str(response_message["message"]))
 
         for update_input in update_inputs:
@@ -1011,6 +1014,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
             delete_ac_automation_in_db(delete_input.ACAutomationId)
 
         for create_input in create_inputs:
+            print('here?')
             new_automation = create_ac_automation_in_db(CreateACAutomationInput(
                 farmId=farm_id,
                 startTime=create_input.startTime,
@@ -1033,10 +1037,13 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                         r: requests.Response = requests.post(url=path, data=json.dumps(body.__dict__))
                     except Exception as e:
                         print(e)
+                        delete_ac_automation_in_db(new_automation.ACAutomationId)
                         get_http_exception('03', message='Backend worker connection failed')
 
                     if r.status_code != 200:
                         response_message = json.loads(r.content)
+                        delete_ac_automation_in_db(new_automation.ACAutomationId)
+                        print(str(response_message["message"]))
                         get_http_exception('03', message=str(response_message["message"]))
 
         for update_input in update_inputs:
@@ -1134,13 +1141,17 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                     r: requests.Response = requests.post(url=path, data=json.dumps(body.__dict__))
                 except Exception as e:
                     print(e)
+                    delete_watering_automation_in_db(new_automation.wateringAutomationId)
+                    print('here')
                     get_http_exception('03', message='Backend worker connection failed')
 
                 if r.status_code != 200:
                     response_message = json.loads(r.content)
+                    delete_watering_automation_in_db(new_automation.wateringAutomationId)
+                    print(str(response_message["message"]))
                     get_http_exception('03', message=str(response_message["message"]))
 
-        for update_input in update_inputs + no_changes_inputs:
+        for update_input in update_inputs: # + no_changes_inputs
             try:
                 body = AutomationInputJSON(
                     ESP_id=ESP_mapping[f"{HardwareType.WATERING.value}{water_controller.waterControllerId}"],
@@ -1177,6 +1188,45 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                 automationId=update_input.wateringAutomationId,
                 startTime=update_input.wateringStartTime,
                 endTime=update_input.wateringEndTime,
+                username=username
+            ))
+
+        for no_change_input in no_changes_inputs:
+            try:
+                body = AutomationInputJSON(
+                    ESP_id=ESP_mapping[f"{HardwareType.WATERING.value}{water_controller.waterControllerId}"],
+                    start_time=str(no_change_input.wateringStartTime),
+                    end_time=str(no_change_input.wateringEndTime),
+                    automation_id=no_change_input.wateringAutomationId,
+                    hardware_type=HardwareType.WATERING,
+                    activate=True,
+                )
+
+                if update_farm_input.isWateringAutomation and not water_controller.automation:
+                    r: requests.Response = requests.post(url=path, data=json.dumps(body.__dict__))
+                elif not update_farm_input.isWateringAutomation and water_controller.automation:
+                    delete_body = DeleteAutomationInput(
+                        ESP_id=ESP_mapping[f"{HardwareType.WATERING.value}{water_controller.waterControllerId}"],
+                        automation_id=no_change_input.wateringAutomationId,
+                        hardware_type=HardwareType.WATERING,
+                    )
+                    r: requests.Response = requests.delete(url=path, data=json.dumps(delete_body.__dict__))
+                else:
+                    r = requests.Response
+                    r.status_code = 200
+            except Exception as e:
+                print(e)
+                get_http_exception('03', message=f'Backend worker connection failed')
+
+            if r.status_code != 200:
+                response_message = json.loads(r.content)
+                print(response_message)
+                get_http_exception('03', message=str(response_message["message"]))
+
+            update_watering_automation_in_db(UpdateWateringAutomationInput(
+                automationId=no_change_input.wateringAutomationId,
+                startTime=no_change_input.wateringStartTime,
+                endTime=no_change_input.wateringEndTime,
                 username=username
             ))
 
