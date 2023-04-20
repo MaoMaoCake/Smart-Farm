@@ -8,11 +8,9 @@ from paho.mqtt import client as mqtt_client
 
 import json
 
-import pymongo
-
 import datetime
 
-from database.connector import update_light_strength_to_all_light,get_hardware_by_esp_id,get_farm_id_by_hardware_id,update_dehumidifier_status,update_co2_controller_status,update_all_sensor_data,get_threshold_by_farm_id,get_ac_status_by_farm_id,update_ac_status,get_dehumidifier_esp_id_by_esp_id,get_ac_esp_id_by_esp_id,get_co2_controller_esp_id_by_esp_id,update_threshold_to_farm
+from database.connector import update_light_strength_to_all_light,get_hardware_by_esp_id,get_farm_id_by_hardware_id,update_dehumidifier_status,update_co2_controller_status,update_all_sensor_data,get_threshold_by_farm_id,get_ac_status_by_farm_id,update_ac_status,get_dehumidifier_esp_id_by_esp_id,get_ac_esp_id_by_esp_id,get_co2_controller_esp_id_by_esp_id,update_threshold_to_farm,insert_sensor_data,queryLatestMaxSensorData
 
 from database.enum_list import System
 
@@ -25,10 +23,6 @@ topic = f'{os.getenv("MQTT_TOPIC")}'
 client_id = f'python-mqtt-{random.randint(0, 100)}'
 username = f'{os.getenv("MQTT_USERNAME")}'
 password = f'{os.getenv("MQTT_PASSWORD")}'
-myclient = pymongo.MongoClient('mongodb://'f'{os.getenv("MONGO_USERNAME")}'':'f'{os.getenv("MONGO_PASSWORD")}''@'f'{os.getenv("MONGO_SERVER")}'':'f'{os.getenv("MONGO_PORT")}''/?authMechanism=DEFAULT') 
-
-mydb = myclient[f'{os.getenv("MONGO_DB")}']
-mycol = mydb[f'{os.getenv("MONGO_COLLECTION")}']
 
 def connect_mqtt() -> mqtt_client:
     try:
@@ -196,14 +190,16 @@ def update_ac(esp_id: int,json_data: json):
     except:
         print('[',datetime.datetime.utcnow(),']Error: [update_ac] cannot update the ac data into mysql from espId:', esp_id, 'and data:', json_data)
 
-def check_threshold(esp_id: int, json_data: json):
+def check_threshold(farm_id: int,esp_id: int):
     try:
         threshold = get_threshold(esp_id)
-        if(json_data.get('co2') and (threshold['co2'] < json_data['co2'])):
-            turn_off_co2(esp_id)
-        if (threshold['humidity'] > json_data['humidity']):
-            turn_off_ac(esp_id)
-            turn_off_dehumidifier(esp_id)
+        sensorDatas = queryLatestMaxSensorData(farm_id)
+        for sensorData in sensorDatas:
+            if((int(threshold['co2'])*0.7 < sensorData['co2'])):
+                turn_off_co2(esp_id)
+            if (int(threshold['humidity'])*0.7 > sensorData['humidity']):
+                turn_off_ac(esp_id)
+                turn_off_dehumidifier(esp_id)
     except:
         print('[',datetime.datetime.utcnow(),']Error: [checkThreshold] cannot turn off the actuator from espId:', esp_id, 'and data:', json_data)
 
@@ -230,8 +226,8 @@ def switch(json_data: json):
             case 'update/co2':
                 update_co2_controller(esp_id, json_data)
             case 'update/sensors':
-                check_threshold(esp_id,json_data)
                 farm_id = get_farm_id_by_esp_id(esp_id)
+                check_threshold(farm_id,esp_id)
                 save_data_to_mongo(farm_id,json_data)
                 update_all_sensor_data_to_sql(farm_id,esp_id, json_data)
             case 'get/threshold':
@@ -262,7 +258,7 @@ def save_data_to_mongo(farm_id: int,json_data: json):
         createdDateTime = datetime.datetime(currentDateTime.year,currentDateTime.month,currentDateTime.day,currentDateTime.hour,createdMinute)
         json_data['farmId'] = farm_id
         json_data['createAt'] = createdDateTime
-        x = mycol.insert_one(json_data)
+        x = insert_sensor_data(json_data)
     except:
         print('[',datetime.datetime.utcnow(),']Error: [save_data_to_mongo] cannot save the data into the mongoDB with farm_id:', farm_id, 'and data:', json_data)
 
