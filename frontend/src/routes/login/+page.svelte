@@ -102,7 +102,7 @@
     </button>
   </div>
   <label class="label">
-    <a href="forgot-password" class="label-text-alt link link-hover"
+    <a href="/forgot-password" class="label-text-alt link link-hover"
       >Forgot password?</a
     >
   </label>

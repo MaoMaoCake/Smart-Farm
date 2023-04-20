@@ -21,7 +21,7 @@
         <div class="col-start-1 col-span-4 row-start-1 flex justify-center bg-primary rounded-t-lg white items-center h-14 pl-3 static">
             {farm_name}
             {#if !type}
-                <a href="{farm_id}/settings">
+                <a href="/{farm_id}/settings">
                     <Icon icon="icon-park-solid:setting-two" class="h-5 w-5 ml-2 pt-1"/>
                 </a>
                 {:else}
