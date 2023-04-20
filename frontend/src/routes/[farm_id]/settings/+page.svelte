@@ -121,6 +121,28 @@
         .catch(error => console.log('error', error));
   }
 
+  function convert_to_local_time(utc_time: string){
+      const date = new Date(`1970-01-01T${utc_time}Z`);
+
+    const localTimeString = date.toLocaleTimeString("en-US", {
+      hour12: false,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+    return localTimeString
+
+  }
+
+  function convert_to_utc_time(local_time: string){
+    const localDate = new Date(`1970-01-01T${local_time}`);
+
+    const utcTimeString = new Date(Date.UTC(
+      1970, 0, 1,
+      localDate.getUTCHours(), localDate.getUTCMinutes(), localDate.getUTCSeconds()
+    )).toISOString().substr(11, 8);
+
+    return utcTimeString
+  }
+
   function control_response_handler(response, type: string, state: boolean) {
     if (!response.successful) {
       alert(response.message);
@@ -155,12 +177,37 @@
     } else if (response.successful) {
       $FarmSettings.co2 = response.data.MinCO2Level;
       $FarmSettings.humidity = response.data.MaxHumidityLevel;
-      $FarmSettings.light_schedule = response.data.LightAutomations;
+
       $FarmSettings.light_preset = response.data.FarmLightPresets;
-      $FarmSettings.ac_schedule = response.data.ACAutomations;
-      $FarmSettings.watering_schedule = response.data.WateringAutomations;
       $FarmSettings.ac_temp = response.data.ACTemp;
       $FarmSettings.watering_automation = response.data.isWateringAutomation;
+
+      $FarmSettings.light_schedule = response.data.LightAutomations.map(object => {
+          return {
+              changes_type: null,
+              farmLightPresetId: object.farmLightPresetId,
+              lightAutomationId: object.lightAutomationId,
+             startTime : convert_to_local_time(object.startTime),
+              endTime : convert_to_local_time(object.endTime)
+          }
+      })
+      $FarmSettings.ac_schedule = response.data.ACAutomations.map(object => {
+         return {
+              changes_type: null,
+              temperature: object.temperature,
+              ACAutomationId: object.ACAutomationId,
+             startTime : convert_to_local_time(object.startTime),
+              endTime : convert_to_local_time(object.endTime)
+          }
+      })
+      $FarmSettings.watering_schedule =  response.data.WateringAutomations.map(object => {
+           return {
+               changes_type: null,
+               wateringAutomationId: object.wateringAutomationId,
+               wateringStartTime : convert_to_local_time(object.wateringStartTime),
+               wateringEndTime: convert_to_local_time(object.wateringEndTime),
+          }
+      })
 
       response.data.FarmLightPresets.forEach(preset => {
           $presetMap[preset.preset_id] = preset.name;
@@ -200,14 +247,39 @@
       myHeaders.append("Origin", "");
       myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
       myHeaders.append('Content-Type', 'application/json');
-
+    console.log($FarmSettings.watering_schedule)
       const input_data = {
           MinCO2Level: $changes.co2 ? $FarmSettings.co2: null,
           MaxHumidityLevel: $changes.humidity ? $FarmSettings.humidity: null,
           isWateringAutomation: $FarmSettings.watering_automation,
-          ACAutomations: $FarmSettings.ac_schedule,
-          LightAutomations: $FarmSettings.light_schedule,
-          WateringAutomations: $FarmSettings.watering_schedule,
+
+           LightAutomations:  $FarmSettings.light_schedule.map(object => {
+          return {
+              changes_type: object.changes_type,
+              farmLightPresetId: object.farmLightPresetId,
+              lightAutomationId: object.lightAutomationId,
+             startTime : convert_to_utc_time(object.startTime),
+              endTime : convert_to_utc_time(object.endTime)
+          }
+      }),
+      ACAutomations : $FarmSettings.ac_schedule.map(object => {
+         return {
+              changes_type: object.changes_type,
+              temperature: object.temperature,
+              ACAutomationId: object.ACAutomationId,
+             startTime : convert_to_utc_time(object.startTime),
+              endTime : convert_to_utc_time(object.endTime)
+          }
+      }),
+      WateringAutomations:  $FarmSettings.watering_schedule.map(object => {
+           return {
+               changes_type: object.changes_type,
+               wateringAutomationId: object.wateringAutomationId,
+               wateringStartTime : convert_to_utc_time(object.wateringStartTime),
+               wateringEndTime: convert_to_utc_time(object.wateringEndTime),
+          }
+      })
+
       }
 
       fetch(
