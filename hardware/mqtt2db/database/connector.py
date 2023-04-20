@@ -62,11 +62,12 @@ def update_co2_controller_status(status: bool,
     return
 
 def update_all_sensor_data(input: UpdateAllSensorInput,farm_id: int,username: str):
-    session.query(CO2SensorDB
-                    ).filter(CO2SensorDB.farmId == farm_id
-                    ).update({  'CO2': input.CO2,
-                                'updateBy': username
-                    })
+    if(input.CO2):
+        session.query(CO2SensorDB
+                        ).filter(CO2SensorDB.farmId == farm_id
+                        ).update({  'CO2': input.CO2,
+                                    'updateBy': username
+                        })
     session.query(HumiditySensorDB
                     ).filter(HumiditySensorDB.farmId == farm_id
                     ).update({  'humidity': input.humidity,
@@ -152,7 +153,7 @@ def get_dehumidifier_esp_id_by_esp_id(esp_id: int) -> list[int]:
 def get_ac_esp_id_by_esp_id(esp_id: int) -> list[int]:
     espMap = session.query(MQTTMapDB).filter(MQTTMapDB.ESPId == esp_id and MQTTMapDB.hardwareType == HardwareType.TEMPERATURE_SENSOR.value).first()
 
-    temperatureSensor = session.query(TemperatureSensorDB).filter(HumiditySensorDB.id == espMap.hardwareId).first()
+    temperatureSensor = session.query(TemperatureSensorDB).filter(TemperatureSensorDB.id == espMap.hardwareId).first()
 
     acs = session.query(ACDB).filter(ACDB.farmId == temperatureSensor.farmId).all()
 
@@ -186,5 +187,20 @@ def update_ac_status(status: bool,temperature: int,farm_id: int,username: str):
 
     return
 
+def update_threshold_to_farm(farm_id: int,username: str, humidity: int, co2: int = 0):
+    if(co2 == 0):
+        session.query(FarmDb
+                        ).filter(FarmDb.id == farm_id
+                        ).update({  'maxHumidity': humidity,
+                                    'minCO2': co2,
+                                    'updateBy': username
+                        })
+    else:
+        session.query(FarmDb
+                        ).filter(FarmDb.id == farm_id
+                        ).update({  'maxHumidity': humidity,
+                                    'updateBy': username
+                        })
+    session.commit()
 
-
+    return
