@@ -43,6 +43,7 @@
   $: humidifier_switching = humidifier_switch;
   let isDisabled = true;
   let done = false;
+  let isLoading = false;
 
   $: {
     const values = Object.values($changes);
@@ -221,17 +222,24 @@
       .catch(error => console.log('error', error));
   }
 
-  function change_setting_handler(response) {
+  async function change_setting_handler(response) {
         if (!response.successful) {
             alert(response.message)
-            // goto(`/${data.farm_id}/settings`);
         } else {
-            location.reload();
-        }
+            isLoading = true;
+              setTimeout(() => {
+                location.reload();
+          }, 5000);
+    }
   }
 
 </script>
 {#if farm_stats && done}
+    {#if isLoading}
+      <div class="loading-ring-overlay">
+        <div class="loading-ring"></div>
+      </div>
+    {/if}
     <div class="flex w-full justify-center items-center flex-col md:flex-row">
         <div class="flex flex-col grow md:w-1/3 md:h-5/6 items-center justify-center">
             <div class="flex grow md:hidden">
@@ -318,4 +326,45 @@
   .select-sm {
   height: 2rem;
 }
+
+  .loading-ring-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .loading-ring {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+  }
+
+  .loading-ring:after {
+    content: " ";
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: loading-ring 1.2s linear infinite;
+  }
+
+  @keyframes loading-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>
