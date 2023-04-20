@@ -844,7 +844,6 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
 
     if update_farm_input.LightAutomations:
         delete_inputs = []
-        delete_inputs = []
         update_inputs = []
         create_inputs = []
         no_changes_inputs = []
@@ -900,14 +899,6 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
         for create_input in create_inputs:
             light_combinations = get_lights_from_preset_db(create_input.farmLightPresetId)
 
-            new_automation = create_light_automation_in_db(CreateLightAutomationInput(
-                farmId=farm_id,
-                startTime=create_input.startTime,
-                endTime=create_input.endTime,
-                farmLightPresetId=create_input.farmLightPresetId,
-                username=username
-            ))
-
             for light_combination in light_combinations:
                 if light_automation_map[light_combination.lightId] and light_combination.automation:
                     try:
@@ -931,6 +922,14 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                     if r.status_code != 200:
                         response_message = json.loads(r.content)
                         get_http_exception('03', message=str(response_message["message"]))
+
+            new_automation = create_light_automation_in_db(CreateLightAutomationInput(
+                farmId=farm_id,
+                startTime=create_input.startTime,
+                endTime=create_input.endTime,
+                farmLightPresetId=create_input.farmLightPresetId,
+                username=username
+            ))
 
         for update_input in update_inputs:
             light_combinations = get_lights_from_preset_db(update_input.farmLightPresetId)
@@ -1012,13 +1011,6 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
             delete_ac_automation_in_db(delete_input.ACAutomationId)
 
         for create_input in create_inputs:
-            new_automation = create_ac_automation_in_db(CreateACAutomationInput(
-                farmId=farm_id,
-                startTime=create_input.startTime,
-                endTime=create_input.endTime,
-                temperature=create_input.temperature,
-                username=username
-            ))
             for ac in acs:
                 if ac.ACStatus:
                     try:
@@ -1039,6 +1031,14 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                     if r.status_code != 200:
                         response_message = json.loads(r.content)
                         get_http_exception('03', message=str(response_message["message"]))
+
+            new_automation = create_ac_automation_in_db(CreateACAutomationInput(
+                farmId=farm_id,
+                startTime=create_input.startTime,
+                endTime=create_input.endTime,
+                temperature=create_input.temperature,
+                username=username
+            ))
 
         for update_input in update_inputs:
             for ac in acs:
@@ -1115,13 +1115,6 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
             delete_watering_automation_in_db(delete_input.wateringAutomationId)
 
         for create_input in create_inputs:
-            new_automation = create_watering_automation_in_db(CreateWateringAutomationInput(
-                farmId=farm_id,
-                startTime=create_input.wateringStartTime,
-                endTime=create_input.wateringEndTime,
-                username=username
-            ))
-
             if update_farm_input.isWateringAutomation:
                 try:
                     body = AutomationInputJSON(
@@ -1140,6 +1133,13 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
                 if r.status_code != 200:
                     response_message = json.loads(r.content)
                     get_http_exception('03', message=str(response_message["message"]))
+
+            new_automation = create_watering_automation_in_db(CreateWateringAutomationInput(
+                farmId=farm_id,
+                startTime=create_input.wateringStartTime,
+                endTime=create_input.wateringEndTime,
+                username=username
+            ))
 
         for update_input in update_inputs + no_changes_inputs:
             try:
