@@ -926,7 +926,7 @@ def get_stats_from_mongo(farm_id: int):
             "$group": {
                 "_id": {
                     "$dateToString": {
-                        "format": "%Y-%m-%d",
+                        "format": "%Y-%m",
                         "date": "$createAt",
                         "timezone": "+00:00"
                     }
