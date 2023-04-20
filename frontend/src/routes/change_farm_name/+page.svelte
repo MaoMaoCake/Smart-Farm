@@ -65,7 +65,7 @@
           >Enter</button>
         </div>
         <div class="form-control mt-5">
-            <a href="{farm_id}/settings" class="btn btn-primary white">Cancel</a>
+            <a href="/{farm_id}/settings" class="btn btn-primary white">Cancel</a>
         </div>
       </div>
   </div>

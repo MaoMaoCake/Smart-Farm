@@ -20,7 +20,7 @@
         <p>{farm_name}</p>
 
         {#if !type}
-            <a href="{farm_id}/settings">
+            <a href="/{farm_id}/settings">
                 <Icon icon="icon-park-solid:setting-two" class="h-4 w-4 ml-2 mt-1"/>
             </a>
         {:else}
