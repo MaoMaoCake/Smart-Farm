@@ -1,6 +1,9 @@
+from datetime import datetime,timedelta
+import json
 import os
 
 from typing import Optional
+import pymongo
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -24,6 +27,11 @@ engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
+myclient = pymongo.MongoClient('mongodb://'f'{os.getenv("MONGO_USERNAME")}'':'f'{os.getenv("MONGO_PASSWORD")}''@'f'{os.getenv("MONGO_SERVER")}'':'f'{os.getenv("MONGO_PORT")}''/?authMechanism=DEFAULT') 
+
+mydb = myclient[f'{os.getenv("MONGO_DB")}']
+mycol = mydb[f'{os.getenv("MONGO_COLLECTION")}']
 
 def update_light_strength_to_all_light(update_light_strength_input: UpdateLightStrengthInput,farm_id: int,username: str):
     session.query(LightDB
@@ -204,3 +212,29 @@ def update_threshold_to_farm(farm_id: int,username: str, humidity: int, co2: int
     session.commit()
 
     return
+
+def insert_sensor_data(json_data: json):
+    mycol.insert_one(json_data)
+    return
+
+def queryLatestMaxSensorData(farm_id: int):
+    lastFiveMin = datetime.utcnow() - timedelta(minutes=5)
+
+    pipeline_min = [
+        {
+            "$match": {
+                "farmId": farm_id,
+                "createAt": {"$gte": lastFiveMin}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$createAt",
+                "Humidity": {"$max": "$humidity"},
+                "CO2": {"$max": "$co2"}
+            }
+        }
+    ]
+
+    responses = mycol.aggregate(pipeline_min)
+    return [response for response in responses]
