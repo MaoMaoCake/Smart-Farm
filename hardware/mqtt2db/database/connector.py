@@ -19,7 +19,8 @@ from dotenv import load_dotenv
 load_dotenv('mqtt2db.env')
 
 engine = create_engine(f"{os.getenv('DB_DIALECT')}://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-                       f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}")
+                       f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_DATABASE')}",
+                        isolation_level="READ UNCOMMITTED")
 
 Session = sessionmaker(bind=engine)
 session = Session()

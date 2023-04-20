@@ -16,7 +16,8 @@ from .schemas import LightPresetAutomationDB,\
                      WaterControllerDB
 
 engine = create_engine(f"{os.environ.get('DB_DIALECT')}://{os.environ.get('DB_USER')}:{os.environ.get('DB_PASSWORD')}"
-                       f"@{os.environ.get('DB_HOST')}:{os.environ.get('DB_PORT')}/{os.environ.get('DB_DATABASE')}")
+                       f"@{os.environ.get('DB_HOST')}:{os.environ.get('DB_PORT')}/{os.environ.get('DB_DATABASE')}",
+                        isolation_level="READ UNCOMMITTED")
 
 Session = sessionmaker(bind=engine)
 session = Session()
