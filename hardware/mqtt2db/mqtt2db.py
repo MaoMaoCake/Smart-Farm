@@ -163,7 +163,7 @@ def turn_on_co2(esp_id: int):
         esp_ids = get_co2_controller_esp_id_by_esp_id(esp_id)
         for i in esp_ids:
             co2_command = {}
-            co2_command['activate'] = False
+            co2_command['activate'] = True
             ret = publish_data(client,str(i),json.dumps(co2_command))  
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [turn_on_co2] cannot turn on the co2 controller from sensor with espId:', esp_id)
