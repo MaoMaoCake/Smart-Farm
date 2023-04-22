@@ -138,11 +138,11 @@
         		"bottom": {
         			"mapsTo": "date",
         			"scaleType": "time",
-        			"format": "%H:%M:%S"
+        			"format": "%Y-%m-%d %H:%M:%S"
         		},
         		"left": {
         			"mapsTo": "value",
-        			"title": "Level of Humidity",
+        			"title": "Level of growth factors",
         			"scaleType": "linear"
         		}
         	},
@@ -165,7 +165,7 @@
         		},
         		"left": {
         			"mapsTo": "value",
-        			"title": "Level of Humidity",
+        			"title": "Level of growth factors",
         			"scaleType": "linear"
         		}
         	},
@@ -188,7 +188,7 @@
         		},
         		"left": {
         			"mapsTo": "value",
-        			"title": "Level of Humidity",
+        			"title": "Level of growth factors",
         			"scaleType": "linear"
         		}
         	},
