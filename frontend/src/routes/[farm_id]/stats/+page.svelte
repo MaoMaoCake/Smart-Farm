@@ -10,6 +10,7 @@
   import {goto} from "$app/navigation";
   import Icon from '@iconify/svelte';
   import { PUBLIC_URL_PREFIX } from '$env/static/public'
+  import {onMount} from "svelte";
 
 
   interface FarmData {
@@ -36,7 +37,8 @@
   myHeaders.append("Origin", "");
   myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
-   fetch(
+  onMount(() => {
+       fetch(
           `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/stats`,
         {
           method: 'GET',
@@ -45,6 +47,17 @@
         })
       .then(async response => response_handler(await response.json()))
       .catch(error => console.log('error', error));
+
+       fetch(
+          `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/statsGraph`,
+        {
+          method: 'GET',
+          headers: myHeaders,
+          redirect: 'follow'
+        })
+      .then(async response => graph_handler(await response.json()))
+      .catch(error => console.log('error', error));
+  })
 
   function response_handler(response) {
       if (!response.successful) {
@@ -63,16 +76,6 @@
           }
       };
   }
-
-  fetch(
-          `${PUBLIC_URL_PREFIX}/api/farm/${$page.params.farm_id}/statsGraph`,
-        {
-          method: 'GET',
-          headers: myHeaders,
-          redirect: 'follow'
-        })
-      .then(async response => graph_handler(await response.json()))
-      .catch(error => console.log('error', error));
 
   function graph_handler(response) {
       if (!response.successful) {
