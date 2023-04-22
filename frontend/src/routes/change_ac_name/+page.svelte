@@ -2,8 +2,9 @@
     import {goto} from "$app/navigation";
     import { onMount } from 'svelte';
     import { PUBLIC_URL_PREFIX } from '$env/static/public'
+    import {is_register} from "../../lib/SettingStores";
 
-
+    is_register.set(false);
     let ac_name = null;
     let farm_id;
     let ac_id;

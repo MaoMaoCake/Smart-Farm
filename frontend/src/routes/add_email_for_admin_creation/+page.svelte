@@ -1,8 +1,9 @@
 <script lang="ts">
     import {goto} from "$app/navigation";
     import { PUBLIC_URL_PREFIX } from '$env/static/public'
+    import {is_register} from "../../lib/SettingStores";
 
-
+    is_register.set(false);
     let email = "";
     let errors = "";
 

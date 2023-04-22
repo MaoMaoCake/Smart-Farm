@@ -6,7 +6,9 @@
     import {goto} from "$app/navigation";
     import Icon from '@iconify/svelte';
     import { PUBLIC_URL_PREFIX } from '$env/static/public'
+    import {is_register} from "../../../../../lib/SettingStores";
 
+    is_register.set(false);
     export let data: PageData;
     let natural;
     let uv;
