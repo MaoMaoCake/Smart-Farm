@@ -12,7 +12,9 @@
   import HumiditySetting from "./HumiditySetting.svelte";
   import WateringSetting from "./WateringSetting.svelte";
   import { PUBLIC_URL_PREFIX } from '$env/static/public'
+  import {is_register} from "../../../lib/SettingStores";
 
+    is_register.set(false);
 
   // The following fetches the data for the farm denoted by the farm id in the path
   // parameter.

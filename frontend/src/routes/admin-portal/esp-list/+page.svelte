@@ -5,7 +5,6 @@
     import Icon from '@iconify/svelte';
     import { PUBLIC_URL_PREFIX } from '$env/static/public'
 
-
     is_admin.set(true);
     is_register.set(false);
 

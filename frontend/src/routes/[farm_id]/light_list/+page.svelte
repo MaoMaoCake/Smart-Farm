@@ -7,8 +7,9 @@
     import { page } from '$app/stores';
     import Icon from '@iconify/svelte';
     import { PUBLIC_URL_PREFIX } from '$env/static/public'
+    import {is_register} from "../../../lib/SettingStores";
 
-
+    is_register.set(false);
     interface FarmData {
         name: string,
         temp: number,
