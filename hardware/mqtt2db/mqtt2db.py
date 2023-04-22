@@ -28,9 +28,9 @@ def connect_mqtt() -> mqtt_client:
     try:
         def on_connect(client, userdata, flags, rc):
             if rc == 0:
-                print('Connected to MQTT Broker!')
+                print('[',datetime.datetime.utcnow(),']Connected to MQTT Broker!')
             else:
-                print('Failed to connect, return code %d\n', rc)
+                print('[',datetime.datetime.utcnow(),']Failed to connect, return code %d\n', rc)
 
         client = mqtt_client.Client(client_id)
         client.username_pw_set(username, password)
@@ -45,7 +45,7 @@ client = connect_mqtt()
 def publish_data(client: mqtt_client,topic: str, data: json):
     try:
         def on_publish(client,userdata,result):             #create function for callback
-            print('data published \n')
+            print('[',datetime.datetime.utcnow(),']data published \n')
             pass
         client.on_publish = on_publish
         ret= client.publish(topic,data)
@@ -201,7 +201,7 @@ def check_threshold(farm_id: int,esp_id: int):
                 turn_off_ac(esp_id)
                 turn_off_dehumidifier(esp_id)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [checkThreshold] cannot turn off the actuator from espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),']Error: [checkThreshold] cannot turn off the actuator from espId:', esp_id, 'and farm id:', farm_id)
 
 def update_threshold(esp_id: int, json_data: json):
     try:
@@ -217,7 +217,6 @@ def switch(json_data: json):
     try:
         action = str(json_data['action'])
         esp_id = int(json_data['espId'])
-        print('espId',esp_id)
         match action:
             case 'update/light':
                 update_light(esp_id, json_data)
@@ -267,7 +266,7 @@ def subscribe(client: mqtt_client):
         def on_message(client, userdata, msg):
             try:
                 message = msg.payload.decode()
-                print(f'Received `{message}` from `{msg.topic}` topic')
+                print('[',datetime.datetime.utcnow(),']'f'Received `{message}` from `{msg.topic}` topic')
                 json_data = json.loads(message)
 
                 switch(json_data)
