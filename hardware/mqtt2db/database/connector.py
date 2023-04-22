@@ -205,6 +205,12 @@ def update_threshold_to_farm(farm_id: int,username: str, humidity: int, co2: int
                         ).update({  'maxHumidity': humidity,
                                     'updateBy': username
                         })
+    elif (humidity == 0):
+        session.query(FarmDb
+                    ).filter(FarmDb.id == farm_id
+                    ).update({  'minCO2': co2,
+                                'updateBy': username
+                    })
     else:
         session.query(FarmDb
                         ).filter(FarmDb.id == farm_id

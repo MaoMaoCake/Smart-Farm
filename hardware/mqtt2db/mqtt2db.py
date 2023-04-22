@@ -143,7 +143,6 @@ def turn_on_ac(esp_id: int):
         for i in esp_ids:
             ac_command = {}
             ac_command['activate'] = True
-            ac_command['temperature'] = 14
             ret = publish_data(client,str(i),json.dumps(ac_command))    
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [turn_on_ac]: cannot turn on the ac from sensor with espId:', esp_id)
