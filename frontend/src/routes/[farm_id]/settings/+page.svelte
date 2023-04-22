@@ -344,7 +344,8 @@
                     {/if}
                      <select class="select select-sm bg-blue-900 rounded-lg white pr-7 mr-1 max-height-3 w-13"
                             bind:value={$FarmSettings.ac_temp}
-                            on:change={() => handleACTempChange()}>
+                            on:change={() => handleACTempChange()}
+                     disabled={!farm_stats.ac}>
                         <option disabled selected>{$FarmSettings.ac_temp}°</option>
                         {#each $FarmSettings.ac_preset as choice}
                             <option value={choice}>{choice}°</option>
