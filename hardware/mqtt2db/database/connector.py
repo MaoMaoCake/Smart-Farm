@@ -203,13 +203,13 @@ def update_threshold_to_farm(farm_id: int,username: str, humidity: int, co2: int
         session.query(FarmDb
                         ).filter(FarmDb.id == farm_id
                         ).update({  'maxHumidity': humidity,
-                                    'minCO2': co2,
                                     'updateBy': username
                         })
     else:
         session.query(FarmDb
                         ).filter(FarmDb.id == farm_id
                         ).update({  'maxHumidity': humidity,
+                                    'minCO2': co2,
                                     'updateBy': username
                         })
     session.commit()
