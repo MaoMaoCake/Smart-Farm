@@ -3,4 +3,4 @@ WORKDIR /app
 COPY . .
 RUN pip install -r requirements.txt
 
-CMD ["python", "mqtt2db.py"]
+CMD ["python", "-u", "mqtt2db.py"]
