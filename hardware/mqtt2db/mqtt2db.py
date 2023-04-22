@@ -256,6 +256,10 @@ def save_data_to_mongo(farm_id: int,json_data: json):
         createdDateTime = datetime.datetime(currentDateTime.year,currentDateTime.month,currentDateTime.day,currentDateTime.hour,createdMinute)
         json_data['farmId'] = farm_id
         json_data['createAt'] = createdDateTime
+        json_data['temperature'] = int(json_data['temperature'])
+        json_data['humidity'] = int(json_data['humidity'])
+        if(json_data.get('co2')):
+            json_data['co2'] = int(json_data['co2'])
         x = insert_sensor_data(json_data)
     except:
         print('[',datetime.datetime.utcnow(),']Error: [save_data_to_mongo] cannot save the data into the mongoDB with farm_id:', farm_id, 'and data:', json_data)
