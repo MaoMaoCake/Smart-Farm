@@ -72,21 +72,21 @@ def update_co2_controller_status(status: bool,
 
     return
 
-def update_all_sensor_data(input: UpdateAllSensorInput,farm_id: int,username: str):
-    if(input.CO2):
+def update_all_sensor_data(json_data: json,farm_id: int,username: str):
+    if(json_data.get('co2')):
         session.query(CO2SensorDB
                         ).filter(CO2SensorDB.farmId == farm_id
-                        ).update({  'CO2': input.CO2,
+                        ).update({  'CO2': json_data['co2'],
                                     'updateBy': username
                         })
     session.query(HumiditySensorDB
                     ).filter(HumiditySensorDB.farmId == farm_id
-                    ).update({  'humidity': input.humidity,
+                    ).update({  'humidity': json_data['humidity'],
                                 'updateBy': username
                     })
     session.query(TemperatureSensorDB
                     ).filter(TemperatureSensorDB.farmId == farm_id
-                    ).update({  'temperature': input.temperature,
+                    ).update({  'temperature': json_data['temperature'],
                                 'updateBy': username
                     })
     session.commit()

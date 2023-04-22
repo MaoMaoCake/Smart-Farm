@@ -38,19 +38,19 @@ def connect_mqtt() -> mqtt_client:
         client.connect(broker, port)
         return client
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [connect_mqtt] cannot connect to the mqtt broker')
+        print('[',datetime.datetime.utcnow(),'] Error: [connect_mqtt] cannot connect to the mqtt broker')
 
 client = connect_mqtt()
 
 def publish_data(client: mqtt_client,topic: str, data: json):
     try:
         def on_publish(client,userdata,result):             #create function for callback
-            print('[',datetime.datetime.utcnow(),']data published \n')
+            print('[',datetime.datetime.utcnow(),'] data published to topic:',topic,'and data:',data)
             pass
         client.on_publish = on_publish
         ret= client.publish(topic,data)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [publish_data] cannot publish the data to the mqtt')
+        print('[',datetime.datetime.utcnow(),'] Error: [publish_data] cannot publish the data to the mqtt')
 
 def get_farm_id_by_esp_id(esp_id: int):
     try:
@@ -58,38 +58,34 @@ def get_farm_id_by_esp_id(esp_id: int):
         farm_id = get_farm_id_by_hardware_id(hardware['hardware_id'],hardware['hardware_type'])
         return farm_id
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [get_farm_id_by_esp_id] cannot get the farm id from espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [get_farm_id_by_esp_id] cannot get the farm id from espId:', esp_id)
 
 def update_light(esp_id: int, json_data: json):
     try:
         farm_id = get_farm_id_by_esp_id(esp_id)
         update_light_strength_to_all_light(bool(json_data['activate']),farm_id,System.USERNAME.value)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [update_light] cannot update light status with the espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [update_light] cannot update light status with the espId:', esp_id, 'and data:', json_data)
 
 def update_dehumidifier(esp_id: int, json_data: json):
     try:
         farm_id = get_farm_id_by_esp_id(esp_id)
         update_dehumidifier_status(bool(json_data['activate']),farm_id,System.USERNAME.value)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [update_dehumidifier] cannot update humidifier status with the espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [update_dehumidifier] cannot update humidifier status with the espId:', esp_id, 'and data:', json_data)
 
 def update_co2_controller(esp_id: int, json_data: json):
     try:
         farm_id = get_farm_id_by_esp_id(esp_id)
         update_co2_controller_status(bool(json_data['activate']),farm_id,System.USERNAME.value)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [update_co2_controller] cannot update co2 controller status status with the espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [update_co2_controller] cannot update co2 controller status status with the espId:', esp_id, 'and data:', json_data)
 
-def update_all_sensor_data_to_sql(farm_id: int, esp_id: int, json_data: json):
+def update_all_sensor_data_to_sql(farm_id: int,json_data: json):
     try:
-        if json_data.get('co2'):
-            updatInput = UpdateAllSensorInput(json_data['temperature'],json_data['humidity'],json_data['co2'])
-        else:
-            updatInput = UpdateAllSensorInput(json_data['temperature'],json_data['humidity'])
-        update_all_sensor_data(updatInput,farm_id,System.USERNAME.value)
+        update_all_sensor_data(json_data,farm_id,System.USERNAME.value)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [update_all_sensor_data_to_sql] cannot update the data to sql by espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [update_all_sensor_data_to_sql] cannot update the data to sql by espId:', esp_id, 'and data:', json_data)
 
 def get_threshold(esp_id: int):
     try:
@@ -97,7 +93,7 @@ def get_threshold(esp_id: int):
         threshold = get_threshold_by_farm_id(farm_id)
         return threshold
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [get_threshold] cannot get the co2 and humidity thresholds from mysql for espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [get_threshold] cannot get the co2 and humidity thresholds from mysql for espId:', esp_id)
 
 def get_ac_status(esp_id: int):
     try:
@@ -105,21 +101,21 @@ def get_ac_status(esp_id: int):
         ac_status = get_ac_status_by_farm_id(farm_id)
         return ac_status
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [get_ac_status] cannot get the ac status from mysql for espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [get_ac_status] cannot get the ac status from mysql for espId:', esp_id)
 
 def send_threshold(esp_id: int):
     try:
         threshold = get_threshold(esp_id)
         ret = publish_data(client,str(esp_id),json.dumps(threshold))
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [send_threshold] cannot send the co2 and humidity thresholds to the espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [send_threshold] cannot send the co2 and humidity thresholds to the espId:', esp_id)
 
 def send_ac_status(esp_id: int):
     try:
         ac_status = get_ac_status(esp_id)
         ret = publish_data(client,str(esp_id),json.dumps(ac_status))
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [send_ac_status] cannot send the ac status to initiate the ac to the espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [send_ac_status] cannot send the ac status to initiate the ac to the espId:', esp_id)
 
 def turn_on_dehumidifier(esp_id: int):
     try:
@@ -129,7 +125,7 @@ def turn_on_dehumidifier(esp_id: int):
             dehumidifier_command['activate'] = True
             ret = publish_data(client,str(i),json.dumps(dehumidifier_command))
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [turn_on_dehumidifier] cannot turn on the dehumidifier from sensor with espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [turn_on_dehumidifier] cannot turn on the dehumidifier from sensor with espId:', esp_id)
 
 def turn_off_dehumidifier(esp_id: int):
     try:
@@ -139,7 +135,7 @@ def turn_off_dehumidifier(esp_id: int):
             dehumidifier_command['activate'] = False
             ret = publish_data(client,str(i),json.dumps(dehumidifier_command))
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [turn_off_dehumidifier] cannot turn off the dehumidifier from sensor with espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [turn_off_dehumidifier] cannot turn off the dehumidifier from sensor with espId:', esp_id)
 
 def turn_on_ac(esp_id: int):
     try:
@@ -150,7 +146,7 @@ def turn_on_ac(esp_id: int):
             ac_command['temperature'] = 14
             ret = publish_data(client,str(i),json.dumps(ac_command))    
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [turn_on_ac]: cannot turn on the ac from sensor with espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [turn_on_ac]: cannot turn on the ac from sensor with espId:', esp_id)
 
 def turn_off_ac(esp_id: int):
     try:
@@ -160,7 +156,7 @@ def turn_off_ac(esp_id: int):
             ac_command['activate'] = False
             ret = publish_data(client,str(i),json.dumps(ac_command))    
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [turn_off_ac]: cannot turn off the ac from sensor with espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [turn_off_ac]: cannot turn off the ac from sensor with espId:', esp_id)
 
 def turn_on_co2(esp_id: int):
     try:
@@ -170,7 +166,7 @@ def turn_on_co2(esp_id: int):
             co2_command['activate'] = False
             ret = publish_data(client,str(i),json.dumps(co2_command))  
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [turn_on_co2] cannot turn on the co2 controller from sensor with espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [turn_on_co2] cannot turn on the co2 controller from sensor with espId:', esp_id)
 
 def turn_off_co2(esp_id: int):
     try:
@@ -180,27 +176,29 @@ def turn_off_co2(esp_id: int):
             co2_command['activate'] = False
             ret = publish_data(client,str(i),json.dumps(co2_command))
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [turn_off_co2] cannot turn off the co2 controller from sensor with espId:', esp_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [turn_off_co2] cannot turn off the co2 controller from sensor with espId:', esp_id)
 
 def update_ac(esp_id: int,json_data: json):
     try:
         farm_id = get_farm_id_by_esp_id(esp_id)
         update_ac_status(json_data['ac_status'],json_data['temperature'],farm_id,System.USERNAME.value)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [update_ac] cannot update the ac data into mysql from espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [update_ac] cannot update the ac data into mysql from espId:', esp_id, 'and data:', json_data)
 
 def check_threshold(farm_id: int,esp_id: int):
     try:
         threshold = get_threshold(esp_id)
         sensorDatas = queryLatestMaxSensorData(farm_id)
-        for sensorData in sensorDatas:
-            if((int(threshold['co2'])*0.7 < sensorData['co2'])):
-                turn_off_co2(esp_id)
-            if (int(threshold['humidity'])*0.7 > sensorData['humidity']):
-                turn_off_ac(esp_id)
-                turn_off_dehumidifier(esp_id)
+        if len(sensorDatas) > 0:
+            for sensorData in sensorDatas:
+                if sensorData.get('CO2'):
+                    if((int(threshold['co2'])*0.7 < sensorData['CO2'])):
+                        turn_off_co2(esp_id)
+                if (int(threshold['humidity'])*0.7 > sensorData['Humidity']):
+                    turn_off_ac(esp_id)
+                    turn_off_dehumidifier(esp_id)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [checkThreshold] cannot turn off the actuator from espId:', esp_id, 'and farm id:', farm_id)
+        print('[',datetime.datetime.utcnow(),'] Error: [checkThreshold] cannot turn off the actuator from espId:', esp_id, 'and farm id:', farm_id)
 
 def update_threshold(esp_id: int, json_data: json):
     try:
@@ -210,7 +208,7 @@ def update_threshold(esp_id: int, json_data: json):
         else:
             update_threshold_to_farm(farm_id,System.USERNAME.value,json_data['humidity'])
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [update_threshold] cannot update the threshold by espId:', esp_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [update_threshold] cannot update the threshold by espId:', esp_id, 'and data:', json_data)
     
 def switch(json_data: json):
     try:
@@ -227,7 +225,7 @@ def switch(json_data: json):
                 farm_id = get_farm_id_by_esp_id(esp_id)
                 check_threshold(farm_id,esp_id)
                 save_data_to_mongo(farm_id,json_data)
-                update_all_sensor_data_to_sql(farm_id,esp_id, json_data)
+                update_all_sensor_data_to_sql(farm_id, json_data)
             case 'get/threshold':
                 send_threshold(esp_id)
             case 'get/ac_status':
@@ -247,7 +245,7 @@ def switch(json_data: json):
             case 'update/threshold':
                 update_threshold(esp_id, json_data)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [switch] cannot take the action from the mqtt payload with data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [switch] cannot take the action from the mqtt payload with data:', json_data)
 
 def save_data_to_mongo(farm_id: int,json_data: json):
     try:
@@ -256,13 +254,9 @@ def save_data_to_mongo(farm_id: int,json_data: json):
         createdDateTime = datetime.datetime(currentDateTime.year,currentDateTime.month,currentDateTime.day,currentDateTime.hour,createdMinute)
         json_data['farmId'] = farm_id
         json_data['createAt'] = createdDateTime
-        json_data['temperature'] = int(json_data['temperature'])
-        json_data['humidity'] = int(json_data['humidity'])
-        if(json_data.get('co2')):
-            json_data['co2'] = int(json_data['co2'])
         x = insert_sensor_data(json_data)
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [save_data_to_mongo] cannot save the data into the mongoDB with farm_id:', farm_id, 'and data:', json_data)
+        print('[',datetime.datetime.utcnow(),'] Error: [save_data_to_mongo] cannot save the data into the mongoDB with farm_id:', farm_id, 'and data:', json_data)
 
 def subscribe(client: mqtt_client):
     try:
@@ -274,19 +268,19 @@ def subscribe(client: mqtt_client):
 
                 switch(json_data)
             except:
-                print('[',datetime.datetime.utcnow(),']Error: [on_message] cannot subcribe the mqtt with client:', client, 'and msg:',msg)
+                print('[',datetime.datetime.utcnow(),'] Error: [on_message] cannot subcribe the mqtt with client:', client, 'and msg:',msg)
             
         client.subscribe(topic)
         client.on_message = on_message
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [subscribe] cannot subcribe the mqtt with client:', client)
+        print('[',datetime.datetime.utcnow(),'] Error: [subscribe] cannot subcribe the mqtt with client:', client)
 
 def run():
     try:
         subscribe(client)
         client.loop_forever()
     except:
-        print('[',datetime.datetime.utcnow(),']Error: [run] cannot run the mqtt2db / cannot run the mqtt client')
+        print('[',datetime.datetime.utcnow(),'] Error: [run] cannot run the mqtt2db / cannot run the mqtt client')
 
 
 if __name__ == '__main__':
