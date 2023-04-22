@@ -95,7 +95,7 @@
                 co2_val: response.data.CO2Level,
                 co2: response.data.CO2controllerStatus,
                 farm_id: response.data.farmId,
-                // ac_temp: response.data.ACTemperature
+                ac_temp: response.data.ACTemperature
             }
 
             light_switch = farm_stats.light;
@@ -179,7 +179,7 @@
       $FarmSettings.humidity = response.data.MaxHumidityLevel;
 
       $FarmSettings.light_preset = response.data.FarmLightPresets;
-      $FarmSettings.ac_temp = response.data.ACTemp;
+      // $FarmSettings.ac_temp = response.data.ACTemp;
       $FarmSettings.watering_automation = response.data.isWateringAutomation;
 
       $FarmSettings.light_schedule = response.data.LightAutomations.map(object => {
