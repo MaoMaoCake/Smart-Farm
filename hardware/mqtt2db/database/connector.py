@@ -234,7 +234,7 @@ def queryLatestMaxSensorData(farm_id: int):
             "$group": {
                 "_id": "$createAt",
                 "Humidity": {"$max": "$humidity"},
-                "CO2": {"$max": "$co2"}
+                "CO2": {"$min": "$co2"}
             }
         }
     ]
