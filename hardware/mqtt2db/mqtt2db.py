@@ -62,9 +62,8 @@ def get_farm_id_by_esp_id(esp_id: int):
 
 def update_light(esp_id: int, json_data: json):
     try:
-        updateInput = UpdateLightStrengthInput(json_data['natural_percent'],json_data['uv_percent'],json_data['ir_percent'])
         farm_id = get_farm_id_by_esp_id(esp_id)
-        update_light_strength_to_all_light(updateInput,farm_id,System.USERNAME.value)
+        update_light_strength_to_all_light(bool(json_data['activate']),farm_id,System.USERNAME.value)
     except:
         print('[',datetime.datetime.utcnow(),']Error: [update_light] cannot update light status with the espId:', esp_id, 'and data:', json_data)
 

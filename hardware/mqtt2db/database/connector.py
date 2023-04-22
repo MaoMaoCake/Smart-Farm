@@ -33,13 +33,16 @@ myclient = pymongo.MongoClient('mongodb://'f'{os.getenv("MONGO_USERNAME")}'':'f'
 mydb = myclient[f'{os.getenv("MONGO_DB")}']
 mycol = mydb[f'{os.getenv("MONGO_COLLECTION")}']
 
-def update_light_strength_to_all_light(update_light_strength_input: UpdateLightStrengthInput,farm_id: int,username: str):
+def update_light_strength_to_all_light(light_status: bool,farm_id: int,username: str):
     session.query(LightDB
         ).filter(LightDB.farmId == farm_id
-            ).update({'UVLightDensity': update_light_strength_input.UVLightDensity,
-                'IRLightDensity': update_light_strength_input.IRLightDensity,
-                'naturalLightDensity': update_light_strength_input.NaturalLightDensity,
+            ).update({'status': light_status,
                 'updateBy': username
+                })
+    session.query(FarmDb
+        ).filter(FarmDb.id == farm_id
+            ).update({  'lightStatus': light_status,
+                        'updateBy': username
                 })
     session.commit()
 
