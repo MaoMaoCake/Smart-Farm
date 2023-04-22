@@ -136,7 +136,7 @@
                     </div>
                     <div class="flex justify-center items-center fixed top-1/2 bottom-1/2 left-1/2 right-1/2 z-30">
                         <div class="flex flex-col justify-center">
-                            <TimePicker {options} on:change={e_okCallback} on:cancel={e_cancelCallback}/>
+                            <TimePicker {options} on:ok={e_okCallback} on:cancel={e_cancelCallback}/>
                         </div>
                     </div>
                 {/if}
