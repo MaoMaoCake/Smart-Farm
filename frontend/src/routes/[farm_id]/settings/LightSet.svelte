@@ -78,13 +78,14 @@
     }
 
     async function remove(){
-        if ($FarmSettings.light_schedule[num].changes_type == "DELETE") {
-            rmTime(num)
-        } else {
-            if (await dialogs.confirm("Are You sure you want to delete this automation?")){
-                rmTime(num)
-            }
-        }
+        // if ($FarmSettings.light_schedule[num].changes_type == "DELETE") {
+        //     rmTime(num)
+        // } else {
+        //     if (await dialogs.confirm("Are You sure you want to delete this automation?")){
+        //         rmTime(num)
+        //     }
+        // }
+        rmTime(num)
     }
 
     async function handleOptionChange(){

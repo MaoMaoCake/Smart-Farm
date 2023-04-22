@@ -85,13 +85,14 @@
     }
 
     async function remove(){
-        if ($FarmSettings.ac_schedule[num].changes_type == "DELETE") {
-            rmTime(num)
-        } else {
-            if (await dialogs.confirm(confirm_ops)){
-                rmTime(num)
-            }
-        }
+        // if ($FarmSettings.ac_schedule[num].changes_type == "DELETE") {
+        //     rmTime(num)
+        // } else {
+        //     if (await dialogs.confirm(confirm_ops)){
+        //         rmTime(num)
+        //     }
+        // }
+        rmTime(num)
     }
 
     async function handleOptionChange(){
