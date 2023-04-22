@@ -133,8 +133,8 @@ def get_threshold_by_farm_id(farm_id: int):
 
     farm = session.query(FarmDb).filter(FarmDb.id == farm_id).first()
 
-    threshold["co2"] = farm.minCO2
-    threshold["humidity"] = farm.maxHumidity
+    threshold["co2_threshold"] = farm.minCO2
+    threshold["humidity_threshold"] = farm.maxHumidity
 
     return threshold
 
