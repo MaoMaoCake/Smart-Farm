@@ -56,13 +56,14 @@
     }
 
     async function remove(){
-        if ($FarmSettings.watering_schedule[num].changes_type == "DELETE") {
-            rmTime(num)
-        } else {
-            if (await dialogs.confirm("Are You sure you want to delete this automation?")){
-                rmTime(num)
-            }
-        }
+        // if ($FarmSettings.watering_schedule[num].changes_type == "DELETE") {
+        //     rmTime(num)
+        // } else {
+        //     if (await dialogs.confirm("Are You sure you want to delete this automation?")){
+        //         rmTime(num)
+        //     }
+        // }
+        rmTime(num)
     }
 </script>
 <div class="flex justify-evenly grow">
