@@ -50,25 +50,21 @@
     isDisabled = values.every(val => val === false);
   }
 
-  onMount(() => {
-      // get the farm's current settings:
-      // let settings;
-      // await fetch (something)
-      // set settings = the thing we fetched
-    })
-
   const myHeaders = new Headers();
   myHeaders.append("Origin", "");
   myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
-  fetch(
+  onMount(() => {
+   fetch(
       `${PUBLIC_URL_PREFIX}/api/farm/${data.farm_id}/stats`,
       {
         method: 'GET',
         headers: myHeaders,
         redirect: 'follow'
       })
-    .then(async response => response_handler(await response.json()))
+    .then(async response => {
+        response_handler(await response.json())
+    })
     .catch(error => console.log('error', error));
 
   fetch(
@@ -80,6 +76,8 @@
       })
     .then(async response => get_setting_response_handler(await response.json()))
     .catch(error => console.log('error', error));
+    })
+
 
   function response_handler(response) {
         if (!response.successful) {
@@ -104,10 +102,10 @@
         };
   }
 
-  beforeUpdate(() => {
-    // This makes the load function run again, this will update the state on our page
-    invalidateAll();
-  })
+  // beforeUpdate(() => {
+  //   // This makes the load function run again, this will update the state on our page
+  //   invalidateAll();
+  // })
 
   function control_actuators(type: string, farm_id: string, state: boolean){
     fetch(
