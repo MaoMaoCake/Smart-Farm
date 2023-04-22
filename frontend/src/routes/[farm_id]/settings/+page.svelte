@@ -98,6 +98,7 @@
                 ac_temp: response.data.ACTemperature
             }
 
+            $FarmSettings.ac_temp = response.data.ACTemperature;
             light_switch = farm_stats.light;
             ac_switch = farm_stats.ac;
             humidifier_switch = farm_stats.humidifier;
