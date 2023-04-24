@@ -327,6 +327,7 @@ def upgrade():
         sa.Column('deleteBy', sa.VARCHAR(45), nullable=True),
 
         sa.Column('farmId', sa.Integer, sa.ForeignKey('farm.id'), nullable=False),
+        sa.Column('status', sa.Boolean, nullable=False),
         sa.Column('automation', sa.Boolean, nullable=False),
         sa.Column('isAvailable', sa.Boolean, nullable=False)
     )

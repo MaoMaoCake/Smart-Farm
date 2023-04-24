@@ -30,7 +30,7 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     create_farm_to_db, create_esp_to_db, get_all_farm_from_user_id_from_db, get_all_sensors_from_farm_id_from_db,\
     create_default_ac_to_db, create_default_watering_to_db, create_default_co2_controller_to_db,\
     create_default_dehumidifier_to_db, create_default_co2_sensor_to_db, create_default_humidity_sensor_to_db,\
-    create_default_temperature_sensor_to_db, create_esp_map_to_db, update_esp_map_to_db
+    create_default_temperature_sensor_to_db, create_esp_map_to_db, update_esp_map_to_db, get_co2_controller_from_db
     
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
@@ -45,7 +45,7 @@ from .models import FarmOwner, FarmStats, Light,\
     Dehumidifier, DehumidifierRequest, UpdateFarmSettings, SensorRequest,\
     LightAutomation, CreateLightAutomationInput, UpdateLightAutomationInput,\
     UpdateACAutomationInput, CreateWateringAutomationInput, UpdateWateringAutomationInput,\
-    CreateACAutomationInput, WateringAutomation
+    CreateACAutomationInput, WateringAutomation, WateringRequest, Co2Request
 
 from .enum_list import HardwareType, ChangesType
 
@@ -703,6 +703,38 @@ def dehumidifier_controlling(farm_id: int, is_turn_on: bool, username: str):
                     get_http_exception('03', message='MQTT connection failed!')
             except:
                 get_http_exception('03', message='MQTT connection failed')
+
+    return get_response_status(message='Successfully send requests to mqtt broker')
+
+
+def watering_controlling(farm_id: int, is_turn_on: bool):
+    water_controller = get_water_controller(farm_id)
+    ESP_mapping = get_esp_map(HardwareType.WATERING.value)
+    try:
+        body = WateringRequest(activate=is_turn_on)
+        response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.WATERING.value}"
+                                                             f"{water_controller.waterControllerId}"]),
+                                       message=json.dumps(body.__dict__))
+        if response.status_code != 200:
+            get_http_exception('03', message='MQTT connection failed!')
+    except:
+        get_http_exception('03', message='MQTT connection failed')
+
+    return get_response_status(message='Successfully send requests to mqtt broker')
+
+
+def co2_controlling(farm_id: int, is_turn_on: bool):
+    co2_controller = get_co2_controller_from_db(farm_id)
+    ESP_mapping = get_esp_map(HardwareType.CO2_CONTROLLER.value)
+    try:
+        body = Co2Request(activate=is_turn_on)
+        response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.CO2_CONTROLLER.value}"
+                                                             f"{co2_controller.CO2ControllerId}"]),
+                                       message=json.dumps(body.__dict__))
+        if response.status_code != 200:
+            get_http_exception('03', message='MQTT connection failed!')
+    except:
+        get_http_exception('03', message='MQTT connection failed')
 
     return get_response_status(message='Successfully send requests to mqtt broker')
 

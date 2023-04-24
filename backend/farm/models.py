@@ -228,6 +228,9 @@ class WateringRequest(BaseModel):
     activate: bool
 
 
+class Co2Request(BaseModel):
+    activate: bool
+
 class DehumidifierRequest(BaseModel):
     activate: bool
 
@@ -275,6 +278,7 @@ class GetFarmSettings(BaseModel):
     MinCO2Level: int
     MaxHumidityLevel: int
     ACTemp: int
+    wateringStatus: bool
     isWateringAutomation: bool
     LightAutomations: List[LightAutomation]
     FarmLightPresets: List[FarmLightPreset]
@@ -350,6 +354,7 @@ class UpdateACAutomationInput(BaseModel):
 class WaterController(BaseModel):
     waterControllerId: int
     automation: bool
+    status: bool
 
 
 class CreateWateringAutomationInput(BaseModel):

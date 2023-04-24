@@ -117,6 +117,18 @@ def upgrade() -> None:
          'humidity': 0,
          'createBy': 'ADMIN',
          'updateBy': 'ADMIN'},
+        {'farmId': 1,
+         'humidity': 0,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'farmId': 1,
+         'humidity': 0,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'farmId': 1,
+         'humidity': 0,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
     ]
     table = sa.Table('humiditySensor', sa.MetaData(), autoload_with=op.get_bind())
     op.bulk_insert(table, humidity_sensor_data)
@@ -171,12 +183,25 @@ def upgrade() -> None:
          'temperature': 0,
          'createBy': 'ADMIN',
          'updateBy': 'ADMIN'},
+        {'farmId': 1,
+         'temperature': 0,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'farmId': 1,
+         'temperature': 0,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
+        {'farmId': 1,
+         'temperature': 0,
+         'createBy': 'ADMIN',
+         'updateBy': 'ADMIN'},
     ]
     table = sa.Table('temperatureSensor', sa.MetaData(), autoload_with=op.get_bind())
     op.bulk_insert(table, temperature_sensor_data)
 
     water_controller_data = [
         {'farmId': 1,
+         'status': False,
          'automation': True,
          'isAvailable': True,
          'createBy': 'ADMIN',
