@@ -36,6 +36,8 @@
   let light_switch = true;
   let ac_switch = true;
   let humidifier_switch = true;
+  let co2_switch = true;
+  let watering_switch = true;
   let settings;
   let farm_stats: FarmData;
   let ac_temp_original = 25;
@@ -43,6 +45,8 @@
   $: light_switching = light_switch;
   $: ac_switching = ac_switch;
   $: humidifier_switching = humidifier_switch;
+  $: co2_switching = co2_switch;
+  $: watering_switching = watering_switch;
   let isDisabled = true;
   let done = false;
   let isLoading = false;
@@ -102,6 +106,7 @@
             light_switch = farm_stats.light;
             ac_switch = farm_stats.ac;
             humidifier_switch = farm_stats.humidifier;
+            co2_switch = farm_stats.co2;
         };
   }
 
@@ -157,6 +162,12 @@
           case "dehumidifier":
               humidifier_switch = !humidifier_switch;
               break;
+          case "co2":
+              co2_switch = !co2_switch;
+              break;
+          case "watering":
+              watering_switch = !watering_switch;
+              break;
       }
 
     } else if (response.successful) {
@@ -169,6 +180,12 @@
       else if ( type == "dehumidifier"){
         farm_stats.humidifier = !state;
       }
+      else if ( type == "co2"){
+        farm_stats.co2 = !state;
+      }
+      // else if ( type == "watering"){
+      //   farm_stats.co2 = !state;
+      // }
     }
   }
 
@@ -182,6 +199,8 @@
       $FarmSettings.light_preset = response.data.FarmLightPresets;
       // $FarmSettings.ac_temp = response.data.ACTemp;
       $FarmSettings.watering_automation = response.data.isWateringAutomation;
+      $FarmSettings.watering_status = response.data.wateringStatus;
+      watering_switch = response.data.wateringStatus;
 
       $FarmSettings.light_schedule = response.data.LightAutomations.map(object => {
           return {
@@ -361,7 +380,25 @@
                     {/if}
                     <input type="checkbox" class="toggle toggle-success" bind:checked={humidifier_switch} on:click={() => {control_actuators("dehumidifier", data.farm_id, humidifier_switching)}}/>
                 </div>
-            </div>
+                </div>
+                <div class="flex justify-center grow pt-5">
+                     <div class="flex justify-center grow items-center white">
+                        {#if co2_switching}
+                            <Icon icon="material-symbols:co2" class="h-9 w-9 bg-red-900 p-2 mr-1 rounded-lg"/>
+                        {:else}
+                            <Icon icon="material-symbols:co2" class="h-9 w-9 bg-red-900 p-2 mr-1 rounded-lg"/>
+                        {/if}
+                        <input type="checkbox" class="toggle toggle-success" bind:checked={co2_switch} on:click={() => {control_actuators("co2", data.farm_id, co2_switching)}}/>
+                    </div>
+                    <div class="flex justify-center grow items-center white pl-5">
+                        {#if watering_switching}
+                            <Icon icon="mdi:watering-can" class="h-9 w-9 bg-blue-400 p-2 mr-1 rounded-lg"/>
+                        {:else}
+                            <Icon icon="mdi:watering-can" class="h-9 w-9 bg-blue-400 p-2 mr-1 rounded-lg"/>
+                        {/if}
+                        <input type="checkbox" class="toggle toggle-success" bind:checked={watering_switch} on:click={() => {control_actuators("watering", data.farm_id, watering_switching)}}/>
+                    </div>
+                </div>
         </div>
         <div class="flex w-full flex-col md:flex-row md:flex-wrap grow md:pl-10 md:pr-10">
             <div class="flex flex-col grow">

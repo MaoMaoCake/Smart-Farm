@@ -530,6 +530,7 @@ def get_farm_setting_from_db(farm_id: int) -> GetFarmSettings:
     return GetFarmSettings(MinCO2Level=farm_setting.minCO2,
                            MaxHumidityLevel=farm_setting.maxHumidity,
                            ACTemp=farm_setting.ACTemp,
+                           wateringStatus=water_controller.status,
                            isWateringAutomation=water_controller.automation,
                            LightAutomations=[LightAutomation(
                                lightAutomationId=data.id,
@@ -749,7 +750,8 @@ def get_water_controller(farm_id: int) -> WaterController:
 
     return WaterController(
         waterControllerId=water_controller.id,
-        automation=water_controller.automation
+        automation=water_controller.automation,
+        status=water_controller.status
     )
 
 

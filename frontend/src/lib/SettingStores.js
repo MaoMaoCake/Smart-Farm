@@ -12,7 +12,8 @@ export let FarmSettings = writable({
     light_list: [],
     ac_list: [],
     ac_temp: 0,
-    watering_automation: true
+    watering_automation: true,
+    watering_status: true
 })
 
 export let presetMap = writable({})

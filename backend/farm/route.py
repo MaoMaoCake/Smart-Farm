@@ -19,7 +19,7 @@ from .utils import link_farm_to_user, list_farms,\
     list_farms_from_user_id_by_admin, list_sensors_from_farm_id_by_admin, create_new_ac_by_admin,\
     create_new_watering_by_admin, create_new_co2_controller_by_admin, create_new_dehumidifier_by_admin,\
     create_new_co2_sensor_by_admin, create_new_humidity_sensor_by_admin, create_new_temperature_sensor_by_admin,\
-    update_esp_map_by_admin, create_new_esp_map_by_admin
+    update_esp_map_by_admin, create_new_esp_map_by_admin, co2_controlling, watering_controlling
 
 from .models import FarmOwner, FarmStats, Light, LightCombination,\
     FarmLightPreset, AC, LightStrength, CreateLightInput, \
@@ -152,6 +152,20 @@ async def control_dehumidifier(farm_id: int, is_turn_on: bool, current_user: Use
     if current_user.role != Role.USER.value:
         get_http_exception('10')
     return dehumidifier_controlling(farm_id, is_turn_on, current_user.username)
+
+
+@farmRouter.post("/farm/{farm_id}/co2/control", response_model=ResponseDto, tags=["Farm"])
+async def control_co2(farm_id: int, is_turn_on: bool, temperature: int ,current_user: User = Depends(get_current_active_user)):
+    if current_user.role != Role.USER.value:
+        get_http_exception('10')
+    return co2_controlling(farm_id, is_turn_on, temperature)
+
+
+@farmRouter.post("/farm/{farm_id}/watering/control", response_model=ResponseDto, tags=["Farm"])
+async def control_watering(farm_id: int, is_turn_on: bool, current_user: User = Depends(get_current_active_user)):
+    if current_user.role != Role.USER.value:
+        get_http_exception('10')
+    return watering_controlling(farm_id, is_turn_on)
 
 
 @farmRouter.patch("/farm/{farm_id}/AC/{ac_id}/automation", response_model=ResponseDto, tags=["AC"])
