@@ -222,28 +222,34 @@ class LightRequest(BaseModel):
     ir_percent: int
     natural_percent: int
     light_combination_id: Optional[int]
+    action_by_user: bool
 
 
 class WateringRequest(BaseModel):
     activate: bool
+    action_by_user: bool
 
 
 class Co2Request(BaseModel):
     activate: bool
+    action_by_user: bool
 
 class DehumidifierRequest(BaseModel):
     activate: bool
+    action_by_user: bool
 
 
 class ACRequest(BaseModel):
     activate: bool
     temperature: int
+    action_by_user: bool
 
 
 class SensorRequest(BaseModel):
     co2_threshold: Optional[int]
     humidity_threshold: Optional[int]
     temperature_threshold: Optional[int]
+    action_by_user: bool
 
 
 class ACAutomation(BaseModel):

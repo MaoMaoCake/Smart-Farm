@@ -173,5 +173,6 @@ class MQTTMapDB(BaseModel):
 class WaterControllerDB(BaseModel):
     __tablename__ = "waterController"
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
+    status = Column(Boolean, nullable=False)
     automation = Column(Boolean, nullable=False)
     isAvailable = Column(Boolean, nullable=False)

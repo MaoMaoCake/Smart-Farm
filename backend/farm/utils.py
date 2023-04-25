@@ -231,7 +231,8 @@ def apply_light_strength_to_all_lights(updateLightStrengthInput: UpdateLightStre
                activate=light.status,
                uv_percent=updateLightStrengthInput.UVLightDensity,
                ir_percent= updateLightStrengthInput.IRLightDensity,
-               natural_percent=updateLightStrengthInput.NaturalLightDensity
+               natural_percent=updateLightStrengthInput.NaturalLightDensity,
+               action_by_user=True
             )
             response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
                                            message=json.dumps(body.__dict__))
@@ -292,7 +293,8 @@ def apply_light_strength_to_all_lights_in_preset(updateLightStrengthInputInPrese
                                        uv_percent=updateLightStrengthInputInPreset.UVLightDensity,
                                        ir_percent=updateLightStrengthInputInPreset.IRLightDensity,
                                        natural_percent=updateLightStrengthInputInPreset.NaturalLightDensity,
-                                       light_combination_id= light_combination_map[light.lightId]
+                                       light_combination_id= light_combination_map[light.lightId],
+                                       action_by_user = True
                              )
                             response = create_mqtt_request(
                                 topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
@@ -365,7 +367,8 @@ def light_controlling(farm_id: int, is_turn_on: bool, username: str):
                    activate=is_turn_on,
                    uv_percent=light.UVLightDensity,
                    ir_percent=light.IRLightDensity,
-                   natural_percent=light.naturalLightDensity
+                   natural_percent=light.naturalLightDensity,
+                   action_by_user = True
                 )
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light.lightId}"]),
                                                message=json.dumps(body.__dict__))
@@ -404,7 +407,8 @@ def ac_controlling(farm_id: int, is_turn_on: bool, _temperature: int ,username: 
             try:
                 body = ACRequest(
                    activate=is_turn_on,
-                   temperature=_temperature
+                   temperature=_temperature,
+                   action_by_user=True,
                 )
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.AC.value}{ac.ACId}"]),
                                                message=json.dumps(body.__dict__))
@@ -450,7 +454,8 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
                 try:
                     body = ACRequest(
                         activate=is_turn_on,
-                        temperature=AC.temperature
+                        temperature=AC.temperature,
+                        action_by_user=True,
                     )
                     response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
                                                    message=json.dumps(body.__dict__))
@@ -466,7 +471,8 @@ def update_ac_automation_by_id(ac_id: int, farm_id, is_turn_on: bool, username: 
         try:
             body = ACRequest(
                activate=is_turn_on,
-               temperature=AC.temperature
+               temperature=AC.temperature,
+               action_by_user=True,
              )
             response = create_mqtt_request(topic=str(mapping[f"{HardwareType.AC.value}{ac_id}"]),
                                            message=json.dumps(body.__dict__))
@@ -580,6 +586,7 @@ def update_light_strength(update_input: UpdateLightStrengthInput,
                     uv_percent=update_input.UVLightDensity,
                     ir_percent=update_input.IRLightDensity,
                     natural_percent=update_input.NaturalLightDensity,
+                    action_by_user=True
                 )
             response = create_mqtt_request(
                 topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_id}"]),
@@ -639,7 +646,8 @@ def update_light_combination_strength(update_input: UpdateLightStrengthInput,
                                 uv_percent=update_input.UVLightDensity,
                                 ir_percent=update_input.IRLightDensity,
                                 natural_percent=update_input.NaturalLightDensity,
-                                light_combination_id=light_combination.id
+                                light_combination_id=light_combination.id,
+                                action_by_user = True
                             )
                         response = create_mqtt_request(
                             topic=str(ESP_mapping[f"{HardwareType.LIGHT.value}{light_combination.lightId}"]),
@@ -695,7 +703,7 @@ def dehumidifier_controlling(farm_id: int, is_turn_on: bool, username: str):
     for dehumidifier in dehumidifiers:
         if dehumidifier.DehumidifierIsAvailable:
             try:
-                body = DehumidifierRequest(activate=is_turn_on)
+                body = DehumidifierRequest(activate=is_turn_on, action_by_user=True,)
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.DEHUMIDIFIER.value}"
                                                                      f"{dehumidifier.DehumidifierId}"]),
                                                message=json.dumps(body.__dict__))
@@ -711,7 +719,8 @@ def watering_controlling(farm_id: int, is_turn_on: bool):
     water_controller = get_water_controller(farm_id)
     ESP_mapping = get_esp_map(HardwareType.WATERING.value)
     try:
-        body = WateringRequest(activate=is_turn_on)
+        body = WateringRequest(activate=is_turn_on,
+                               action_by_user=True,)
         response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.WATERING.value}"
                                                              f"{water_controller.waterControllerId}"]),
                                        message=json.dumps(body.__dict__))
@@ -727,7 +736,7 @@ def co2_controlling(farm_id: int, is_turn_on: bool):
     co2_controller = get_co2_controller_from_db(farm_id)
     ESP_mapping = get_esp_map(HardwareType.CO2_CONTROLLER.value)
     try:
-        body = Co2Request(activate=is_turn_on)
+        body = Co2Request(activate=is_turn_on, action_by_user=True,)
         response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.CO2_CONTROLLER.value}"
                                                              f"{co2_controller.CO2ControllerId}"]),
                                        message=json.dumps(body.__dict__))
@@ -848,7 +857,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
         co2_sensor_ids = list_co2_sensors_id(farm_id)
         for co2_sensor_id in co2_sensor_ids:
             try:
-                body = SensorRequest(co2_threshold=update_farm_input.MinCO2Level)
+                body = SensorRequest(co2_threshold=update_farm_input.MinCO2Level, action_by_user=True,)
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.CO2_SENSOR.value}"
                                                                      f"{co2_sensor_id}"]),
                                                message=json.dumps(body.__dict__))
@@ -864,7 +873,7 @@ def update_farm_setting_to_db(update_farm_input: UpdateFarmSettings, farm_id: in
         humidity_sensor_ids = list_humidity_sensors_id(farm_id)
         for humidity_sensor_id in humidity_sensor_ids:
             try:
-                body = SensorRequest(humidity_threshold=update_farm_input.MaxHumidityLevel)
+                body = SensorRequest(humidity_threshold=update_farm_input.MaxHumidityLevel, action_by_user=True,)
                 response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.HUMIDITY_SENSOR.value}"
                                                                      f"{humidity_sensor_id}"]),
                                                message=json.dumps(body.__dict__))

@@ -43,13 +43,16 @@ def create_payload(automation_input: AutomationInput, is_start: bool):
                                 uv_percent=automation_input.uv_percent,
                                 ir_percent=automation_input.ir_percent,
                                 natural_percent=automation_input.natural_percent,
-                                light_combination_id=automation_input.light_combination_id
+                                light_combination_id=automation_input.light_combination_id,
+                                action_by_user = True,
                                 )
         case HardwareType.AC:
             body = ACRequest(activate=is_start,
-                             temperature=automation_input.temperature
+                             temperature=automation_input.temperature,
+                             action_by_user=True,
                              )
         case HardwareType.WATERING:
-            body = WateringRequest(activate=is_start)
+            body = WateringRequest(activate=is_start,
+                                   action_by_user = True,)
 
     return json.dumps(body.__dict__)
