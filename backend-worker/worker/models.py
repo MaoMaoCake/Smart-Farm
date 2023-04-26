@@ -31,12 +31,15 @@ class LightRequest(BaseModel):
     ir_percent: int
     natural_percent: int
     light_combination_id: Optional[int]
+    action_by_user: bool
 
 
 class WateringRequest(BaseModel):
     activate: bool
+    action_by_user: bool
 
 
 class ACRequest(BaseModel):
     activate: bool
     temperature: int
+    action_by_user: bool
