@@ -155,10 +155,10 @@ async def control_dehumidifier(farm_id: int, is_turn_on: bool, current_user: Use
 
 
 @farmRouter.post("/farm/{farm_id}/co2/control", response_model=ResponseDto, tags=["Farm"])
-async def control_co2(farm_id: int, is_turn_on: bool, temperature: int ,current_user: User = Depends(get_current_active_user)):
+async def control_co2(farm_id: int, is_turn_on: bool, current_user: User = Depends(get_current_active_user)):
     if current_user.role != Role.USER.value:
         get_http_exception('10')
-    return co2_controlling(farm_id, is_turn_on, temperature)
+    return co2_controlling(farm_id, is_turn_on)
 
 
 @farmRouter.post("/farm/{farm_id}/watering/control", response_model=ResponseDto, tags=["Farm"])
