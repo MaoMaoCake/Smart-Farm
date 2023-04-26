@@ -45,10 +45,10 @@ client = connect_mqtt()
 def publish_data(client: mqtt_client,topic: str, data: json):
     try:
         def on_publish(client,userdata,result):             #create function for callback
-            print('[',datetime.datetime.utcnow(),'] data published to topic:',topic,'and data:',data)
             pass
         client.on_publish = on_publish
         ret= client.publish(topic,data)
+        print('[',datetime.datetime.utcnow(),'] data published to topic:',topic,'and data:',data)
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [publish_data] cannot publish the data to the mqtt')
 
@@ -191,7 +191,7 @@ def check_threshold(farm_id: int,esp_id: int):
         if len(sensorDatas) > 0:
             for sensorData in sensorDatas:
                 if sensorData.get('CO2'):
-                    if((int(threshold['co2_threshold'])*0.7 < sensorData['CO2'])):
+                    if(int(threshold['co2_threshold'])*0.7 < sensorData['CO2']):
                         turn_off_co2(esp_id)
                 if (int(threshold['humidity_threshold'])*0.7 > sensorData['Humidity']):
                     turn_off_ac(esp_id)
@@ -231,7 +231,6 @@ def switch(json_data: json):
                 farm_id = get_farm_id_by_esp_id(esp_id)
                 check_threshold(farm_id,esp_id)
                 save_data_to_mongo(farm_id,json_data)
-                update_all_sensor_data_to_sql(farm_id, json_data)
             case 'get/threshold':
                 send_threshold(esp_id)
             case 'get/ac_status':
