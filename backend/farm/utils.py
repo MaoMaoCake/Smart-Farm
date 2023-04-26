@@ -733,17 +733,18 @@ def watering_controlling(farm_id: int, is_turn_on: bool):
 
 
 def co2_controlling(farm_id: int, is_turn_on: bool):
-    co2_controller = get_co2_controller_from_db(farm_id)
+    co2_controllers = get_co2_controller_from_db(farm_id)
     ESP_mapping = get_esp_map(HardwareType.CO2_CONTROLLER.value)
-    try:
-        body = Co2Request(activate=is_turn_on, action_by_user=True,)
-        response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.CO2_CONTROLLER.value}"
-                                                             f"{co2_controller.CO2ControllerId}"]),
-                                       message=json.dumps(body.__dict__))
-        if response.status_code != 200:
-            get_http_exception('03', message='MQTT connection failed!')
-    except Exception as e:
-        get_http_exception('03', message=f'MQTT connection failed ,{e}')
+    for co2_controller in co2_controllers:
+        try:
+            body = Co2Request(activate=is_turn_on, action_by_user=True,)
+            response = create_mqtt_request(topic=str(ESP_mapping[f"{HardwareType.CO2_CONTROLLER.value}"
+                                                                 f"{co2_controller.CO2ControllerId}"]),
+                                           message=json.dumps(body.__dict__))
+            if response.status_code != 200:
+                get_http_exception('03', message='MQTT connection failed!')
+        except Exception as e:
+            get_http_exception('03', message=f'MQTT connection failed ,{e}')
 
     return get_response_status(message='Successfully send requests to mqtt broker')
 
