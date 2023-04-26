@@ -116,6 +116,9 @@ def get_farm_id_by_hardware_id(id: int, table: str) -> int:
         case HardwareType.CO2_CONTROLLER.value:
             co2_emitter = session.query(CO2ControllerDB).filter(CO2ControllerDB.id == id).first() 
             return co2_emitter.farmId
+        case HardwareType.WATERING.value:
+            water_controller = session.query(WaterControllerDB).filter(WaterControllerDB.id == id).first() 
+            return water_controller.farmId
         
 def get_hardware_by_esp_id(esp_id: int):
     ESP_mapping = {}
@@ -205,7 +208,6 @@ def update_watering_status(status: bool,farm_id: int,username: str):
                                 'updateBy': username
                     })
     session.commit()
-
     return
 
 def update_threshold_to_farm(farm_id: int,username: str, humidity: int = 0, co2: int = 0):
