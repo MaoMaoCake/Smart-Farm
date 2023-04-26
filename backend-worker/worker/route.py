@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from fastapi import APIRouter
 import schedule
@@ -40,7 +40,7 @@ async def add_task(automation_input: AutomationInput):
 
     if automation_input.end_time:
         if automation_input.hardware_type == HardwareType.WATERING:
-            end_time = automation_input.start_time + timedelta(minutes=5)
+            end_time = (datetime.combine(datetime.min, automation_input.start_time) + timedelta(minutes=5)).time()
             job_id = schedule.every().day.at(end_time.strftime("%H:%M")).do(run_task,
                                                                              automation_input,
                                                                              False)
@@ -76,7 +76,7 @@ async def update_task(automation_input: AutomationInput):
                                       f"_{automation_input.automation_id}_end"]["job_id"])
 
             if automation_input.hardware_type == HardwareType.WATERING:
-                end_time = automation_input.start_time + timedelta(minutes=5)
+                end_time = (datetime.combine(datetime.min, automation_input.start_time) + timedelta(minutes=5)).time()
                 new_job_id = schedule.every().day.at(end_time.strftime("%H:%M")) \
                     .do(run_task, automation_input, False)
                 tasks[f"{automation_input.hardware_type}_{automation_input.ESP_id}" \

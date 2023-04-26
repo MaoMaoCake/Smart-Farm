@@ -742,8 +742,8 @@ def co2_controlling(farm_id: int, is_turn_on: bool):
                                        message=json.dumps(body.__dict__))
         if response.status_code != 200:
             get_http_exception('03', message='MQTT connection failed!')
-    except:
-        get_http_exception('03', message='MQTT connection failed')
+    except Exception as e:
+        get_http_exception('03', message=f'MQTT connection failed ,{e}')
 
     return get_response_status(message='Successfully send requests to mqtt broker')
 
