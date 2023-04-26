@@ -10,7 +10,7 @@ import json
 
 import datetime
 
-from database.connector import update_light_strength_to_all_light,get_hardware_by_esp_id,get_farm_id_by_hardware_id,update_dehumidifier_status,update_co2_controller_status,update_all_sensor_data,get_threshold_by_farm_id,get_ac_status_by_farm_id,update_ac_status,get_dehumidifier_esp_id_by_esp_id,get_ac_esp_id_by_esp_id,get_co2_controller_esp_id_by_esp_id,update_threshold_to_farm,insert_sensor_data,queryLatestMaxSensorData
+from database.connector import update_light_strength_to_all_light,get_hardware_by_esp_id,get_farm_id_by_hardware_id,update_dehumidifier_status,update_co2_controller_status,update_all_sensor_data,get_threshold_by_farm_id,get_ac_status_by_farm_id,update_ac_status,get_dehumidifier_esp_id_by_esp_id,get_ac_esp_id_by_esp_id,get_co2_controller_esp_id_by_esp_id,update_threshold_to_farm,insert_sensor_data,queryLatestMaxSensorData,update_watering_status
 
 from database.enum_list import System
 
@@ -209,6 +209,13 @@ def update_threshold(esp_id: int, json_data: json):
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [update_threshold] cannot update the threshold by espId:', esp_id, 'and data:', json_data)
     
+def update_watering(esp_id: int, json_data: json):
+    try:
+        farm_id = get_farm_id_by_esp_id(esp_id)
+        update_watering_status(bool(json_data['activate']),farm_id,System.USERNAME.value)
+    except:
+        print('[',datetime.datetime.utcnow(),'] Error: [update_watering] cannot update the watering status by espId:', esp_id, 'and data:', json_data)
+
 def switch(json_data: json):
     try:
         action = str(json_data['action'])
@@ -243,6 +250,8 @@ def switch(json_data: json):
                 turn_off_co2(esp_id)
             case 'update/threshold':
                 update_threshold(esp_id, json_data)
+            case 'update/watering_status':
+                update_watering(esp_id, json_data)
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [switch] cannot take the action from the mqtt payload with data:', json_data)
 

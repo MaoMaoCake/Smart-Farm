@@ -14,7 +14,7 @@ from models import FarmOwner, FarmStats, Light, LightCombination, \
     UpdateLightStrengthInput,UpdateAllSensorInput
 from .schemas import MQTTMapDB, UserDb, FarmOwnerDB, FarmDb, TemperatureSensorDB, \
     ACDB, HumiditySensorDB, DehumidifierDB, CO2SensorDB, \
-    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB
+    CO2ControllerDB, LightDB, FarmLightPresetDB, LightCombinationDB, WaterControllerDB
 
 from .enum_list import HardwareType,ESPType
 
@@ -192,6 +192,16 @@ def update_ac_status(status: bool,temperature: int,farm_id: int,username: str):
                     ).filter(ACDB.farmId == farm_id
                     ).update({  'status': status,
                                 'temperature': temperature,
+                                'updateBy': username
+                    })
+    session.commit()
+
+    return
+
+def update_watering_status(status: bool,farm_id: int,username: str):
+    session.query(WaterControllerDB
+                    ).filter(WaterControllerDB.farmId == farm_id
+                    ).update({  'status': status,
                                 'updateBy': username
                     })
     session.commit()
