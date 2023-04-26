@@ -208,25 +208,19 @@ def update_watering_status(status: bool,farm_id: int,username: str):
 
     return
 
-def update_threshold_to_farm(farm_id: int,username: str, humidity: int, co2: int = 0):
-    if(co2 == 0):
+def update_threshold_to_farm(farm_id: int,username: str, humidity: int = 0, co2: int = 0):
+    if(humidity != 0):
         session.query(FarmDb
                         ).filter(FarmDb.id == farm_id
                         ).update({  'maxHumidity': humidity,
                                     'updateBy': username
                         })
-    elif (humidity == 0):
+    if (co2 != 0):
         session.query(FarmDb
                     ).filter(FarmDb.id == farm_id
                     ).update({  'minCO2': co2,
                                 'updateBy': username
                     })
-    else:
-        session.query(FarmDb
-                        ).filter(FarmDb.id == farm_id
-                        ).update({  'minCO2': co2,
-                                    'updateBy': username
-                        })
     session.commit()
 
     return
