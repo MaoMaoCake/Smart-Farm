@@ -174,6 +174,72 @@ def list_farms_from_user_id(user_id: int) -> [FarmStats]:
 
 
 def get_farm_stats_from_db(farm_id: int) -> FarmStats:
+    last_5_mins = datetime.now() - timedelta(hours=24)
+
+    pipeline = [
+        {
+            "$match": {
+                "farmId": farm_id,
+                "createAt": {"$gte": last_5_mins}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$createAt",
+                "Temperature": {"$avg": "$temperature"},
+                "Humidity": {"$avg": "$humidity"},
+                "CO2": {"$avg": "$co2"}
+            }
+        },
+        {
+            "$sort": {"_id": -1}
+        },
+        {
+            "$limit": 1
+        }
+    ]
+
+    farm = session.query(FarmDb.id,
+                         TemperatureSensorDB.temperature,
+                         HumiditySensorDB.humidity,
+                         CO2SensorDB.CO2,
+                        ).join(TemperatureSensorDB, FarmDb.id == TemperatureSensorDB.farmId
+                        ).join(HumiditySensorDB, FarmDb.id == HumiditySensorDB.farmId
+                        ).join(CO2SensorDB, FarmDb.id == CO2SensorDB.farmId
+                        ).filter(FarmDb.id == farm_id).first()
+
+    temperature = farm[1]
+    humidity = farm[2]
+    co2 = farm[3]
+
+    mongo_result = collection.aggregate(pipeline)
+    for record in mongo_result:
+        if record["Temperature"] is not None:
+            temperature = record["Temperature"]
+        if record["Humidity"] is not None:
+            humidity = record["Humidity"]
+        if record["CO2"] is not None:
+            co2 = record["CO2"]
+
+    session.query(TemperatureSensorDB
+                  ).filter(TemperatureSensorDB.farmId == farm_id
+                           ).update({
+        "temperature": temperature,
+    })
+
+    session.query(HumiditySensorDB
+                  ).filter(HumiditySensorDB.farmId == farm_id
+                           ).update({
+        "humidity": humidity,
+    })
+
+    session.query(CO2SensorDB
+                  ).filter(CO2SensorDB.farmId == farm_id
+                           ).update({
+        "CO2": co2,
+    })
+    session.commit()
+
     farm = session.query(FarmDb.id,
                           FarmDb.name,
                           TemperatureSensorDB.temperature,
@@ -518,6 +584,18 @@ def check_preset_in_light_automation_db(farm_id: int, preset_id: int):
     if preset_automation:
         get_http_exception('PA400')
     return preset_automation
+
+
+def get_all_lights_automation(farm_id: int):
+    automations = session.query(LightAutomationDB).filter(LightAutomationDB.farmId == farm_id).all()
+
+    return [LightAutomation(
+        lightAutomationId=automation.id,
+        startTime=automation.startTime,
+        endTime=automation.endTime,
+        farmLightPresetId=automation.farmLightPresetId
+    ) for automation in automations]
+
 
 def get_farm_setting_from_db(farm_id: int) -> GetFarmSettings:
     light_automations = session.query(LightAutomationDB).filter(LightAutomationDB.farmId == farm_id).all()

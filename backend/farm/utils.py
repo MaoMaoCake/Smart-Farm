@@ -30,7 +30,8 @@ from database.connector import get_user_from_db, add_farm_to_user_db, \
     create_farm_to_db, create_esp_to_db, get_all_farm_from_user_id_from_db, get_all_sensors_from_farm_id_from_db,\
     create_default_ac_to_db, create_default_watering_to_db, create_default_co2_controller_to_db,\
     create_default_dehumidifier_to_db, create_default_co2_sensor_to_db, create_default_humidity_sensor_to_db,\
-    create_default_temperature_sensor_to_db, create_esp_map_to_db, update_esp_map_to_db, get_co2_controller_from_db
+    create_default_temperature_sensor_to_db, create_esp_map_to_db, update_esp_map_to_db, get_co2_controller_from_db,\
+    get_all_lights_automation
     
 from response.response_dto import ResponseDto, get_response_status
 from response.error_codes import get_http_exception
@@ -597,6 +598,35 @@ def update_light_strength(update_input: UpdateLightStrengthInput,
             get_http_exception('03', message='MQTT connection failed')
         return get_response_status('Update has been sent to the device')
     else:
+        if update_input.automation:
+            light_automations = get_all_lights_automation(farm_id)
+
+            url = os.getenv("WORKER_SERVICE_URL")
+            port = os.getenv("WORKER_SERVICE_PORT")
+            path = f"{url}:{port}/task"
+
+            for light_automation in light_automations:
+                light_combinations = get_lights_from_preset_db(light_automation.farmLightPresetId)
+                for light_combination in light_combinations:
+                    if (light_combination.lightId == light_id) and light_combination.automation:
+                        try:
+                            body = AutomationInputJSON(
+                                ESP_id=ESP_mapping[f"{HardwareType.LIGHT.value}{light_combination.lightId}"],
+                                start_time=str(light_automation.startTime),
+                                end_time=str(light_automation.endTime),
+                                automation_id=light_automation.lightAutomationId,
+                                hardware_type=HardwareType.LIGHT,
+                                activate=True,
+                                light_combination_id=light_combination.lightCombinationId,
+                                uv_percent=light_combination.UVLightDensity,
+                                ir_percent=light_combination.IRLightDensity,
+                                natural_percent=light_combination.naturalLightDensity,
+                            )
+                            r: requests.Response = requests.post(url=path, data=json.dumps(body.__dict__))
+                        except Exception as e:
+                            print(e)
+                            get_http_exception('03', message='Backend worker connection failed')
+
         updated_light = update_light_strength_in_db(update_input, light_id, username)
         return get_response_status(message='Light strength has been updated', data=updated_light)
 
