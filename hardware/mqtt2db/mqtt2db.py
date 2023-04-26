@@ -212,7 +212,7 @@ def update_threshold(esp_id: int, json_data: json):
 def update_watering(esp_id: int, json_data: json):
     try:
         farm_id = get_farm_id_by_esp_id(esp_id)
-        update_watering_status(bool(json_data['activate']),farm_id,System.USERNAME.value)
+        update_watering_status(json_data['activate'],farm_id,System.USERNAME.value)
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [update_watering] cannot update the watering status by espId:', esp_id, 'and data:', json_data)
 
