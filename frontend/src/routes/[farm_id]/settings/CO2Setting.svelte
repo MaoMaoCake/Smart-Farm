@@ -30,7 +30,7 @@
         <div class="divider w-full ml-2"></div>
         {#if tooltip}
             <div class="absolute left-10 top-10">
-                <div class="bg-gray-300 w-56 h-52 rounded-xl relative z-30">
+                <div class="bg-gray-300 w-56 h-64 rounded-xl relative z-30 p-5 flex justify-center items-center">
                     <div class="text-black">
                         <p>CO2 Setting</p>
                         <br>
