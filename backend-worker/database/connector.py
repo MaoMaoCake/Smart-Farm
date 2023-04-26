@@ -1,7 +1,8 @@
 import os
-
+import pymongo
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime, timedelta
 
 from worker.models import AutomationInput
 from worker.enum_list import HardwareType
@@ -21,6 +22,10 @@ engine = create_engine(f"{os.environ.get('DB_DIALECT')}://{os.environ.get('DB_US
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
+client = pymongo.MongoClient(os.getenv('MONGO_PATH'))
+db = client[os.getenv('MONGO_DB')]
+collection = db[os.getenv('MONGO_COLLECTION')]
 
 
 def get_all_lights_automation() -> list[AutomationInput]:
