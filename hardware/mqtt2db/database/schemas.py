@@ -184,3 +184,4 @@ class WaterControllerDB(BaseModel):
     farmId = Column(Integer, ForeignKey('farm.id'), nullable=False)
     automation = Column(Boolean, nullable=False)
     isAvailable = Column(Boolean, nullable=False)
+    status = Column(Boolean, nullable=False)
