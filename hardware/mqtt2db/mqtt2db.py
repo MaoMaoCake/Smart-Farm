@@ -203,9 +203,9 @@ def update_threshold(esp_id: int, json_data: json):
     try:
         farm_id = get_farm_id_by_esp_id(esp_id)
         if(json_data.get('co2')):
-            update_threshold_to_farm(farm_id,System.USERNAME.value,json_data['humidity'],json_data['co2'])
+            update_threshold_to_farm(farm_id,System.USERNAME.value,int(json_data['humidity']),int(json_data['co2']))
         else:
-            update_threshold_to_farm(farm_id,System.USERNAME.value,json_data['humidity'])
+            update_threshold_to_farm(farm_id,System.USERNAME.value,int(json_data['humidity']))
     except:
         print('[',datetime.datetime.utcnow(),'] Error: [update_threshold] cannot update the threshold by espId:', esp_id, 'and data:', json_data)
     
