@@ -381,7 +381,7 @@
                     <input type="checkbox" class="toggle toggle-success" bind:checked={humidifier_switch} on:click={() => {control_actuators("dehumidifier", data.farm_id, humidifier_switching)}}/>
                 </div>
                 </div>
-                <div class="flex justify-center grow pt-5">
+                <div class="flex justify-center grow pt-5 md:pb-20">
                      <div class="flex justify-center grow items-center white">
                         {#if co2_switching}
                             <Icon icon="material-symbols:co2" class="h-9 w-9 bg-red-900 p-2 mr-1 rounded-lg"/>
