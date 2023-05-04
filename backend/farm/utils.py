@@ -594,6 +594,8 @@ def update_light_strength(update_input: UpdateLightStrengthInput,
                 message=json.dumps(body.__dict__))
             if response.status_code != 200:
                 get_http_exception('03', message='MQTT connection failed')
+            updated_light = update_light_strength_in_db(update_input, light_id, username)
+            get_response_status(message='Light strength has been updated', data=updated_light)
         except:
             get_http_exception('03', message='MQTT connection failed')
         return get_response_status('Update has been sent to the device')
