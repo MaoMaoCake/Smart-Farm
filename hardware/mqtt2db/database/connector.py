@@ -232,7 +232,7 @@ def insert_sensor_data(json_data: json):
     return
 
 def queryLatestMaxSensorData(farm_id: int):
-    lastFiveMin = datetime.utcnow() - timedelta(minutes=5)
+    lastFiveMin = datetime.utcnow() - timedelta(minutes=1)
 
     pipeline_min = [
         {
