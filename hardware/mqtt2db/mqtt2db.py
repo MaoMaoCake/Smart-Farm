@@ -191,7 +191,7 @@ def check_threshold(farm_id: int,esp_id: int):
         if len(sensorDatas) > 0:
             for sensorData in sensorDatas:
                 if sensorData.get('CO2'):
-                    if(int(threshold['co2_threshold'])*0.7 < sensorData['CO2']):
+                    if(int(threshold['co2_threshold'])*1.2 < sensorData['CO2']):
                         turn_off_co2(esp_id)
                 if (int(threshold['humidity_threshold'])*0.7 > sensorData['Humidity']):
                     turn_off_ac(esp_id)
