@@ -1,0 +1,21 @@
+@startuml
+
+boundary Backend
+control WateringController
+participant MQTT2DB
+database MySQL
+
+Backend -> WateringController: send the request to turn on the watering system
+
+WateringController -> WateringController: turn on the watering system
+
+alt turn on the watering system success:
+    WateringController -> MQTT2DB: send the request to update the watering status in the database
+    MQTT2DB -> MySQL: update the watering status in the database
+else turn on the watering system fail:
+    note right of MQTT2DB
+        the watering status will not update to the database
+    end note
+end
+
+@enduml

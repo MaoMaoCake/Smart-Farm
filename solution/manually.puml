@@ -1,0 +1,20 @@
+@startuml
+
+participant Frontend
+participant Backend
+control HardwareModule
+participant MQTT2DB
+database MySQL
+
+Frontend -> Backend: send http request
+
+Backend -> HardwareModule: send the mqtt request
+
+HardwareModule -> HardwareModule: execute command according to the request
+
+alt execute success
+    HardwareModule -> MQTT2DB: send mqtt request to update the hardware status
+    MQTT2DB -> MySQL: update the hardware status in the database
+end
+
+@enduml

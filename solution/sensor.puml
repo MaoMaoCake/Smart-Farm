@@ -1,0 +1,20 @@
+@startuml
+
+control Sensor
+participant MQTT2DB
+database MySQL
+database MongoDB
+
+loop Every 5 minutes:
+    Sensor -> MQTT2DB: send the request to update in the database
+    note right of MQTT2DB
+        Update the value:
+        - Temperature
+        - Carbon Dioxide level
+        - Humidity level
+    end note
+    MQTT2DB -> MySQL: update the data in the database
+    MQTT2DB -> MongoDB: insert the data in the database
+end
+
+@enduml

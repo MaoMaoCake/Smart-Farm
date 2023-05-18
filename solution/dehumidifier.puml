@@ -1,0 +1,21 @@
+@startuml
+
+boundary Backend
+control DehumidifierController
+participant MQTT2DB
+database MySQL
+
+Backend -> DehumidifierController: send the request to turn on the dehumidifier
+
+DehumidifierController -> DehumidifierController: turn on the dehumidifier
+
+alt turn on the dehumidifier success:
+    DehumidifierController -> MQTT2DB: send the request to update the dehumidifier status in the database
+    MQTT2DB -> MySQL: update the dehumidifier status in the database
+else turn on the dehumidifier fail:
+    note right of MQTT2DB
+        the dehumidifier status will not update to the database
+    end note
+end
+
+@enduml

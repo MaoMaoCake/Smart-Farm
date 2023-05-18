@@ -1,0 +1,41 @@
+@startuml
+
+participant Frontend
+participant Backend
+database MySQL
+database MongoDB
+
+group farm currently status
+    Frontend -> Backend: send the http request
+    activate Backend
+
+    Backend -> MongoDB: query aggregated sensors data
+    activate MongoDB
+
+    MongoDB -> Backend: return aggregated sensorsdata
+    deactivate MongoDB
+    
+    Backend -> MySQL: query all the farm data
+    activate MySQL
+
+    MySQL -> Backend: return all the farm data
+    deactivate MySQL
+
+    Backend -> Frontend: return response
+    deactivate Backend
+end
+
+group farm statistic
+    Frontend -> Backend: send the http request
+    activate Backend
+    
+    Backend -> MongoDB: query all sensors data
+    activate MongoDB
+
+    MongoDB -> Backend: return all the sensors data
+    deactivate MongoDB
+    
+    Backend -> Frontend: return response
+    deactivate Backend
+end
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+
+boundary Backend
+control LightController
+participant MQTT2DB
+database MySQL
+
+Backend -> LightController: send a request to turn on the light
+
+LightController -> LightController: turn on the light
+
+
+alt turn on the light success:
+    LightController -> MQTT2DB: send the request to update the light status in the database
+    MQTT2DB -> MySQL: update the light status in the database
+else turn on the light fail:
+    note right of MQTT2DB
+        the light status will not update to the database
+    end note
+end
+
+
+@enduml

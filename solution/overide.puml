@@ -1,0 +1,92 @@
+@startuml
+
+control SensorModule
+participant MQTT2DB
+control DehumidifierController
+control AirConditionerController
+control CO2Controller
+database MySQL
+
+group Sensor module initialization
+    SensorModule -> MQTT2DB: send the mqtt request
+    note right of SensorModule
+        request for the threshold value
+    end note
+    MQTT2DB -> MySQL: query the threshold value
+    MySQL -> MQTT2DB: return the threshold value
+    MQTT2DB -> SensorModule: send the mqtt request for the threshold value
+end
+
+loop every 5 minutes
+    loop every second
+        SensorModule -> SensorModule: capture the data from the sensors
+        alt if the co2 level is less than the threshold
+            SensorModule -> MQTT2DB: send the mqtt request to activate the CO2 controller
+            MQTT2DB -> CO2Controller: send the mqtt request to activate the co2 emitter
+            CO2Controller -> CO2Controller: activate the co2 emitter
+            alt if the action success
+                CO2Controller -> MQTT2DB: send request to udpate the CO2 controller status
+                MQTT2DB -> MySQL: update the CO2 controller status in the database
+            end
+        end
+        alt if the humidity level is more than the threshold
+            SensorModule -> MQTT2DB: send the mqtt request to activate the dehumidifier controller
+            MQTT2DB -> DehumidifierController: send the mqtt request to activate the dehumidifier
+            DehumidifierController -> DehumidifierController: activate the dehumidifier
+            alt if the action success
+                DehumidifierController -> MQTT2DB: send request to udpate the dehumidifier controller status
+                MQTT2DB -> MySQL: update the CO2 controller status in the database
+            end
+        end
+    end
+    SensorModule -> MQTT2DB: send the mqtt resuest to update the data in the database
+    note right of MQTT2DB
+        Update the value:
+        - Temperature
+        - Carbon Dioxide level
+        - Humidity level
+    end note
+
+    group check the controllers status
+        MQTT2DB -> MySQL: query the dehumidifier and co2 controller status
+        MySQL -> MQTT2DB: return the status of the dehumidifier and co2 controller
+        MQTT2DB -> MQTT2DB: check the status
+        note right of MQTT2DB
+            check the status
+            - dehumidifier controller
+            - co2 controller
+        end note
+    end
+
+    alt if the status of the dehumidifier controller is active
+        MQTT2DB -> MQTT2DB: check the humidity level compare with the humidity threshold
+        alt if the humidity level is less than 70 percent of the threshold
+            MQTT2DB -> DehumidifierController: send the mqtt request to deactivate the dehumidifier
+            DehumidifierController -> DehumidifierController: execute the action according to the request
+            alt if the action success
+                DehumidifierController -> MQTT2DB: send the mqtt request to update the dehumidifier controller status
+                MQTT2DB -> MySQL: update the dehumidifier status in the database
+            end
+
+            MQTT2DB -> AirConditionerController: send the mqtt request to deactivate the air conditioner
+            AirConditionerController -> AirConditionerController: execute the action according to the request
+            alt if the action success
+                AirConditionerController -> MQTT2DB: send the mqtt request to update the air conditioner controller status
+                MQTT2DB -> MySQL: update the air conditioner status in the database
+            end
+        end
+    else if the status of the co2 controller is active
+        MQTT2DB -> MQTT2DB: check the co2 level compare with the co2 threshold
+        alt if the co2 level is more than 120 percent of the threshold
+            MQTT2DB -> CO2Controller: send the mqtt request to deactivate the co2 controller
+            CO2Controller -> CO2Controller: execute the action according to the request
+            alt if the action success
+                CO2Controller -> MQTT2DB: send the mqtt request to update the co2 controller status
+                MQTT2DB -> MySQL: update the co2 status in the database
+            end
+        end
+    end
+    MQTT2DB -> MySQL: update the data in the database
+    MQTT2DB -> MongoDB: insert the data in the database
+end
+@enduml

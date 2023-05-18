@@ -1,0 +1,21 @@
+@startuml
+
+boundary Backend
+control AirConditionerController
+participant MQTT2DB
+database MySQL
+
+Backend -> AirConditionerController: send the request to turn on the air conditioner
+
+AirConditionerController -> AirConditionerController: turn on the air conditioner
+
+alt turn on the air conditioner success:
+    AirConditionerController -> MQTT2DB: send the request to update the air conditioner status in the database
+    MQTT2DB -> MySQL: update the air conditioner status in the database
+else turn on the air conditioner fail:
+    note right of MQTT2DB
+        the air conditioner status will not update to the database
+    end note
+end
+
+@enduml

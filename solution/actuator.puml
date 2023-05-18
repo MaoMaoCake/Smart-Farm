@@ -1,0 +1,22 @@
+@startuml
+
+boundary Backend
+control ActuatorModule
+participant MQTT2DB
+database MySQL
+
+Backend -> ActuatorModule: send a MQTT request to command the actuator
+
+ActuatorModule -> ActuatorModule: execute the command according to the request
+
+
+alt executing the actuator success:
+    ActuatorModule -> MQTT2DB: send the request to update the actuator status in the database
+    MQTT2DB -> MySQL: update the actuator status in the database
+else executing the actuator fail:
+    note right of ActuatorModule
+        the actuator status will not update to the database
+    end note
+end
+
+@enduml
