@@ -105,3 +105,4 @@ tzdata==2022.7
 tzlocal==4.2
 urllib3==1.26.13
 uvicorn==0.20.0
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
