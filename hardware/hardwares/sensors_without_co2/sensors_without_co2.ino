@@ -14,18 +14,22 @@ DynamicJsonDocument doc(1024);
 DHT dht(DHTPIN, DHTTYPE); // Create DHT object
 
 int count = 0;
-int send_time_interval = 10;
+int trigger = 0;
+const int esp_status_pin = 2;
+int send_time_interval = 60;
+int trigger_interval = 300;
+bool dehumidifier_status = false;
 
 // Update these with values suitable for your network.
-const char* ssid = "PD_LAPTOP";
-const char* password = "012345679";
-const char* mqtt_server = "192.168.137.250";
+const char* ssid = "dlink-7F78";
+const char* password = "qwertyuiop";
+const char* mqtt_server = "192.168.0.10";
 int maxHumidity = 0;
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
 #define MQTT_SERIAL_PUBLISH_CH "python/mqtt"
-#define MQTT_SERIAL_RECEIVER_CH "3"
+#define MQTT_SERIAL_RECEIVER_CH "4"
 
 WiFiClient wifiClient;
 
@@ -83,13 +87,21 @@ void callback(char* topic, byte *payload, unsigned int length) {
   DeserializationError error = deserializeJson(doc, payload);
   if (error)
     return;
-  maxHumidity = doc["humidity"];
+  int input_humidity = doc["humidity_threshold"];
+
+  if (input_humidity != 0) {
+    maxHumidity = input_humidity;
+  }
+  
+  update_threshold_to_db();
+
 }
 
 void setup() {
   Serial.begin(115200);
-
-  Serial.print("MG-811 Demostration\n"); 
+  pinMode(esp_status_pin, OUTPUT);
+  digitalWrite(esp_status_pin, HIGH);
+  Serial.print("MG-811 Demostration\n");
   dht.begin();           // Initialize DHT sensor
   Serial.setTimeout(500);// Set time out for
   setup_wifi();
@@ -97,95 +109,121 @@ void setup() {
   client.setCallback(callback);
   reconnect();
   setThreshold();
-  Serial.print("Max Humidity\n"); 
+  Serial.print("Max Humidity\n");
   Serial.println(maxHumidity);
-  
+
 }
 
-void setThreshold(){
+void setThreshold() {
   String thresholdRequest = "{\"action\":\"get/threshold\",\"espId\":";
   thresholdRequest += String(MQTT_SERIAL_RECEIVER_CH);
   thresholdRequest += F("}");
   publishSerialData(thresholdRequest);
 }
 
-void turnOnDehumidifier(){
-  String dehumidifierRequest = F("{\"action\": \"turn_on/dehumidifier\"}");
+void turnOnDehumidifier() {
+  String dehumidifierRequest = F("{\"action\": \"turn_on/dehumidifier\",\"espId\":");
+  dehumidifierRequest += String(MQTT_SERIAL_RECEIVER_CH);
+  dehumidifierRequest += F("}");
   publishSerialData(dehumidifierRequest);
 }
 
-void turnOffDehumidifier(){
-  String dehumidifierRequest = F("{\"action\": \"turn_off/dehumidifier\"}");
+void turnOffDehumidifier() {
+  String dehumidifierRequest = F("{\"action\": \"turn_off/dehumidifier\",\"espId\":");
+  dehumidifierRequest += String(MQTT_SERIAL_RECEIVER_CH);
+  dehumidifierRequest += F("}");
   publishSerialData(dehumidifierRequest);
+}
+
+void update_threshold_to_db() {
+  String updateThresholdData;
+  updateThresholdData += F("{\"action\": \"update/threshold\"");
+  updateThresholdData += F(",\"espId\":");
+  updateThresholdData += String(MQTT_SERIAL_RECEIVER_CH);
+  updateThresholdData += F(",\"humidity\":");
+  updateThresholdData += String(maxHumidity);
+  updateThresholdData += F("}");
+  publishSerialData(updateThresholdData);
 }
 
 String collectAllSensorData() {
-  
+
   float humidity = dht.readHumidity();    // Read humidity value from sensor
   float temperature = dht.readTemperature();  // Read temperature value from sensor
-  
+
   // Check if any reading failed
   if (isnan(humidity) || isnan(temperature)) {
     Serial.println("Failed to read from DHT sensor!");
   } else {
     // Print temperature and humidity values
-  Serial.print("Temperature: ");
-  Serial.print(temperature);
-  Serial.print(" °C  |  ");
-  Serial.print("Humidity: ");
-  Serial.print(humidity);
-  Serial.println(" %");
+    Serial.print("Temperature: ");
+    Serial.print(temperature);
+    Serial.print(" °C  |  ");
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.println(" %");
 
-  if (maxHumidity > 0){
-    if (int(humidity) > maxHumidity){
-      Serial.print("Humidity is over limit");
-      turnOnDehumidifier();
-      Serial.println(maxHumidity);
-    } else {
-      turnOffDehumidifier();
+    if (!dehumidifier_status) {
+      if (maxHumidity > 0) {
+        if (int(humidity) > maxHumidity) {
+          Serial.print("Humidity is over limit");
+          turnOnDehumidifier();
+          Serial.println(maxHumidity);
+          dehumidifier_status = true;
+        }
+      }
     }
-  }
-    
-  String response;
-  response += F("{\"action\": \"update/sensors\"");
-  response += F(",\"espId\":");
-  response += String(MQTT_SERIAL_RECEIVER_CH);
-  response += F(",\"temperature\":");
-  response += String(temperature, 6);
-  response += F(",\"humidity\":");
-  response += String(humidity, 6);
-  response += F("}");
 
-  Serial.println(response);
-  
-  return response;
+    String response;
+    response += F("{\"action\": \"update/sensors\"");
+    response += F(",\"espId\":");
+    response += String(MQTT_SERIAL_RECEIVER_CH);
+    response += F(",\"temperature\":");
+    response += String(temperature, 6);
+    response += F(",\"humidity\":");
+    response += String(humidity, 6);
+    response += F("}");
+
+    Serial.println(response);
+
+    return response;
   }
-    
+
 }
 
 void publishSerialData(String serialData) {
   if (!client.connected()) {
     reconnect();
   }
-  int str_len = serialData.length() + 1; 
-  
-  // Prepare the character array (the buffer) 
+  int str_len = serialData.length() + 1;
+
+  // Prepare the character array (the buffer)
   char char_array[str_len];
-  
-  // Copy it over 
+
+  // Copy it over
   serialData.toCharArray(char_array, str_len);
   client.publish(MQTT_SERIAL_PUBLISH_CH, char_array);
 }
 void loop() {
-
   client.loop();
+  check_status();
   String message = collectAllSensorData();
   Serial.println("-------new message from broker-----");
-  if (count == send_time_interval){
+  if (count == send_time_interval) {
     publishSerialData(message);
     count = 0;
+    if (trigger == trigger_interval) {
+      dehumidifier_status = false;
+      trigger = 0;
+    }
   }
   Serial.println(count);
-  delay(1000);
   count += 1;
+  trigger += 1;
+}
+void check_status() {
+  digitalWrite(esp_status_pin, HIGH);
+  delay(500);
+  digitalWrite(esp_status_pin, LOW);
+  delay(500);
 }

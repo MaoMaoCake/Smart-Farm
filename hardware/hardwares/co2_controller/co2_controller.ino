@@ -5,9 +5,9 @@
 DynamicJsonDocument doc(1024);
 
 // Update these with values suitable for your network.
-const char* ssid = "PD_LAPTOP";
-const char* password = "012345679";
-const char* mqtt_server = "192.168.137.250";
+const char* ssid = "dlink-7F78";
+const char* password = "qwertyuiop";
+const char* mqtt_server = "192.168.0.10";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
@@ -20,12 +20,19 @@ PubSubClient client(wifiClient);
 
 bool activate = false;
 
-const int co2_pin = 19;
+const int co2_pin = 5;
+const int esp_status_pin = 2;
+
+bool turn_on_status = false;
+bool used_by_user = false;
+
 
 void setup() {
   Serial.begin(115200);
-
+  pinMode(esp_status_pin, OUTPUT);                        //set pin to input
+  digitalWrite(esp_status_pin, HIGH);
   pinMode(co2_pin, OUTPUT);      // set the LED pin mode
+  digitalWrite(co2_pin, HIGH);
   Serial.setTimeout(500);// Set time out for
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
@@ -86,27 +93,43 @@ void callback(char* topic, byte *payload, unsigned int length) {
   if (error)
     return;
   activate = doc["activate"];
-  if(activate){
-    turnOnDehumidifier();
+  bool action_by_user = doc["action_by_user"];
+  if (!turn_on_status) {
+    if (action_by_user && activate) {
+      turnOnCo2();
+      turn_on_status = true;
+      used_by_user = true;
+    } else if (!used_by_user && activate) {
+      turnOnCo2();
+      turn_on_status = true;
+    }
   } else {
-    turnOffDehumidifier();
+    if ((action_by_user && !activate) || (!used_by_user && !activate)) {
+      turnOffCo2();
+      turn_on_status = false;
+      used_by_user = false;
+    }
   }
 }
 
-void turnOnDehumidifier(){
-  digitalWrite(co2_pin,LOW);
+void turnOnCo2() {
+  digitalWrite(co2_pin, LOW);
   String updateData;
   updateData += F("{\"action\": \"update/co2\"");
+  updateData += F(",\"espId\":");
+  updateData += String(MQTT_SERIAL_RECEIVER_CH);
   updateData += F(",\"activate\":");
   updateData += String(activate);
   updateData += F("}");
   publishSerialData(updateData);
 }
 
-void turnOffDehumidifier(){
-  digitalWrite(co2_pin,HIGH);
+void turnOffCo2() {
+  digitalWrite(co2_pin, HIGH);
   String updateData;
   updateData += F("{\"action\": \"update/co2\"");
+  updateData += F(",\"espId\":");
+  updateData += String(MQTT_SERIAL_RECEIVER_CH);
   updateData += F(",\"activate\":");
   updateData += String(activate);
   updateData += F("}");
@@ -117,16 +140,24 @@ void publishSerialData(String serialData) {
   if (!client.connected()) {
     reconnect();
   }
-  int str_len = serialData.length() + 1; 
-  
-  // Prepare the character array (the buffer) 
+  int str_len = serialData.length() + 1;
+
+  // Prepare the character array (the buffer)
   char char_array[str_len];
-  
-  // Copy it over 
+
+  // Copy it over
   serialData.toCharArray(char_array, str_len);
   client.publish(MQTT_SERIAL_PUBLISH_CH, char_array);
 }
 
 void loop() {
   client.loop();
+  check_status();
+}
+
+void check_status() {
+  digitalWrite(esp_status_pin, HIGH);
+  delay(500);
+  digitalWrite(esp_status_pin, LOW);
+  delay(500);
 }

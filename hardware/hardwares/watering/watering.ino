@@ -4,10 +4,9 @@
 
 DynamicJsonDocument doc(1024);
 
-// Update these with values suitable for your network.
-const char* ssid = "PD_LAPTOP";
-const char* password = "012345679";
-const char* mqtt_server = "192.168.137.250";
+const char* ssid = "dlink-7F78";
+const char* password = "qwertyuiop";
+const char* mqtt_server = "192.168.0.10";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
@@ -20,12 +19,18 @@ PubSubClient client(wifiClient);
 
 bool activate = false;
 
-const int watering_pin = 2;
+const int period = 300000;
+
+const int watering_pin = 5;
+
+const int esp_status_pin = 2;
 
 void setup() {
   Serial.begin(112500);
-
+  pinMode(esp_status_pin, OUTPUT);                        //set pin to input
+  digitalWrite(esp_status_pin, HIGH);
   pinMode(watering_pin, OUTPUT);      // set the LED pin mode
+  digitalWrite(watering_pin, HIGH);
   Serial.setTimeout(500);// Set time out for
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
@@ -86,47 +91,51 @@ void callback(char* topic, byte *payload, unsigned int length) {
   if (error)
     return;
   activate = doc["activate"];
-  if(activate){
+  if (activate) {
     turnOnWatering();
   } else {
     turnOffWatering();
   }
+  String response;
+  response += F("{\"action\": \"update/watering_status\"");
+  response += F(",\"espId\":");
+  response += String(MQTT_SERIAL_RECEIVER_CH);
+  response += F(",\"activate\":");
+  response += String(activate);
+  response += F("}");
+  publishSerialData(response);
 }
 
-void turnOnWatering(){
-  digitalWrite(watering_pin,LOW);
-//  String updateData;
-//  updateData += F("{\"action\": \"update/dehumidifier\"");
-//  updateData += F(",\"activate\":");
-//  updateData += String(activate);
-//  updateData += F("}");
-//  publishSerialData(updateData);
+void turnOnWatering() {
+  digitalWrite(watering_pin, LOW);
+  delay(500);
 }
 
-void turnOffWatering(){
-  digitalWrite(watering_pin,HIGH);
-//  String updateData;
-//  updateData += F("{\"action\": \"update/dehumidifier\"");
-//  updateData += F(",\"activate\":");
-//  updateData += String(activate);
-//  updateData += F("}");
-//  publishSerialData(updateData);
+void turnOffWatering() {
+  digitalWrite(watering_pin, HIGH);
+  delay(500);
 }
 
 void publishSerialData(String serialData) {
   if (!client.connected()) {
     reconnect();
   }
-  int str_len = serialData.length() + 1; 
-  
-  // Prepare the character array (the buffer) 
+  int str_len = serialData.length() + 1;
+
   char char_array[str_len];
-  
-  // Copy it over 
+
   serialData.toCharArray(char_array, str_len);
   client.publish(MQTT_SERIAL_PUBLISH_CH, char_array);
 }
 
 void loop() {
   client.loop();
+  check_status();
+}
+
+void check_status() {
+  digitalWrite(esp_status_pin, HIGH);
+  delay(500);
+  digitalWrite(esp_status_pin, LOW);
+  delay(500);
 }
