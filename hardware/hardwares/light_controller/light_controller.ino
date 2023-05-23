@@ -6,24 +6,24 @@
 DynamicJsonDocument doc(1024);
 
 // Update these with values suitable for your network.
-const char* ssid = "PD_LAPTOP";
-const char* password = "012345679";
-const char* mqtt_server = "192.168.1.158";
+const char* ssid = "dlink-7F78";
+const char* password = "qwertyuiop";
+const char* mqtt_server = "192.168.0.10";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
 #define MQTT_SERIAL_PUBLISH_CH "python/mqtt"
 #define MQTT_SERIAL_RECEIVER_CH "7"
 
-const int esp_status_pin = 2;
-
 WiFiClient wifiClient;
 
 PubSubClient client(wifiClient);
 
+const int esp_status_pin = 2;
+
 float T = 0.115;
 int UVPin = 23;
-int IRPin = 2;
+int IRPin = 5;
 int NLPin = 4;
 Servo UVs;
 Servo IRs;
@@ -35,6 +35,29 @@ int currentNL = 0;
 
 bool currentState = 1;
 
+int testPin = 21;
+
+//modify angle here, not 30 degree but around 45 degree is better i guess
+////for id = 8
+////left maybe 220-250
+//int lUVangle = 200;
+//int lIRangle = 220;
+//int lNLangle = 220;
+////right maybe 150-200
+//int rUVangle = 160;
+//int rIRangle = 160;
+//int rNLangle = 150;
+
+//for id = 7
+//left maybe 220-250
+int lUVangle = 250;
+int lIRangle = 230;
+int lNLangle = 225;
+//right maybe 150-200
+int rUVangle = 180;
+int rIRangle = 160;
+int rNLangle = 160;
+
 struct Result{
   int moveUV;
   int moveIR;
@@ -44,17 +67,17 @@ struct Result{
   int cNL;
 };
 
+Result val;
+
 void setup() {
-  Serial.begin(9600);
-  pinMode(esp_status_pin, OUTPUT);
-  digitalWrite(esp_status_pin, HIGH);
+  Serial.begin(115200);
   UVs.attach(UVPin);
   IRs.attach(IRPin);
   NLs.attach(NLPin);
-
-//  moveServo(100, 0, 100, 1);
-//  moveServo(0, 0, 0, 1);
-
+  pinMode(testPin, OUTPUT);
+  digitalWrite(testPin, HIGH);
+  pinMode(esp_status_pin, OUTPUT);
+  digitalWrite(esp_status_pin, HIGH);
   Serial.setTimeout(500);// Set time out for
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
@@ -64,12 +87,15 @@ void setup() {
 
 void loop() {
   client.loop();
-  digitalWrite(esp_status_pin, HIGH);
-  delay(100);
-  digitalWrite(esp_status_pin, LOW);
-  delay(100);
+  check_status();
 }
 
+void check_status() {
+  digitalWrite(esp_status_pin, HIGH);
+  delay(500);
+  digitalWrite(esp_status_pin, LOW);
+  delay(500);
+}
 
 void setup_wifi() {
   delay(10);
@@ -124,11 +150,12 @@ void callback(char* topic, byte *payload, unsigned int length) {
   if (error)
     return;
   bool activate = doc["activate"];
+  bool testMode = doc["testMode"];
   int UVp = doc["uv_percent"];
   int IRp = doc["ir_percent"];
   int NLp = doc["natural_percent"];
 
-  moveServo(UVp, IRp, NLp, activate);
+  moveServo(UVp, IRp, NLp, activate, testMode);
 }
 
 void publishSerialData(String serialData) {
@@ -149,7 +176,7 @@ int getPos(int pos){
   switch(pos){
     case 0:
       return 0;
-    case 15:
+    case 10:
       return 1;
       break;
     case 20:
@@ -179,19 +206,49 @@ int getPos(int pos){
     case 100:
       return 10;
       break;
+    case -10:
+      return -1;
+      break;
+    case -20:
+      return -2;
+      break;
+    case -30:
+      return -3;
+      break;
+    case -40:
+      return -4;
+      break;
+    case -50:
+      return -5;
+      break;
+    case -60:
+      return -6;
+      break;
+    case -70:
+      return -7;
+      break;
+    case -80:
+      return -8;
+      break;
+    case -90:
+      return -9;
+      break;    
+    case -100:
+      return -10;
+      break;
   }
 }
 
 void turnOn(){
-  turnR(currentUV, 1, currentUV);
-  turnR(currentIR, 2, currentIR);
-  turnR(currentNL, 3, currentNL);
+  turnR(0, 1, currentUV);
+  turnR(0, 2, currentIR);
+  turnR(0, 3, currentNL);
 }
 
 void turnOff(){
-  turnL(0, 1, currentUV);
-  turnL(0, 2, currentIR);
-  turnL(0, 3, currentNL);
+  turnL(currentUV, 1, currentUV);
+  turnL(currentIR, 2, currentIR);
+  turnL(currentNL, 3, currentNL);
 }
 
 
@@ -219,32 +276,32 @@ void turnR(int pos, int lightType, int count){
   Serial.println(count);
   Serial.println("----------------------------------");
   for (int counts = 0; counts < count; counts++){
-//    Serial.println("right");
-//    Serial.println(lightType);
-//    Serial.println(pos); 
+    Serial.println("right");
+    Serial.println(lightType);
+    Serial.println(pos); 
     if(pos <= 10 && pos >= 0){
       switch(lightType){
         case 1:
           UVs.write(100);
-          delay(150);
+          delay(200);
           UVs.write(180);
-          delay(150);
+          delay(rUVangle);
           UVs.write(90);
           delay(1500);
           break;
         case 2:
           IRs.write(100);
-          delay(150);
+          delay(200);
           IRs.write(180);
-          delay(0.15 * 1000);
+          delay(rIRangle);
           IRs.write(90);
           delay(1500);
           break;
         case 3:
           NLs.write(100);
-          delay(150);
+          delay(200);
           NLs.write(180);
-          delay(0.15 * 1000);
+          delay(rNLangle);
           NLs.write(90);
           delay(1500);
           break;
@@ -261,28 +318,28 @@ void turnL(int pos, int lightType, int count){
     Serial.println(count);
     Serial.println("----------------------------------");
     for (int counts = 0; counts < count; counts++){
-//      Serial.println("left");
-//      Serial.println(lightType); 
-//      Serial.println(pos); 
+      Serial.println("left");
+      Serial.println(lightType); 
+      Serial.println(pos); 
       if(pos <= 10 && pos >= 0){
         
         switch(lightType){
           case 1:
  
             UVs.write(1);
-            delay(0.17 * 1000);
+            delay(rUVangle);
             UVs.write(90);
             delay(1500);
             break;
           case 2:
             IRs.write(1);
-            delay(0.17 * 1000);
+            delay(rIRangle);
             IRs.write(90);
             delay(1500);
             break;
           case 3:
             NLs.write(1);
-            delay(0.17 * 1000);
+            delay(rNLangle);
             NLs.write(90);
             delay(1500);
             break;
@@ -294,19 +351,56 @@ void turnL(int pos, int lightType, int count){
 }
 
 
-void moveServo(int UV, int IR, int NL, bool isActivate){
+void moveServo(int UV, int IR, int NL, bool isActivate, bool testMode){
   Serial.println("-----------------------------------");
   Serial.println("moveServo");
+  Serial.print("UV:");
   Serial.println(UV);
+  Serial.print("IR:");
   Serial.println(IR);
+  Serial.print("NL:");
   Serial.println(NL);
   Serial.println(isActivate);
   Serial.println("-----------------------------------");
-  if(isActivate){
+  if(testMode){
+    
+    if(getPos(UV) >= 1){
+      turnR(0, 1, getPos(UV)); 
+    }
+    else if(getPos(UV) < 0){
+      turnL(10, 1, -getPos(UV));
+    }
+  
+    if(getPos(IR) >= 1){
+      //Serial.println("moved by : " + val.moveIR);  
+      turnR(0, 2, getPos(IR));   
+      
+    }
+    else if(getPos(IR) < 0){
+      //Serial.println("-moved by : " + val.moveUV);
+      turnL(10, 2, getPos(IR));
+    }
+  
+    if(getPos(NL) >= 1){
+      //Serial.println("moved by : " + val.moveNL);  
+      turnR(0, 3, getPos(NL));   
+      
+    }
+    else if(getPos(NL) < 0){
+      //Serial.println("-moved by : " + val.moveUV);
+      turnL(10, 3, getPos(NL));
+    }
+  }
+  else{
+    if(isActivate){
+    
+    Result val = translate(UV, IR, NL);  
+    
     if(!currentState){
       turnOn();
+      currentState = 1;
+      Serial.println("turn on");
     }
-    Result val = translate(UV, IR, NL);
     if(val.moveUV >= 1){
       turnR(currentUV, 1, val.moveUV); 
     }
@@ -339,23 +433,24 @@ void moveServo(int UV, int IR, int NL, bool isActivate){
   }
   else if(!isActivate){
     turnOff();
+    currentState = 0;
+    Serial.println("turn off");
   }
-//  Serial.println("-----------------------------");
-//  Serial.println(currentUV);
-//  Serial.println(currentIR);
-//  Serial.println(currentNL);
-//  Serial.println("-----------------------------");
-  
+  Serial.println("-----------------------------");
+  Serial.print("current UV:");
+  Serial.println(currentUV);
+  Serial.print("current IR:");
+  Serial.println(currentIR);
+  Serial.print("current NL:");
+  Serial.println(currentNL);
+  Serial.println("-----------------------------");
+
+  }
+    
   String message;
   message += F("{\"action\": \"update/light\"");
   message += F(",\"espId\":");
   message += String(MQTT_SERIAL_RECEIVER_CH);
-  message += F(",\"uv_percent\":");
-  message += String(UV);
-  message += F(",\"ir_percent\":");
-  message += String(IR);
-  message += F(",\"natural_percent\":");
-  message += String(NL);
   message += F(",\"activate\":");
   message += String(isActivate);
   message += F("}");

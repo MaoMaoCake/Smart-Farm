@@ -5,9 +5,9 @@
 DynamicJsonDocument doc(1024);
 
 // Update these with values suitable for your network.
-const char* ssid = "PD_LAPTOP";
-const char* password = "012345679";
-const char* mqtt_server = "192.168.137.250";
+const char* ssid = "dlink-7F78";
+const char* password = "qwertyuiop";
+const char* mqtt_server = "192.168.0.10";
 #define mqtt_port 1883
 #define MQTT_USER "admin"
 #define MQTT_PASSWORD "password"
@@ -20,13 +20,19 @@ PubSubClient client(wifiClient);
 
 bool activate = false;
 
-const int dehumidifier_pin = 2;
+const int dehumidifier_pin = 5;
+const int esp_status_pin = 2;
+
+bool used_by_user = false;
+bool turn_on_status = false;
 
 void setup() {
   Serial.begin(115200);
 
   pinMode(dehumidifier_pin, OUTPUT);      // set the LED pin mode
-  digitalWrite(dehumidifier_pin,HIGH);
+  pinMode(esp_status_pin, OUTPUT);
+  digitalWrite(esp_status_pin, HIGH);
+  digitalWrite(dehumidifier_pin, HIGH);
   Serial.setTimeout(500);// Set time out for
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
@@ -87,15 +93,27 @@ void callback(char* topic, byte *payload, unsigned int length) {
   if (error)
     return;
   activate = doc["activate"];
-  if(activate){
-    turnOnDehumidifier();
+  bool action_by_user = doc["action_by_user"];
+  if (!turn_on_status) {
+    if (action_by_user && activate) {
+      turnOnDehumidifier();
+      turn_on_status = true;
+      used_by_user = true;
+    } else if (!used_by_user && activate){
+      turnOnDehumidifier();
+      turn_on_status = true;
+    }
   } else {
-    turnOffDehumidifier();
+    if ((action_by_user && !activate) || (!used_by_user && !activate)) {
+      turnOffDehumidifier();
+      turn_on_status = false;
+      used_by_user = false;
+    }
   }
 }
 
-void turnOnDehumidifier(){
-  digitalWrite(dehumidifier_pin,LOW);
+void turnOnDehumidifier() {
+  digitalWrite(dehumidifier_pin, LOW);
   String updateData;
   updateData += F("{\"action\": \"update/dehumidifier\"");
   updateData += F(",\"activate\":");
@@ -106,8 +124,8 @@ void turnOnDehumidifier(){
   publishSerialData(updateData);
 }
 
-void turnOffDehumidifier(){
-  digitalWrite(dehumidifier_pin,HIGH);
+void turnOffDehumidifier() {
+  digitalWrite(dehumidifier_pin, HIGH);
   String updateData;
   updateData += F("{\"action\": \"update/dehumidifier\"");
   updateData += F(",\"activate\":");
@@ -122,16 +140,24 @@ void publishSerialData(String serialData) {
   if (!client.connected()) {
     reconnect();
   }
-  int str_len = serialData.length() + 1; 
-  
-  // Prepare the character array (the buffer) 
+  int str_len = serialData.length() + 1;
+
+  // Prepare the character array (the buffer)
   char char_array[str_len];
-  
-  // Copy it over 
+
+  // Copy it over
   serialData.toCharArray(char_array, str_len);
   client.publish(MQTT_SERIAL_PUBLISH_CH, char_array);
 }
 
 void loop() {
   client.loop();
+  check_status();
+}
+
+void check_status() {
+  digitalWrite(esp_status_pin, HIGH);
+  delay(1000);
+  digitalWrite(esp_status_pin, LOW);
+  delay(1000);
 }
