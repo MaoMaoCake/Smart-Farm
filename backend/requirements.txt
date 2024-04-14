@@ -16,7 +16,7 @@ google-auth==2.17.1
 google-auth-oauthlib==1.0.0
 h11==0.14.0
 icalendar==5.0.4
-idna==3.4
+idna==3.7
 Mako==1.2.4
 MarkupSafe==2.1.2
 oauthlib==3.2.2
@@ -69,7 +69,7 @@ google-auth==2.17.1
 google-auth-oauthlib==1.0.0
 h11==0.14.0
 icalendar==5.0.4
-idna==3.4
+idna==3.7
 itsdangerous==2.1.2
 Mako==1.2.4
 MarkupSafe==2.1.2
