@@ -27,7 +27,7 @@ pyasn1-modules==0.2.8
 pycparser==2.21
 pydantic==1.10.4
 pymongo==4.3.3
-PyMySQL==1.0.2
+PyMySQL==1.1.1
 python-dateutil==2.8.2
 python-dotenv==0.21.1
 python-http-client==3.3.7
@@ -81,7 +81,7 @@ pyasn1-modules==0.2.8
 pycparser==2.21
 pydantic==1.10.4
 pymongo==4.3.3
-PyMySQL==1.0.2
+PyMySQL==1.1.1
 python-dateutil==2.8.2
 python-dotenv==0.21.1
 python-http-client==3.3.7
