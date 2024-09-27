@@ -1,4 +1,4 @@
-FROM node:19.4-bullseye-slim AS build
+FROM node:19.7-bullseye-slim AS build
 
 # install dependencies
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # only copy the build app
-FROM node:19.4-bullseye-slim
+FROM node:19.7-bullseye-slim
 
 WORKDIR /app
 
