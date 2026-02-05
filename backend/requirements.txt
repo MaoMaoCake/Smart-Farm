@@ -21,7 +21,7 @@ Mako==1.2.4
 MarkupSafe==2.1.2
 oauthlib==3.2.2
 passlib==1.7.4
-protobuf==3.20.3
+protobuf==6.33.5
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
@@ -75,7 +75,7 @@ Mako==1.2.4
 MarkupSafe==2.1.2
 oauthlib==3.2.2
 passlib==1.7.4
-protobuf==3.20.3
+protobuf==6.33.5
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
